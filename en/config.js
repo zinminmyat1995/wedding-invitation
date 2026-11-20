@@ -27,7 +27,7 @@ window.WEDDING_EN = {
 
   // Where quiz answers are saved (Google Apps Script web-app URL — see tools/quiz-sheet.gs).
   // Leave empty and answers are only kept on each guest's own phone.
-  quizEndpoint: "",
+  quizEndpoint: "https://script.google.com/macros/s/AKfycbyBGdHECqsguR8mvwAern6JRb7bN21ge0L2Nn6rPPjFvbkNXwGIgHqHpOUgBy2u8ENovg/exec",
 
   // Fun Quiz — "answer" is the index (0-3) of the correct option
   quiz: {
