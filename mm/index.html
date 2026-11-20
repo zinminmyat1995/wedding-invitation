@@ -216,15 +216,9 @@
         <div class="tp-chrome"></div>
         <p class="p5-title" id="p5Title"></p>
         <p class="p5-addr" id="p5Addr"></p>
-        <a class="p5-photo" id="p5Photo" target="_blank" rel="noopener" aria-label="ခန်းမ ဓာတ်ပုံ"></a>
-        <svg class="p5-route" viewBox="0 0 941 1672" aria-hidden="true">
-          <path id="routePath" d="M190 1150 C 236 1152, 252 1120, 298 1122 C 344 1124, 356 1152, 398 1138 C 428 1128, 442 1104, 458 1100" fill="none" stroke="#fff6c8" stroke-width="7" stroke-linecap="round"/>
-          <circle class="route-dot" r="9" fill="#fffbe6"><animateMotion dur="2.6s" repeatCount="indefinite" rotate="auto"><mpath href="#routePath"/></animateMotion></circle>
-          <circle class="pin-ripple r1" cx="458" cy="1100" r="10" fill="none" stroke="#e53935" stroke-width="4"/>
-          <circle class="pin-ripple r2" cx="458" cy="1100" r="10" fill="none" stroke="#e53935" stroke-width="4"/>
-        </svg>
-        <a class="p5-map" id="p5Map" target="_blank" rel="noopener" aria-label="မြေပုံ ဖွင့်ရန်"></a>
-        <a class="p5-btn pb5-1" id="p5Dir" target="_blank" rel="noopener"><span class="p5-btn-label" id="p5DirLabel"></span></a>
+        <a class="p5-photo" id="p5Photo" target="_blank" rel="noopener" aria-label="Royal Myeik Hotel"><img src="../assets/img/venue-hotel.jpg" alt="Royal Myeik Hotel"></a>
+        <a class="p5-map" id="p5Map" target="_blank" rel="noopener" aria-label="မြေပုံ ဖွင့်ရန်"><span class="p5-map-frame"></span></a>
+        <button class="p5-btn pb5-1" id="p5Dir" type="button"><span class="p5-btn-label" id="p5DirLabel"></span></button>
         <a class="p5-btn pb5-2" id="p5Gmap" target="_blank" rel="noopener"><span class="p5-btn-label" id="p5GmapLabel"></span></a>
         <div class="butterflies" aria-hidden="true"></div>
       </div>
@@ -312,6 +306,70 @@
       <li><button type="button" data-go="p7"><span>🙏</span>ကျေးဇူးတင်လွှာ</button></li>
     </ul>
   </nav>
+
+  <!-- ============ VENUE GUIDE : "wedding boarding pass" ============ -->
+  <div class="guide" id="guide" role="dialog" aria-modal="true" aria-labelledby="gdTitle" aria-hidden="true">
+    <div class="gd-backdrop" data-gclose></div>
+    <div class="gd-ticket" id="gdTicket">
+      <button class="gd-close" type="button" data-gclose aria-label="ပိတ်ရန်">✕</button>
+
+      <!-- top: hotel photo + logo -->
+      <div class="gd-hero">
+        <img class="gd-hero-img" src="../assets/img/venue-hotel.jpg" alt="Royal Myeik Hotel">
+        <img class="gd-logo" src="../assets/img/venue-hotel-logo.jpg" alt="">
+        <span class="gd-hero-shine" aria-hidden="true"></span>
+      </div>
+
+      <p class="gd-kicker">✦ မင်္ဂလာ ခရီးလက်မှတ် ✦</p>
+      <h3 class="gd-title" id="gdTitle"></h3>
+
+      <!-- from → to with a flying heart on a golden route -->
+      <div class="gd-route">
+        <div class="gd-end"><span class="gd-code">သင့်ထံ</span><span class="gd-sub">ကျွန်ုပ်နေရာ</span></div>
+        <svg class="gd-path" viewBox="0 0 200 60" aria-hidden="true">
+          <path id="gdArc" d="M8 46 Q100 -14 192 46" fill="none" stroke="url(#goldGrad)" stroke-width="2.4" stroke-dasharray="5 6"/>
+          <g class="gd-flyer"><path d="M0 4 C-6 -2 -9 -6 -5 -9 C-2 -11 0 -9 0 -7 C0 -9 2 -11 5 -9 C9 -6 6 -2 0 4Z" fill="#c0392b"/>
+            <animateMotion dur="3.2s" repeatCount="indefinite" rotate="0" keyPoints="0;1" keyTimes="0;1" calcMode="spline" keySplines=".45 0 .55 1"><mpath href="#gdArc"/></animateMotion></g>
+          <circle cx="8" cy="46" r="4" fill="#b8862b"/><circle cx="192" cy="46" r="5" fill="#8f1d1d"/>
+        </svg>
+        <div class="gd-end gd-to"><span class="gd-code">RM</span><span class="gd-sub" id="gdToName"></span></div>
+      </div>
+
+      <div class="gd-fields">
+        <div><span>ရက်စွဲ</span><b id="gdDate"></b></div>
+        <div><span>ခန်းမ</span><b id="gdHall"></b></div>
+        <div class="wide"><span>အချိန်</span><b id="gdTime"></b></div>
+        <div class="wide"><span>လိပ်စာ</span><b id="gdAddr"></b></div>
+      </div>
+
+      <div class="gd-tear" aria-hidden="true"></div>
+
+      <!-- stub: live golden compass -->
+      <div class="gd-stub">
+        <div class="gd-compass" id="gdCompass" aria-hidden="true">
+          <div class="gd-dial" id="gdDial">
+            <span class="n">မြောက်</span><span class="e">အရှေ့</span><span class="s">တောင်</span><span class="w">အနောက်</span>
+          </div>
+          <div class="gd-needle" id="gdNeedle"><i></i></div>
+          <span class="gd-hub"></span>
+        </div>
+        <div class="gd-info">
+          <p class="gd-dist" id="gdDist">—</p>
+          <p class="gd-hint" id="gdHint"></p>
+          <button class="gd-locate" type="button" id="gdLocate">📡 ကျွန်ုပ်နေရာမှ တွက်ချက်မည်</button>
+        </div>
+      </div>
+
+      <div class="gd-actions">
+        <a class="gd-btn gold" id="gdGo" target="_blank" rel="noopener">🧭 လမ်းကြောင်း စတင်မည်</a>
+        <div class="gd-row">
+          <a class="gd-btn" id="gdCall1"></a>
+          <a class="gd-btn" id="gdCall2"></a>
+        </div>
+        <button class="gd-btn ghost" type="button" id="gdCopy">📋 လိပ်စာ ကူးယူမည်</button>
+      </div>
+    </div>
+  </div>
 
   <!-- silk curtain (between page groups) -->
   <div class="curtain" id="curtain" aria-hidden="true">

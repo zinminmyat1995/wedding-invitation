@@ -79,9 +79,15 @@ window.WEDDING = {
   // ⑦ Page 5 — ကျင်းပမည့် နေရာ
   page5: {
     title: "မင်္ဂလာ နေရာ",   // အပေါ်ဆုံး ခေါင်းစဉ်
-    name: "Royal Myeik Ballroom",
-    address: "Royal Myeik Ballroom\nကြံတောရပ်၊ မြိတ်မြို့။",   // \n = စာကြောင်းခွဲ
-    mapQuery: "Royal Myeik Hotel, Myeik, Myanmar",   // Google Maps မှာ ရှာမယ့်စာ
+    name: "Royal Myeik Hotel",
+    hall: "Ballroom",
+    address: "Royal Myeik Hotel (Ballroom)\nအမှတ် ၁၄၄/(က)၊ ကြံတောလမ်း၊\nကန်ဖျားရပ်၊ မြိတ်မြို့။",   // \n = စာကြောင်းခွဲ
+    mapQuery: "Royal Myeik Hotel, Myeik",   // Google Maps မှာ ရှာမယ့်စာ
+    // ဟိုတယ်ရဲ့ တည်နေရာ — Google Maps မှာ ဟိုတယ်ကို ဖိထားရင် ပေါ်လာတဲ့ ဂဏန်း ၂ ခု (ဥပမာ 12.44, 98.60)
+    // ထည့်ထားရင် လမ်းညွှန်လက်မှတ်မှာ အကွာအဝေးနဲ့ သံလိုက်အိမ်မြှောင် အလုပ်လုပ်မယ်
+    lat: null,
+    lng: null,
+    phones: ["09881166595", "09684440736"],
     dirLabel: "နေရာသို့ လမ်းညွှန်",
     mapLabel: "Google Map ဖြင့် ကြည့်ရန်",
   },

@@ -87,15 +87,14 @@
     li.querySelector(".p4-desc").textContent = P4.items[i].title;
   });
 
-  const q = encodeURIComponent(P5.mapQuery || "");
+  const q = encodeURIComponent(typeof P5.lat === "number" && typeof P5.lng === "number" ? `${P5.lat},${P5.lng}` : (P5.mapQuery || ""));
   const mapSearch = `https://www.google.com/maps/search/?api=1&query=${q}`;
   const mapDir = `https://www.google.com/maps/dir/?api=1&destination=${q}`;
   setText("p5Title", P5.title);
   setText("p5Addr", P5.address);
   setText("p5DirLabel", P5.dirLabel);
   setText("p5GmapLabel", P5.mapLabel);
-  $("#p5Dir").href = mapDir;
-  $("#p5Map").href = mapDir;
+  $("#p5Map").href = mapSearch;
   $("#p5Gmap").href = mapSearch;
   $("#p5Photo").href = mapSearch;
 
@@ -153,9 +152,11 @@
     fadedOut = true;
     fadeAudio(0, ms, () => { if (fadedOut) audio.pause(); });
   }
-  function musicFadeIn() {
-    if (!fadedOut || musicMode !== "file" || userPaused) return;
+  function musicFadeIn(restart) {
+    if (musicMode !== "file" || userPaused) return;
+    if (!fadedOut && !restart) return;
     fadedOut = false;
+    if (restart) { fadeToken++; audio.volume = 0; audio.currentTime = 0; }   // start the song again from the top
     audio.play().then(() => fadeAudio(MUSIC_VOL, 2500)).catch(() => {});
   }
   function startSynth() {
@@ -446,19 +447,35 @@
     }
     if (name === "p2") setTimeout(() => sparkleAt(".p2-rings"), (delay + 1.9) * 1000);
     if (name === "p3") setTimeout(() => sparkleAt(".p3-heart"), (delay + 1.8) * 1000);
-    if (name === "p5") setTimeout(() => sparkleAt(".p5-route", 0.485, 0.672), (delay + 2.6) * 1000);
+    if (name === "p5") { window.__loadVenueMap && window.__loadVenueMap(); setTimeout(() => sparkleAt(".p5-map"), (delay + 2.2) * 1000); }
     if (name === "p6") { autoplay(false); setTimeout(() => current === "p6" && autoplay(true), (delay + 3) * 1000); }
     if (name === "p8") {
       const st = p.querySelector(".art-stage");
-      setTimeout(() => current === "p8" || busy ? musicFadeOut(5000) : 0, (delay + 0.6) * 1000);   // as the doors start to swing shut
+      // the thank-you letter we just left is shown inside the open doorway,
+      // so the camera can pull back out of it before the doors close
+      const hall = p.querySelector(".p8-hall");
+      hall.querySelectorAll(".p8-scene").forEach((n) => n.remove());
+      const src = $("#p7Stage");
+      if (src) {
+        const scene = document.createElement("div");
+        scene.className = "p8-scene page-p7";
+        const clone = src.cloneNode(true);
+        clone.removeAttribute("id");
+        clone.querySelectorAll("[id]").forEach((n) => n.removeAttribute("id"));
+        clone.querySelectorAll(".butterflies, button").forEach((n) => n.remove());
+        clone.setAttribute("aria-hidden", "true");
+        scene.appendChild(clone);
+        hall.appendChild(scene);
+      }
+      setTimeout(() => current === "p8" || busy ? musicFadeOut(5000) : 0, (delay + 2.5) * 1000);   // as the doors start to swing shut
       setTimeout(() => {               // the moment the two leaves meet
         st.classList.remove("shake"); void st.offsetWidth; st.classList.add("shake");
         if (navigator.vibrate) navigator.vibrate([35, 40, 70]);
         const s = p.querySelector(".p8-seam").getBoundingClientRect();
         burst(s.left + s.width / 2, s.bottom - 10, 50);
         burst(s.left + s.width / 2, s.top + s.height * 0.4, 30);
-      }, (delay + 2.08) * 1000);
-      setTimeout(() => sparkleAt(".p8-plaque"), (delay + 3.3) * 1000);
+      }, (delay + 3.65) * 1000);
+      setTimeout(() => sparkleAt(".p8-plaque"), (delay + 4.5) * 1000);
     }
   }
   function sparkleAt(sel, fx = 0.5, fy = 0.5) {
@@ -545,7 +562,7 @@
     const p8 = pages.p8, home = pages.home;
     if (reduceMotion) { p8.classList.remove("active"); home.classList.add("active"); settle("home"); return; }
     p8.classList.add("reopen");
-    musicFadeIn();                     // doors swing open again → the song returns
+    musicFadeIn(true);                 // doors swing open again → the song starts over
     gust(true);
     setTimeout(() => p8.classList.add("walk"), 500);
     setTimeout(() => { fx.className = "fx"; void fx.offsetWidth; fx.className = "fx white"; }, 1250);
@@ -570,10 +587,10 @@
     if (inBook(fromName) && inBook(toName)) turn(fromName, toName);
     else if (tabHop) cube(fromName, toName);
     else if (pair === "p6-p7") overlayFx("bloom", fromName, toName, 1700, 720);
-    else if (pair === "p7-p8") overlayFx("iris", fromName, toName, 1900, 900);
+    else if (pair === "p7-p8") { pages[fromName].classList.remove("active"); pages[toName].classList.add("active"); enterFx(toName, 0); setTimeout(() => settle(toName), 300); }   // straight cut: doors already open, they start closing at once
     else if (fromName === "p8" && toName === "home") portalHome();
     else curtainTo(fromName, toName);
-    if (fromEl) { const o = originOf(fromEl); ringAt(o.x, o.y); }
+    if (fromEl && pair !== "p7-p8") { const o = originOf(fromEl); ringAt(o.x, o.y); }
     if (fromName === "p8" && toName === "home") { stack.length = 0; stack.push("home"); history.pushState({ page: "home" }, "", location.pathname + location.search); return; }
     if (!push) return;
     const url = toName === "home" ? location.pathname + location.search : `#${toName}`;
@@ -701,6 +718,126 @@
       if (sx === null) return;
       const dx = e.changedTouches[0].clientX - sx; sx = null;
       if (Math.abs(dx) > 45) userNav(() => showPhoto(gi + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1));
+    });
+  }
+
+  /* ============================================================
+     6c. VENUE — real map + "wedding boarding pass" guide
+  ============================================================ */
+  {
+    const hasLL = typeof P5.lat === "number" && typeof P5.lng === "number";
+    const dest = hasLL ? `${P5.lat},${P5.lng}` : (P5.mapQuery || "");
+    const mapEmbed = `https://maps.google.com/maps?q=${encodeURIComponent(dest)}&z=16&hl=my&output=embed`;
+    const goUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dest)}&travelmode=driving`;
+
+    // real map inside the drawn frame (loaded once the page is first shown)
+    const mapBox = $("#p5Map");
+    let mapLoaded = false;
+    window.__loadVenueMap = () => {
+      if (mapLoaded) return; mapLoaded = true;
+      const f = document.createElement("iframe");
+      f.src = mapEmbed; f.title = P5.name || "map"; f.loading = "lazy";
+      f.referrerPolicy = "no-referrer-when-downgrade";
+      mapBox.prepend(f);
+    };
+
+    // ---- guide overlay ----
+    const guide = $("#guide"), needle = $("#gdNeedle"), dial = $("#gdDial");
+    const distEl = $("#gdDist"), hintEl = $("#gdHint"), locBtn = $("#gdLocate");
+    const mm = (n) => String(n).replace(/\d/g, (d) => "၀၁၂၃၄၅၆၇၈၉"[d]);
+    setText("gdTitle", P5.name);
+    setText("gdToName", P5.name);
+    setText("gdDate", (W.page4 && W.page4.items && W.page4.items[0] && W.page4.items[0].title) || "");
+    setText("gdTime", (W.home && W.home.cardTime) ? `${W.home.cardTime} ${W.home.cardTimeSub || ""}`.trim() : "");
+    setText("gdHall", P5.hall || "");
+    setText("gdAddr", (P5.address || "").split("\n").slice(1).join(" "));
+    $("#gdGo").href = goUrl;
+    const phones = P5.phones || [];
+    ["gdCall1", "gdCall2"].forEach((id, i) => {
+      const a = $("#" + id);
+      if (!phones[i]) { a.remove(); return; }
+      a.href = `tel:${phones[i]}`;
+      a.textContent = `📞 ${phones[i].replace(/^(\d{2})(\d{3})(\d{3})(\d+)$/, "$1 $2 $3 $4")}`;
+    });
+    hintEl.textContent = hasLL ? "ခလုတ်နှိပ်ပြီး ဟိုတယ်ရှိရာ ဦးတည်ချက်ကို ကြည့်ပါ" : "ဟိုတယ်သို့ ဖုန်းဆက်၍လည်း မေးမြန်းနိုင်ပါသည်";
+    if (!hasLL) { locBtn.hidden = true; distEl.textContent = "မြိတ်မြို့"; }
+
+    let lastFocus = null;
+    function openGuide(fromEl) {
+      lastFocus = fromEl || document.activeElement;
+      const r = (fromEl || document.body).getBoundingClientRect();
+      guide.style.setProperty("--gx", `${r.left + r.width / 2}px`);
+      guide.style.setProperty("--gy", `${r.top + r.height / 2}px`);
+      guide.classList.add("open");
+      guide.setAttribute("aria-hidden", "false");
+      burst(r.left + r.width / 2, r.top + r.height / 2, 30);
+      setTimeout(() => guide.querySelector(".gd-close").focus({ preventScroll: true }), 600);
+    }
+    function closeGuide() {
+      guide.classList.remove("open");
+      guide.setAttribute("aria-hidden", "true");
+      stopCompass();
+      if (lastFocus) lastFocus.focus({ preventScroll: true });
+    }
+    $("#p5Dir").addEventListener("click", (e) => openGuide(e.currentTarget));
+    guide.addEventListener("click", (e) => { if (e.target.closest("[data-gclose]")) closeGuide(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && guide.classList.contains("open")) { e.stopImmediatePropagation(); closeGuide(); } }, true);
+
+    $("#gdCopy").addEventListener("click", async () => {
+      try { await navigator.clipboard.writeText(`${P5.name}\n${(P5.address || "").replace(/\n/g, " ")}`); toast("📋 လိပ်စာ ကူးယူပြီးပါပြီ"); }
+      catch { toast("ကူးယူ၍ မရပါ"); }
+    });
+
+    // ---- compass: bearing from the guest to the hotel, turned by the phone's heading ----
+    let bearing = null, heading = 0, watchId = null, orientOn = false;
+    const toRad = (d) => d * Math.PI / 180, toDeg = (r) => r * 180 / Math.PI;
+    function calc(lat1, lng1) {
+      const φ1 = toRad(lat1), φ2 = toRad(P5.lat), Δλ = toRad(P5.lng - lng1), Δφ = φ2 - φ1;
+      const a = Math.sin(Δφ / 2) ** 2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) ** 2;
+      const km = 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      const y = Math.sin(Δλ) * Math.cos(φ2), x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+      return { km, brg: (toDeg(Math.atan2(y, x)) + 360) % 360 };
+    }
+    function paint() {
+      dial.style.transform = `rotate(${-heading}deg)`;
+      if (bearing !== null) needle.style.transform = `rotate(${bearing - heading}deg)`;
+    }
+    function onOrient(e) {
+      const h = typeof e.webkitCompassHeading === "number" ? e.webkitCompassHeading
+        : (e.absolute && typeof e.alpha === "number" ? 360 - e.alpha : null);
+      if (h === null) return;
+      heading = h; paint();
+    }
+    function stopCompass() {
+      if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+      if (orientOn) { removeEventListener("deviceorientationabsolute", onOrient); removeEventListener("deviceorientation", onOrient); orientOn = false; }
+    }
+    locBtn.addEventListener("click", async () => {
+      if (!hasLL || !navigator.geolocation) return;
+      // iOS asks permission for the compass inside the tap
+      try {
+        if (typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function") {
+          await DeviceOrientationEvent.requestPermission();
+        }
+      } catch (e) {}
+      if (!orientOn) { addEventListener("deviceorientationabsolute", onOrient); addEventListener("deviceorientation", onOrient); orientOn = true; }
+      distEl.textContent = "…"; hintEl.textContent = "တည်နေရာ ရှာနေသည်";
+      $("#gdCompass").classList.add("seeking");
+      watchId = navigator.geolocation.watchPosition((pos) => {
+        const { km, brg } = calc(pos.coords.latitude, pos.coords.longitude);
+        bearing = brg;
+        $("#gdCompass").classList.remove("seeking");
+        $("#gdCompass").classList.add("locked");
+        distEl.textContent = km < 1 ? `${mm(Math.round(km * 1000))} မီတာ` : `${mm(km.toFixed(1))} ကီလိုမီတာ`;
+        const mins = Math.max(1, Math.round(km / 25 * 60));      // ~25 km/h in town
+        hintEl.textContent = km < 0.08 ? "🎉 ရောက်ပါပြီ — ကြိုဆိုပါသည်" : `ကားဖြင့် ခန့်မှန်း ${mm(mins)} မိနစ် · မြှားအတိုင်း သွားပါ`;
+        locBtn.textContent = "🔄 ပြန်တွက်မည်";
+        paint();
+      }, () => {
+        $("#gdCompass").classList.remove("seeking");
+        distEl.textContent = "—";
+        hintEl.textContent = "တည်နေရာ ခွင့်ပြုချက် မရပါ";
+      }, { enableHighAccuracy: true, maximumAge: 10000, timeout: 15000 });
     });
   }
 
