@@ -195,6 +195,8 @@
     if (where === "gallery") window.__closeGallery();
     else if (where === "bigday") window.__closeBigDay();
     else if (where === "story") window.__closeStory();
+    else if (where === "quiz") window.__closeQuiz();
+    else if (where === "thanks") window.__closeThanks();
     else if (where === "garden") backToHero();
     else if (location.hash === "#garden") enterGarden(false);
   });
@@ -210,6 +212,7 @@
     world.style.transformOrigin = `${((sr.left + sr.width * 0.3 - wr.left) / wr.width) * 100}% ${((sr.top + sr.height / 2 - wr.top) / wr.height) * 100}%`;
     burstAt(s, 14);
     garden.classList.add("toward");
+    if (s.dataset.dest === "quiz") { setTimeout(() => { busy = false; window.__openQuiz(); }, reduce ? 0 : 900); return; }
     if (s.dataset.dest === "story") { setTimeout(() => { busy = false; window.__openStory(); }, reduce ? 0 : 900); return; }
     if (s.dataset.dest === "bigday") { setTimeout(() => { busy = false; window.__openBigDay(); }, reduce ? 0 : 900); return; }
     if (s.dataset.dest === "gallery") { setTimeout(() => { busy = false; window.__openGallery(); }, reduce ? 0 : 900); return; }
@@ -494,9 +497,345 @@
   window.__openStory = openStory;
   window.__closeStory = closeStory;
 
+
+  /* ============================================================
+     FUN QUIZ
+  ============================================================ */
+  const QZ = C.quiz || { questions: [] };
+  const QS = QZ.questions || [];
+  const qz = $("#qz");
+  document.querySelectorAll(".qzG").forEach((e) => (e.textContent = C.groom));
+  document.querySelectorAll(".qzB").forEach((e) => (e.textContent = C.bride));
+  const QICON = {
+    cafe: '<path d="M4 9h12v4a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zM16 10h1.5a2.5 2.5 0 0 1 0 5H15M9 3c-1 1.5 1 2 0 4M12 3c-1 1.5 1 2 0 4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>',
+    school: '<path d="M2 9l10-5 10 5-10 5zM6 11v5c3 2 9 2 12 0v-5M22 9v6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>',
+    work: '<rect x="3" y="7" width="18" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M9 7V5h6v2M3 12h18" fill="none" stroke="currentColor" stroke-width="1.4"/>',
+    pin: '<path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0C18.5 14.8 12 21 12 21z" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="12" cy="10" r="2.4" fill="none" stroke="currentColor" stroke-width="1.4"/>',
+    movie: '<rect x="3" y="9" width="18" height="11" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M3 9l2-5 16 2-1 3M8 5l2 3M13 5.5l2 3" fill="none" stroke="currentColor" stroke-width="1.4"/>',
+    dinner: '<path d="M7 3v7a2 2 0 0 0 2 2v9M5 3v6M9 3v6M17 3c-2 2-2 6 0 8v10" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>',
+    trip: '<path d="M2 19l6-10 4 6 3-4 7 8z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>',
+    him: '<circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" fill="none" stroke="currentColor" stroke-width="1.4"/>',
+    her: '<path d="M8 8a4 4 0 1 1 8 0c0 3 1 4 2 5H6c1-1 2-2 2-5z" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5" fill="none" stroke="currentColor" stroke-width="1.4"/>',
+    heart: '<path d="M12 20s-8-5-8-11a4.5 4.5 0 0 1 8-2.5A4.5 4.5 0 0 1 20 9c0 6-8 11-8 11z" fill="none" stroke="currentColor" stroke-width="1.4"/>',
+    smile: '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 14c1 2 7 2 8 0" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="9" cy="10" r=".9" fill="currentColor"/><circle cx="15" cy="10" r=".9" fill="currentColor"/>',
+    gate: '<path d="M3 5h18M5 8h14M7 8v12M17 8v12M2 3c3 2 17 2 20 0" fill="none" stroke="currentColor" stroke-width="1.4"/>',
+    temple: '<path d="M12 3l3 5H9zM7 11h10l-1-3H8zM5 14h14M6 14v6M18 14v6M10 14v6M14 14v6M3 20h18" fill="none" stroke="currentColor" stroke-width="1.3"/>',
+    palm: '<path d="M12 21c0-6 1-9 1-11M13 10c-2-3-6-3-8-1 3 0 5 0 8 1zM13 10c2-3 6-3 8-1-3 0-5 0-8 1zM13 10c-1-3-3-5-6-5 2 1 4 3 6 5zM13 10c1-3 3-5 6-5-2 1-4 3-6 5zM8 21h9" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>',
+    europe: '<path d="M3 20h18M4 20V11h16v9M4 11c2-4 14-4 16 0M7 20v-6M11 20v-6M15 20v-6M19 20v-6" fill="none" stroke="currentColor" stroke-width="1.3"/>',
+    home: '<path d="M3 11l9-7 9 7M5 9.5V20h14V9.5M10 20v-5h4v5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>',
+    plane: '<path d="M2 13l20-8-6 16-4-7z M12 14l10-9" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>',
+    family: '<circle cx="7" cy="9" r="2.4" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="17" cy="9" r="2.4" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="12" cy="12" r="2" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M2 20c0-3 2-5 5-5s5 2 5 5M12 20c0-3 2-5 5-5s5 2 5 5M12 5s-2-1.6-2-3a1.2 1.2 0 0 1 2-.5 1.2 1.2 0 0 1 2 .5c0 1.4-2 3-2 3z" fill="none" stroke="currentColor" stroke-width="1.3"/>',
+    sprout: '<path d="M12 21v-9M12 12c0-4-3-6-7-6 0 4 3 6 7 6zM12 12c0-4 3-6 7-6 0 4-3 6-7 6z" fill="none" stroke="currentColor" stroke-width="1.4"/>',
+  };
+  let qi = -1;
+  const picks = new Array(QS.length).fill(null);
+  $("#qzDots").innerHTML = QS.map(() => "<i></i>").join("");
+  const qDots = [...$("#qzDots").children];
+  const card = $("#qzCard");
+
+  // stages: -1 = your name · 0..n-1 = questions · n = a few words from the heart
+  let mode = "name";
+  const U = QZ.ui || {};
+  const mmd = (s) => String(s).replace(/\d/g, (d) => "၀၁၂၃၄၅၆၇၈၉"[d]);
+  const T = (k, en) => U[k] || en;
+  document.querySelector(".qz-intro .qz-ask").textContent = T("askName", "Before we begin…");
+  document.querySelector(".qz-intro .qz-lab").textContent = T("nameLabel", "What’s your name?");
+  document.querySelector(".qz-note .qz-ask").textContent = T("askNote", "One last thing…");
+  document.querySelector(".qz-note .qz-lab").textContent = T("noteLabel", "Leave us a few words from your heart ♡");
+  $("#qzName").placeholder = T("namePh", "Type your name here");
+  $("#qzMsg").placeholder = T("notePh", "Write something sweet for the couple…");
+  $("#qzPrev").textContent = T("back", "← Back");
+  document.querySelector(".qz-banner span").textContent = T("got", "You got");
+  document.querySelector(".qz-res-s").textContent = T("thanks", "Thank you for being part of our story. ♡");
+  $("#qzAgain").textContent = T("again", "Play Again ↻");
+  $("#qzHome").textContent = T("home", "Back to Invitation ⌂");
+  set("qzCnt", mmd("0 / 300"));
+  const nameIn = $("#qzName"), msgIn = $("#qzMsg");
+  nameIn.addEventListener("input", () => { if (mode === "name") $("#qzNext").disabled = !nameIn.value.trim(); });
+  msgIn.addEventListener("input", () => set("qzCnt", mmd(`${msgIn.value.length} / 300`)));
+  nameIn.addEventListener("keydown", (e) => { if (e.key === "Enter" && nameIn.value.trim()) $("#qzNext").click(); });
+
+  function renderQ(anim) {
+    const n = QS.length;
+    mode = qi < 0 ? "name" : qi >= n ? "note" : "q";
+    const paint = () => {
+      card.dataset.mode = mode;
+      qDots.forEach((d, k) => { d.className = k < Math.max(qi, 0) || qi >= n ? "done" : k === qi ? "now" : ""; });
+      if (mode === "name") {
+        set("qzStep", T("ready", "Ready to play?"));
+        $("#qzImg").src = QZ.introPhoto || QS[0].photo;
+        $("#qzPrev").classList.add("hide");
+        $("#qzNext").textContent = T("start", "Start the Quiz →");
+        $("#qzNext").disabled = !nameIn.value.trim();
+        return;
+      }
+      if (mode === "note") {
+        set("qzStep", T("almost", "Almost done ♡"));
+        $("#qzImg").src = QZ.notePhoto || QS[n - 1].photo;
+        $("#qzPrev").classList.remove("hide");
+        $("#qzNext").textContent = T("submit", "Submit ✓");
+        $("#qzNext").disabled = false;
+        setTimeout(() => msgIn.focus({ preventScroll: true }), 500);
+        return;
+      }
+      const q = QS[qi];
+      set("qzStep", mmd(T("step", "Question {n} of {t}").replace("{n}", qi + 1).replace("{t}", n)));
+      set("qzNum", `Q${qi + 1}`);
+      set("qzQuestion", q.q);
+      $("#qzImg").src = q.photo;
+      $("#qzOpts").innerHTML = q.options.map((o, k) =>
+        `<button class="qz-opt${picks[qi] === k ? " sel" : ""}" type="button" data-k="${k}"><svg viewBox="0 0 24 24" aria-hidden="true">${QICON[o.icon] || QICON.heart}</svg><span></span></button>`).join("");
+      [...$("#qzOpts").children].forEach((b, k) => (b.querySelector("span").textContent = q.options[k].text));
+      $("#qzPrev").classList.remove("hide");
+      $("#qzNext").textContent = T("next", "Next →");
+      $("#qzNext").disabled = picks[qi] === null;
+    };
+    if (anim && !reduce) { card.classList.remove("swap"); void card.offsetWidth; card.classList.add("swap"); setTimeout(paint, 320); }
+    else paint();
+  }
+  $("#qzOpts").addEventListener("click", (e) => {
+    const b = e.target.closest(".qz-opt"); if (!b) return;
+    picks[qi] = +b.dataset.k;
+    [...$("#qzOpts").children].forEach((x) => x.classList.toggle("sel", x === b));
+    $("#qzNext").disabled = false;
+    fxBurst(b, 10);
+  });
+  $("#qzNext").addEventListener("click", () => {
+    if (mode === "name") { if (!nameIn.value.trim()) { nameIn.focus(); return; } nameIn.blur(); qi = 0; renderQ(true); return; }
+    if (mode === "note") { submitQuiz(); return; }
+    if (picks[qi] === null) return;
+    qi++; renderQ(true);
+  });
+  $("#qzPrev").addEventListener("click", () => { if (qi > 0) { qi--; renderQ(true); } else if (qi === 0) { qi = -1; renderQ(true); } });
+
+  // ---- save the answers (Google Sheet via Apps Script, plus a copy on this device) ----
+  function submitQuiz() {
+    const score = QS.reduce((s, q, k) => s + (picks[k] === q.answer ? 1 : 0), 0);
+    const rec = {
+      time: new Date().toISOString(),
+      name: nameIn.value.trim().slice(0, 40),
+      answers: QS.map((q, k) => (picks[k] === null ? "" : q.options[picks[k]].text)),
+      correct: QS.map((q, k) => picks[k] === q.answer),
+      score, total: QS.length,
+      message: msgIn.value.trim().slice(0, 300),
+    };
+    try { const all = JSON.parse(localStorage.getItem("quizAnswers") || "[]"); all.push(rec); localStorage.setItem("quizAnswers", JSON.stringify(all)); } catch (e) {}
+    if (C.quizEndpoint) {
+      fetch(C.quizEndpoint, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(rec) }).catch(() => {});
+    }
+    showResult(score);
+  }
+
+  function showResult(score) {
+    set("qzScore", mmd(`${score} / ${QS.length}`));
+    const R = QZ.results || {};
+    const name = nameIn.value.trim();
+    set("qzResT", score === QS.length ? (R.perfect || "You know us perfectly!") : score >= QS.length - 1 ? (R.great || "You really know us!") : score >= QS.length / 2 ? (R.good || "Not bad at all!") : (R.low || "Come celebrate and get to know us!"));
+    if (name) $("#qzResT").textContent = `${name}၊ ${$("#qzResT").textContent}`;
+    $("#qzResImg").src = QZ.resultPhoto || QS[0].photo;
+    qz.classList.add("result");
+    set("qzTitle", "Quiz Result");
+    confetti();
+  }
+  $("#qzAgain").addEventListener("click", () => { picks.fill(null); qi = -1; msgIn.value = ""; set("qzCnt", mmd("0 / 300")); qz.classList.remove("result"); set("qzTitle", "Fun Quiz"); renderQ(true); });
+  $("#qzHome").addEventListener("click", () => (history.state && history.state.p === "quiz" ? history.back() : closeQuiz()));
+
+  // petals + gold confetti
+  const fxc = $("#qzFx"), fg = fxc.getContext("2d");
+  let fxp = [], fxOn = false;
+  function fxSize() { const r = fxc.getBoundingClientRect(), dp = Math.min(devicePixelRatio || 1, 2); fxc.width = r.width * dp; fxc.height = r.height * dp; fg.setTransform(dp, 0, 0, dp, 0, 0); }
+  function fxLoop() {
+    const r = fxc.getBoundingClientRect(); fg.clearRect(0, 0, r.width, r.height);
+    fxp = fxp.filter((p) => {
+      p.vy += 0.12; p.vx *= 0.99; p.x += p.vx; p.y += p.vy; p.r += p.vr; p.life--;
+      fg.save(); fg.translate(p.x, p.y); fg.rotate(p.r); fg.globalAlpha = Math.min(1, p.life / 40);
+      fg.fillStyle = p.c;
+      if (p.petal) { fg.beginPath(); fg.ellipse(0, 0, p.s, p.s * 0.55, 0, 0, 7); fg.fill(); } else fg.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2);
+      fg.restore();
+      return p.life > 0 && p.y < r.height + 20;
+    });
+    if (fxp.length) requestAnimationFrame(fxLoop); else fxOn = false;
+  }
+  function fxAdd(x, y, n, spread) {
+    if (reduce) return;
+    const cols = ["#f7d98c", "#fff3d0", "#f4b8c4", "#ffffff", "#e8c06a"];
+    for (let i = 0; i < n; i++) fxp.push({ x, y, vx: (Math.random() - .5) * spread, vy: -Math.random() * spread * .9 - 2, r: Math.random() * 6, vr: (Math.random() - .5) * .3, s: 4 + Math.random() * 6, c: cols[(Math.random() * cols.length) | 0], petal: Math.random() < .5, life: 90 + Math.random() * 60 });
+    if (!fxOn) { fxOn = true; fxSize(); requestAnimationFrame(fxLoop); }
+  }
+  function fxBurst(el, n) { const r = el.getBoundingClientRect(), c = fxc.getBoundingClientRect(); fxAdd(r.left - c.left + r.width / 2, r.top - c.top + r.height / 2, n, 6); }
+  function confetti() { const c = fxc.getBoundingClientRect(); fxAdd(c.width * .3, c.height * .45, 60, 14); fxAdd(c.width * .7, c.height * .45, 60, 14); setTimeout(() => fxAdd(c.width / 2, c.height * .3, 70, 16), 350); }
+
+  function openQuiz(push = true) {
+    if (busy && push) return;
+    busy = true; where = "quiz";
+    picks.fill(null); qi = -1; qz.classList.remove("result"); set("qzTitle", "Fun Quiz"); renderQ(false);
+    walk.className = "walk"; void walk.offsetWidth; walk.className = "walk run fwd";
+    setTimeout(() => { qz.classList.add("on"); qz.classList.remove("out"); qz.removeAttribute("aria-hidden"); restart(qz, "in"); }, reduce ? 0 : 900);
+    setTimeout(() => { garden.classList.remove("toward", "on"); garden.setAttribute("aria-hidden", "true"); walk.className = "walk"; busy = false; }, reduce ? 50 : 2300);
+    if (push) history.pushState({ p: "quiz" }, "", "#quiz");
+  }
+  function closeQuiz() {
+    if (busy) return;
+    busy = true;
+    qz.classList.add("out");
+    walk.className = "walk"; void walk.offsetWidth; walk.className = "walk run bwd";
+    setTimeout(() => { garden.classList.add("on"); garden.removeAttribute("aria-hidden"); restart(garden, "arrive"); }, reduce ? 0 : 700);
+    setTimeout(() => { qz.classList.remove("on", "in", "out", "result"); qz.setAttribute("aria-hidden", "true"); garden.classList.remove("arrive"); walk.className = "walk"; where = "garden"; busy = false; }, reduce ? 50 : 2600);
+  }
+  $("#qzBack").addEventListener("click", () => (history.state && history.state.p === "quiz" ? history.back() : closeQuiz()));
+  window.__openQuiz = openQuiz;
+  window.__closeQuiz = closeQuiz;
+  if (QS.length) renderQ(false);
+
+
+
+
+  /* ============================================================
+     THANK YOU — reached by walking down the garden path
+  ============================================================ */
+  const TY = C.thanks || {};
+  const ty = $("#ty");
+  set("tyL1", TY.line1); set("tyL2", TY.line2); set("tyL3", TY.line3);
+  // glowing footprints walking up the stepping stones + a little sign
+  const gw = $("#gWorld");
+  const STEPS = [[47, 92, -8], [53, 87, 6], [46, 82, -6], [51, 77.5, 8], [44, 73.5, -4], [49, 69.5, 6], [42, 66, -2], [46, 62.5, 4]];
+  const FOOT = '<svg viewBox="0 0 20 32"><ellipse cx="10" cy="19" rx="7" ry="11" fill="#fff4d6"/><circle cx="4" cy="5" r="2.3" fill="#fff4d6"/><circle cx="8.5" cy="3" r="2.4" fill="#fff4d6"/><circle cx="13" cy="3.6" r="2.2" fill="#fff4d6"/><circle cx="16.6" cy="6.4" r="1.9" fill="#fff4d6"/></svg>';
+  gw.insertAdjacentHTML("beforeend",
+    STEPS.map((s, i) => `<span class="fp" style="left:${s[0]}%;top:${s[1]}%;--t:rotate(${s[2]}deg) ${i % 2 ? "scaleX(-1)" : ""};animation-delay:${i * 0.35}s">${FOOT}</span>`).join("") +
+    `<button class="path-go" type="button" id="pathGo" aria-label="${TY.tag || "Thank you"}"></button>`);
+  // a little red arrow sign-post beside the path — the way out to the Thank-You page
+  gw.insertAdjacentHTML("beforeend", `<button class="exit-sign" type="button" id="exitSign" aria-label="${TY.tag || "Thank you"}">
+      <svg viewBox="0 0 120 150" aria-hidden="true">
+        <rect x="56" y="40" width="8" height="108" rx="2" fill="#5b3a1c"/><rect x="57" y="40" width="3" height="108" fill="#7a5230"/>
+        <g class="exit-arrow">
+          <path d="M12 30 L34 8 H110 V52 H34 Z" fill="#b32d26" stroke="#f2d48f" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M17 30 L36 12 H105 V48 H36 Z" fill="none" stroke="rgba(255,230,200,.35)" stroke-width="1.5"/>
+          <text x="70" y="36" text-anchor="middle" font-family="Cormorant Garamond, Georgia, serif" font-weight="700" font-size="17" fill="#fff3dc">${TY.sign || "This way"}</text>
+        </g>
+      </svg>
+    </button>`);
+  $("#gStage").insertAdjacentHTML("beforeend", '<span class="path-tag" id="pathTag" hidden></span>');
+  // keep the sign over the path even though the art is right-anchored on phones
+  function placeTag() {
+    const st = $("#gStage").getBoundingClientRect(), r = $("#pathGo").getBoundingClientRect();
+    const t = $("#pathTag");
+    const half = t.offsetWidth / 2 + 12;
+    t.style.left = `${Math.min(st.width - half, Math.max(half, r.left - st.left + r.width * .5))}px`;
+    t.style.top = `${r.top - st.top + r.height * .32}px`;
+  }
+  addEventListener("resize", placeTag);
+  const flash = Object.assign(document.createElement("div"), { className: "ty-flash" });
+  document.body.appendChild(flash);
+
+  function openThanks(push = true) {
+    if (busy && push) return;
+    busy = true; where = "thanks";
+    restart(garden, "walkin");                       // walk down the path (no butterflies here)
+    setTimeout(() => { flash.classList.remove("on"); void flash.offsetWidth; flash.classList.add("on"); }, reduce ? 0 : 1700);
+    setTimeout(() => { ty.classList.add("on"); ty.classList.remove("out"); ty.removeAttribute("aria-hidden"); restart(ty, "in"); }, reduce ? 0 : 2350);
+    setTimeout(() => {
+      garden.classList.remove("on", "walkin"); garden.setAttribute("aria-hidden", "true");
+      busy = false;
+    }, reduce ? 50 : 2900);
+    if (push) history.pushState({ p: "thanks" }, "", "#thanks");
+  }
+  function closeThanks() {
+    if (busy) return;
+    busy = true;
+    ty.classList.add("out");
+    setTimeout(() => { garden.classList.add("on"); garden.removeAttribute("aria-hidden"); restart(garden, "arrive", "in"); }, reduce ? 0 : 500);
+    setTimeout(() => {
+      ty.classList.remove("on", "in", "out"); ty.setAttribute("aria-hidden", "true");
+      garden.classList.remove("arrive"); where = "garden"; busy = false; placeTag();
+    }, reduce ? 50 : 2400);
+  }
+  $("#pathGo").addEventListener("click", () => { if (where === "garden") openThanks(); });
+  $("#exitSign").addEventListener("click", () => { if (where === "garden") openThanks(); });
+  $("#tyBack").addEventListener("click", () => (history.state && history.state.p === "thanks" ? history.back() : closeThanks()));
+  window.__openThanks = openThanks;
+  window.__closeThanks = closeThanks;
+  new MutationObserver(() => { if (garden.classList.contains("on")) requestAnimationFrame(placeTag); }).observe(garden, { attributes: true, attributeFilter: ["class"] });
+  requestAnimationFrame(placeTag);
+
+  /* ============================================================
+     BUTTERFLY RIVER — ~1000 butterflies sweep across the screen in
+     swirling waves; the page changes behind them
+  ============================================================ */
+  (function () {
+    const cv2 = Object.assign(document.createElement("canvas"), { className: "bf-river" });
+    cv2.setAttribute("aria-hidden", "true");
+    const ctx = cv2.getContext("2d");
+    const COLS = ["#fff8e6", "#f9e6b8", "#f3d48f", "#ffffff", "#f6dca6", "#ead0a0"];
+    let raf = null;
+    function river(back) {
+      if (reduce) return;
+      if (!cv2.isConnected) document.body.appendChild(cv2);
+      const dpr = Math.min(devicePixelRatio || 1, 1.5), W = innerWidth, H = innerHeight;
+      cv2.width = W * dpr; cv2.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const N = W < 600 ? 750 : 1000;
+      const dir = back ? -1 : 1;
+      const bs = [];
+      for (let i = 0; i < N; i++) {
+        // a river band that sweeps across, with each butterfly looping around its own little circle
+        bs.push({
+          d: Math.random() * 900,                    // start delay (ms)
+          T: 1100 + Math.random() * 700,             // crossing time
+          y: H * (0.05 + Math.random() * 0.9),
+          amp: 30 + Math.random() * H * 0.12,        // big wave
+          waves: 0.6 + Math.random() * 1.2,
+          ph: Math.random() * Math.PI * 2,
+          loopR: 10 + Math.random() * 45,            // little swirl
+          loops: 1 + Math.random() * 2.5,
+          s: 6 + Math.random() * 9,
+          flap: 0.025 + Math.random() * 0.03,
+          c: COLS[(Math.random() * COLS.length) | 0],
+          a: 0.55 + Math.random() * 0.45,
+        });
+      }
+      const t0 = performance.now(), END = 900 + 1800 + 100;
+      cancelAnimationFrame(raf);
+      function frame(now) {
+        const t = now - t0;
+        ctx.clearRect(0, 0, W, H);
+        for (const b of bs) {
+          const p = (t - b.d) / b.T;
+          if (p <= 0 || p >= 1) continue;
+          const e = p * p * (3 - 2 * p);               // smoothstep
+          let x = -80 + (W + 160) * e;
+          if (dir < 0) x = W - x;
+          const th = p * Math.PI * 2 * b.loops + b.ph;
+          const y = b.y + Math.sin(e * Math.PI * 2 * b.waves + b.ph) * b.amp + Math.sin(th) * b.loopR;
+          x += Math.cos(th) * b.loopR * dir;
+          const ang = Math.atan2(Math.cos(e * Math.PI * 2 * b.waves + b.ph) * b.amp * 0.02 + Math.cos(th) * 0.3, dir) * 0.6;
+          const fl = 0.25 + 0.75 * Math.abs(Math.sin(now * b.flap + b.ph));
+          const fade = p < 0.12 ? p / 0.12 : p > 0.85 ? (1 - p) / 0.15 : 1;
+          ctx.save();
+          ctx.translate(x, y); ctx.rotate(ang);
+          ctx.globalAlpha = b.a * fade;
+          ctx.fillStyle = b.c;
+          const s = b.s;
+          ctx.beginPath(); ctx.ellipse(-s * 0.55 * fl, -s * 0.35, s * 0.62 * fl, s * 0.8, -0.5, 0, 6.283); ctx.fill();
+          ctx.beginPath(); ctx.ellipse(s * 0.55 * fl, -s * 0.35, s * 0.62 * fl, s * 0.8, 0.5, 0, 6.283); ctx.fill();
+          ctx.beginPath(); ctx.ellipse(-s * 0.4 * fl, s * 0.45, s * 0.42 * fl, s * 0.5, 0.4, 0, 6.283); ctx.fill();
+          ctx.beginPath(); ctx.ellipse(s * 0.4 * fl, s * 0.45, s * 0.42 * fl, s * 0.5, -0.4, 0, 6.283); ctx.fill();
+          ctx.fillStyle = "rgba(120, 84, 30, .8)";
+          ctx.fillRect(-s * 0.06, -s * 0.6, s * 0.12, s * 1.3);
+          ctx.restore();
+        }
+        if (t < END) raf = requestAnimationFrame(frame); else ctx.clearRect(0, 0, W, H);
+      }
+      raf = requestAnimationFrame(frame);
+    }
+    new MutationObserver(() => {
+      if (walk.classList.contains("run")) river(walk.classList.contains("bwd"));
+    }).observe(walk, { attributes: true, attributeFilter: ["class"] });
+  })();
+
   // preview helper: en/?garden  ·  en/?gallery
   if (/[?&]garden\b/.test(location.search)) { hero.classList.add("leaving", "away"); garden.classList.add("on", "in"); garden.removeAttribute("aria-hidden"); where = "garden"; }
   if (/[?&]gallery/.test(location.search)) { hero.classList.add("leaving", "away"); gal.classList.add("on", "in"); gal.removeAttribute("aria-hidden"); where = "gallery"; layout(); }
   if (/[?&]bigday/.test(location.search)) { hero.classList.add("leaving", "away"); bd.classList.add("on", "in"); bd.removeAttribute("aria-hidden"); where = "bigday"; }
   if (/[?&]story/.test(location.search)) { hero.classList.add("leaving", "away"); st.classList.add("on", "in"); st.removeAttribute("aria-hidden"); where = "story"; }
+  if (/[?&]quiz/.test(location.search)) { hero.classList.add("leaving", "away"); qz.classList.add("on", "in"); qz.removeAttribute("aria-hidden"); where = "quiz"; }
+  if (/[?&]thanks/.test(location.search)) { hero.classList.add("leaving", "away"); ty.classList.add("on", "in"); ty.removeAttribute("aria-hidden"); where = "thanks"; }
 })();

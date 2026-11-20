@@ -11,9 +11,9 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💍</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Pinyon+Script&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Pinyon+Script&family=Noto+Serif+Myanmar:wght@400;500;600;700&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="preload" as="image" href="../assets/img/en-hero.jpg">
-  <link rel="stylesheet" href="style.css?v=25">
+  <link rel="stylesheet" href="style.css?v=38">
 </head>
 <body>
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -256,6 +256,95 @@
       </div>
     </section>
 
+    <!-- ================= FUN QUIZ ================= -->
+    <section class="page qz" id="qz" aria-label="Fun Quiz" aria-hidden="true">
+      <div class="hero-backdrop" style="--bg:url('../assets/img/en-qz-tiny.jpg')" aria-hidden="true"></div>
+      <div class="stage qz-stage">
+        <div class="qz-world"><img class="qz-bg" src="../assets/img/en-qz-bg.jpg" alt="" draggable="false">
+          <span class="bd-glow c1" aria-hidden="true"></span><span class="bd-glow c2" aria-hidden="true"></span>
+        </div>
+        <canvas class="qz-fx" id="qzFx" aria-hidden="true"></canvas>
+
+        <button class="ic-back qz-back" type="button" id="qzBack" aria-label="Back to the garden">
+          <svg viewBox="0 0 48 24" aria-hidden="true"><path d="M46 12 H3 M12 3 L3 12 L12 21" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+
+        <header class="qz-head">
+          <svg class="g-rings" viewBox="0 0 160 44" aria-hidden="true"><circle cx="70" cy="22" r="13" fill="none" stroke="url(#champ)" stroke-width="2.4"/><circle cx="90" cy="22" r="13" fill="none" stroke="url(#champ)" stroke-width="2.4"/></svg>
+          <h2 class="qz-title" id="qzTitle">Fun Quiz</h2>
+          <p class="qz-names"><span class="qzG"></span> <em>&amp;</em> <span class="qzB"></span></p>
+          <svg class="bd-orn" viewBox="0 0 240 14" aria-hidden="true"><path d="M10 7 H104 M136 7 H230" stroke="url(#champ)" stroke-width="1" vector-effect="non-scaling-stroke"/><path d="M120 1 L127 7 L120 13 L113 7 Z" fill="none" stroke="url(#champ)" stroke-width="1.2" vector-effect="non-scaling-stroke"/></svg>
+        </header>
+
+        <div class="qz-prog" id="qzProg"><p id="qzStep"></p><div class="qz-dots" id="qzDots"></div></div>
+
+        <!-- question card -->
+        <div class="qz-card" id="qzCard">
+          <div class="qz-photos" id="qzPhotos">
+            <span class="qz-ph back2"></span><span class="qz-ph back1"></span>
+            <span class="qz-ph front"><img id="qzImg" alt=""></span>
+          </div>
+          <span class="qz-q" id="qzNum">Q1</span>
+          <div class="qz-ribbon"><p id="qzQuestion"></p></div>
+          <div class="qz-opts" id="qzOpts"></div>
+          <!-- step 0: who is playing -->
+          <div class="qz-intro">
+            <p class="qz-ask">Before we begin…</p>
+            <label class="qz-lab" for="qzName">What’s your name?</label>
+            <div class="qz-field"><input id="qzName" type="text" maxlength="40" autocomplete="name" placeholder="Type your name here"><span class="qz-field-glow" aria-hidden="true"></span></div>
+          </div>
+          <!-- last step: a few words from the heart -->
+          <div class="qz-note">
+            <p class="qz-ask">One last thing…</p>
+            <label class="qz-lab" for="qzMsg">Leave us a few words from your heart ♡</label>
+            <div class="qz-letter">
+              <textarea id="qzMsg" maxlength="300" rows="4" placeholder="Write something sweet for the couple…"></textarea>
+              <span class="qz-cnt" id="qzCnt">0 / 300</span>
+            </div>
+          </div>
+          <div class="qz-nav">
+            <button class="qz-btn ghost" type="button" id="qzPrev">← Back</button>
+            <button class="qz-btn gold" type="button" id="qzNext" disabled>Next →</button>
+          </div>
+        </div>
+
+        <!-- result card -->
+        <div class="qz-res" id="qzRes" aria-live="polite">
+          <span class="qz-res-photo"><img id="qzResImg" alt=""></span>
+          <div class="qz-banner"><span>You got</span><b id="qzScore">0 / 5</b></div>
+          <p class="qz-res-t" id="qzResT"></p>
+          <p class="qz-res-s">Thank you for being part of our story. ♡</p>
+          <p class="qz-hearts" aria-hidden="true">♡ ♡ ♡</p>
+          <button class="qz-btn gold wide" type="button" id="qzAgain">Play Again ↻</button>
+          <button class="qz-btn ghost wide" type="button" id="qzHome">Back to Invitation ⌂</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= THANK YOU ================= -->
+    <section class="page ty" id="ty" aria-label="Thank you" aria-hidden="true">
+      <div class="hero-backdrop" style="--bg:url('../assets/img/en-ty-tiny.jpg')" aria-hidden="true"></div>
+      <div class="stage ty-stage">
+        <div class="ty-world">
+          <img class="ty-bg" src="../assets/img/en-ty-bg.jpg" alt="" draggable="false">
+          <div class="ty-photo"><img src="../assets/img/gallery-en/g4.jpg" alt="Wai Hlyan Soe and Jue Mi Mi Aw"></div>
+          <img class="ty-fl" src="../assets/img/en-fl-bl.png" alt="" aria-hidden="true">
+          <span class="ty-glow" aria-hidden="true"></span>
+        </div>
+        <button class="ic-back ty-back" type="button" id="tyBack" aria-label="Back to the garden">
+          <svg viewBox="0 0 48 24" aria-hidden="true"><path d="M46 12 H3 M12 3 L3 12 L12 21" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="ty-text">
+          <h2 class="ty-title">Thank You<svg class="ty-heart" viewBox="0 0 60 30" aria-hidden="true"><path d="M2 22 C20 28 34 20 40 14 M40 14 C38 8 44 4 48 8 C52 4 58 8 54 14 C52 18 48 20 48 22 C46 20 42 18 40 14Z" fill="none" stroke="url(#champ)" stroke-width="1.6"/></svg></h2>
+          <p class="ty-l1" id="tyL1"></p>
+          <svg class="ty-rings" viewBox="0 0 240 30" aria-hidden="true"><path d="M8 15 H92 M148 15 H232" stroke="#b68a45" stroke-width="1" vector-effect="non-scaling-stroke"/><circle cx="111" cy="15" r="11" fill="none" stroke="#c99a52" stroke-width="2"/><circle cx="129" cy="15" r="11" fill="none" stroke="#c99a52" stroke-width="2"/></svg>
+          <p class="ty-l2" id="tyL2"></p>
+          <p class="ty-l3" id="tyL3"></p>
+          <p class="ty-end" aria-hidden="true"><span></span>♥<span></span></p>
+        </div>
+      </div>
+    </section>
+
     <!-- full-screen photo viewer -->
     <div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-label="Photo" aria-hidden="true">
       <img class="viewer-img" id="viewerImg" alt="">
@@ -275,7 +364,7 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <audio id="bgm" loop preload="auto"></audio>
 
-  <script src="config.js?v=25"></script>
-  <script src="app.js?v=25"></script>
+  <script src="config.js?v=38"></script>
+  <script src="app.js?v=38"></script>
 </body>
 </html>

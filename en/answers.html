@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Quiz Answers</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Pinyon+Script&family=Noto+Serif+Myanmar:wght@400;500;600;700&family=Jost:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg: #f7f1e4; --card: #fffdf8; --ink: #2b2216; --muted: #8a7a5e; --gold: #c99a52; --line: #eadfc8; --ok: #4f7a3a; --no: #b4553f; }
+    * { box-sizing: border-box; margin: 0; }
+    body { min-height: 100vh; background: radial-gradient(ellipse at 50% 0, #fff8e8, var(--bg) 60%); color: var(--ink); font-family: "Jost", system-ui, sans-serif; padding: 28px 16px 60px; }
+    .wrap { max-width: 1200px; margin: 0 auto; }
+    header { text-align: center; margin-bottom: 22px; }
+    h1 { font-family: "Pinyon Script", cursive; font-weight: 400; font-size: clamp(42px, 8vw, 64px); color: #9a7034; line-height: 1.1; }
+    .sub { font-family: "Cormorant Garamond", serif; letter-spacing: .25em; text-transform: uppercase; font-size: 13px; color: var(--muted); }
+    .stats { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin: 20px 0; }
+    .stat { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 20px; min-width: 130px; text-align: center; box-shadow: 0 4px 14px rgba(120, 80, 20, .06); }
+    .stat b { display: block; font-family: "Cormorant Garamond", serif; font-size: 30px; color: #7a5520; }
+    .stat span { font-size: 12px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
+    .bar { display: flex; gap: 10px; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .bar input { flex: 1; min-width: 200px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 99px; font: inherit; background: var(--card); }
+    .btn { padding: 10px 18px; border-radius: 99px; border: 1px solid var(--gold); background: linear-gradient(180deg, #a07a3e, #6e4f22); color: #fff7e4; font: inherit; cursor: pointer; }
+    .btn.ghost { background: var(--card); color: var(--ink); }
+    .tablebox { background: var(--card); border: 1px solid var(--line); border-radius: 18px; overflow: auto; box-shadow: 0 10px 30px rgba(120, 80, 20, .08); }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th { position: sticky; top: 0; background: #f6ecd8; text-align: left; font-weight: 500; color: #6e5326; padding: 12px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+    th small { display: block; font-weight: 400; color: var(--muted); font-size: 11px; max-width: 170px; white-space: normal; line-height: 1.3; }
+    td { padding: 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    tr:last-child td { border-bottom: 0; }
+    tr:hover td { background: #fffaf0; }
+    .name { font-family: "Cormorant Garamond", serif; font-weight: 600; font-size: 17px; white-space: nowrap; }
+    .time { color: var(--muted); font-size: 12px; white-space: nowrap; }
+    .ans { white-space: nowrap; }
+    .ans.ok::before { content: "✓ "; color: var(--ok); font-weight: 600; }
+    .ans.no::before { content: "✗ "; color: var(--no); font-weight: 600; }
+    .score { font-family: "Cormorant Garamond", serif; font-size: 20px; font-weight: 600; color: #7a5520; white-space: nowrap; }
+    .msg { min-width: 240px; font-family: "Cormorant Garamond", serif; font-style: italic; font-size: 16px; line-height: 1.4; color: #3a2e1e; }
+    .empty, .err { text-align: center; padding: 40px 16px; color: var(--muted); }
+    .err { color: var(--no); }
+    body { font-variant-numeric: lining-nums; }
+    .note { margin-top: 12px; text-align: center; font-size: 12px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Quiz Answers</h1>
+      <p class="sub" id="couple"></p>
+    </header>
+    <div class="stats">
+      <div class="stat"><b id="sCount">–</b><span>Players</span></div>
+      <div class="stat"><b id="sAvg">–</b><span>Average score</span></div>
+      <div class="stat"><b id="sPerfect">–</b><span>Perfect 5 / 5</span></div>
+      <div class="stat"><b id="sMsg">–</b><span>Messages</span></div>
+    </div>
+    <div class="bar">
+      <input id="search" type="search" placeholder="Search a name or message…">
+      <button class="btn ghost" id="reload" type="button">↻ Refresh</button>
+      <button class="btn" id="csv" type="button">⤓ Download (Excel / CSV)</button>
+    </div>
+    <div class="tablebox">
+      <table>
+        <thead id="head"></thead>
+        <tbody id="body"><tr><td class="empty" colspan="10">Loading…</td></tr></tbody>
+      </table>
+    </div>
+    <p class="note" id="note"></p>
+  </div>
+
+  <script src="config.js?v=32"></script>
+  <script>
+  (() => {
+    const C = window.WEDDING_EN, Q = (C.quiz && C.quiz.questions) || [];
+    const key = new URLSearchParams(location.search).get("key") || "";
+    const $ = (s) => document.querySelector(s);
+    const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    $("#couple").textContent = `${C.groom} & ${C.bride}`;
+    $("#head").innerHTML = `<tr><th>#</th><th>Name</th>${Q.map((q, i) => `<th>Q${i + 1}<small>${esc(q.q)}</small></th>`).join("")}<th>Score</th><th>Message</th></tr>`;
+    let rows = [];
+
+    function render() {
+      const f = $("#search").value.trim().toLowerCase();
+      const list = rows.filter((r) => !f || String(r.name).toLowerCase().includes(f) || String(r.message).toLowerCase().includes(f));
+      $("#sCount").textContent = rows.length;
+      $("#sAvg").textContent = rows.length ? (rows.reduce((s, r) => s + Number(r.score || 0), 0) / rows.length).toFixed(1) : "–";
+      $("#sPerfect").textContent = rows.filter((r) => Number(r.score) === Q.length).length;
+      $("#sMsg").textContent = rows.filter((r) => String(r.message || "").trim()).length;
+      if (!list.length) { $("#body").innerHTML = `<tr><td class="empty" colspan="${Q.length + 4}">No answers yet.</td></tr>`; return; }
+      $("#body").innerHTML = list.map((r, i) => {
+        const t = new Date(r.time);
+        return `<tr><td>${i + 1}</td>
+          <td><div class="name">${esc(r.name)}</div><div class="time">${isNaN(t) ? "" : t.toLocaleString()}</div></td>
+          ${Q.map((q, k) => `<td class="ans ${r.correct && r.correct[k] ? "ok" : "no"}">${esc((r.answers || [])[k])}</td>`).join("")}
+          <td class="score">${esc(r.score)} / ${Q.length}</td>
+          <td class="msg">${esc(r.message)}</td></tr>`;
+      }).join("");
+    }
+
+    async function load() {
+      $("#body").innerHTML = `<tr><td class="empty" colspan="${Q.length + 4}">Loading…</td></tr>`;
+      if (!C.quizEndpoint) {
+        try { rows = JSON.parse(localStorage.getItem("quizAnswers") || "[]"); } catch (e) { rows = []; }
+        $("#note").textContent = "No online sheet is connected yet — showing only answers made on this device. See tools/quiz-sheet.gs.";
+        rows.sort((a, b) => new Date(b.time) - new Date(a.time)); render(); return;
+      }
+      try {
+        const res = await fetch(`${C.quizEndpoint}?key=${encodeURIComponent(key)}`);
+        const j = await res.json();
+        if (!j.ok) throw new Error(j.error || "error");
+        rows = j.rows.sort((a, b) => new Date(b.time) - new Date(a.time));
+        $("#note").textContent = `Updated ${new Date().toLocaleTimeString()}`;
+        render();
+      } catch (e) {
+        $("#body").innerHTML = `<tr><td class="err" colspan="${Q.length + 4}">Could not load answers. Check the key in the link.</td></tr>`;
+      }
+    }
+
+    $("#search").addEventListener("input", render);
+    $("#reload").addEventListener("click", load);
+    $("#csv").addEventListener("click", () => {
+      const head = ["Time", "Name", ...Q.map((q, i) => `Q${i + 1}: ${q.q}`), "Score", "Message"];
+      const cell = (v) => `"${String(v == null ? "" : v).replace(/"/g, '""')}"`;
+      const lines = [head.map(cell).join(",")].concat(rows.map((r) => [r.time, r.name, ...Q.map((_, k) => (r.answers || [])[k] + ((r.correct || [])[k] ? " ✓" : " ✗")), `${r.score}/${Q.length}`, r.message].map(cell).join(",")));
+      const blob = new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" });
+      const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: "wedding-quiz-answers.csv" });
+      document.body.appendChild(a); a.click(); a.remove();
+    });
+    load();
+  })();
+  </script>
+</body>
+</html>
