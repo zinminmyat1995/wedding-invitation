@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="my">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#3a0d0d">
+  <title>မင်္ဂလာ ဖိတ်ကြားလွှာ</title>
+  <meta name="description" content="မင်္ဂလာအခမ်းအနားသို့ ဖိတ်ကြားအပ်ပါသည်">
+  <meta property="og:title" content="မင်္ဂလာ ဖိတ်ကြားလွှာ">
+  <meta property="og:description" content="မင်္ဂလာအခမ်းအနားသို့ ကြွရောက်ချီးမြှင့်ပေးပါရန် ဖိတ်ကြားအပ်ပါသည်">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💛</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Myanmar:wght@400;600;700;800&family=Cinzel+Decorative:wght@400;700&family=Great+Vibes&display=swap" rel="stylesheet">
+  <link rel="preload" as="image" href="../assets/img/mm-home-bg.jpg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ============ SVG DEFS ============ -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#fff1b8"/>
+        <stop offset=".35" stop-color="#e8b84a"/>
+        <stop offset=".65" stop-color="#b8862b"/>
+        <stop offset="1" stop-color="#ffe08a"/>
+      </linearGradient>
+      <linearGradient id="heartGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#fff3c4"/>
+        <stop offset=".5" stop-color="#f1c056"/>
+        <stop offset="1" stop-color="#c98a2a"/>
+      </linearGradient>
+      <radialGradient id="bfGrad" cx="0.5" cy="0.5" r="0.7">
+        <stop offset="0" stop-color="#ffffff"/>
+        <stop offset=".45" stop-color="#fff2c4"/>
+        <stop offset="1" stop-color="#f3c35e"/>
+      </radialGradient>
+      <symbol id="lotus" viewBox="0 0 120 60">
+        <path d="M60 58 C40 50 30 36 34 18 C46 24 56 36 60 58 Z M60 58 C80 50 90 36 86 18 C74 24 64 36 60 58 Z" fill="url(#goldGrad)"/>
+        <path d="M60 58 C50 40 52 20 60 4 C68 20 70 40 60 58 Z" fill="url(#goldGrad)"/>
+        <path d="M60 58 C34 56 12 46 4 30 C22 30 44 40 60 58 Z M60 58 C86 56 108 46 116 30 C98 30 76 40 60 58 Z" fill="url(#goldGrad)" opacity=".8"/>
+      </symbol>
+      <symbol id="butterfly" viewBox="-50 -40 100 80">
+        <g class="wing wing-l">
+          <path d="M0 -4 C-14 -34 -46 -40 -46 -16 C-46 0 -26 6 -6 2 Z" fill="url(#bfGrad)"/>
+          <path d="M-2 4 C-20 8 -36 22 -26 34 C-16 42 -6 24 -1 10 Z" fill="url(#bfGrad)" opacity=".9"/>
+        </g>
+        <g class="wing wing-r">
+          <path d="M0 -4 C14 -34 46 -40 46 -16 C46 0 26 6 6 2 Z" fill="url(#bfGrad)"/>
+          <path d="M2 4 C20 8 36 22 26 34 C16 42 6 24 1 10 Z" fill="url(#bfGrad)" opacity=".9"/>
+        </g>
+        <ellipse cx="0" cy="4" rx="2.4" ry="14" fill="#fff6d6"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <!-- =========================================================
+       INTRO : GOLDEN PAGODA GATE
+       ========================================================= -->
+  <section id="intro" class="intro" aria-label="ဖိတ်စာ ဖွင့်ရန်">
+    <div class="intro-backdrop" aria-hidden="true"></div>
+    <div class="stage" id="gateStage">
+      <img class="stage-bg" src="../assets/img/mm-gate-bg.jpg" alt="" draggable="false">
+      <div class="door-hall" aria-hidden="true"><span class="hall-sky"></span><span class="hall-rays"></span><span class="hall-mist m1"></span><span class="hall-mist m2"></span><span class="hall-mist m3"></span><span class="hall-motes"></span><span class="hall-core"></span></div>
+      <div class="doors" id="doors">
+        <img class="leaf leaf-l" src="../assets/img/mm-door-left.png" alt="" draggable="false">
+        <img class="leaf leaf-r" src="../assets/img/mm-door-right.png" alt="" draggable="false">
+        <span class="seam" aria-hidden="true"></span>
+      </div>
+      <span class="glow g-lantern-l" aria-hidden="true"></span>
+      <span class="glow g-lantern-r" aria-hidden="true"></span>
+      <span class="glow g-candle-l" aria-hidden="true"></span>
+      <span class="glow g-candle-r" aria-hidden="true"></span>
+
+      <div class="gate-title">
+        <p class="gt-main" id="introTitle">မင်္ဂလာ ဖိတ်စာ</p>
+      </div>
+      <div class="gate-floor">
+        <p class="gf-kicker" id="introKicker">မင်္ဂလာဆောင် ဖိတ်ကြားစာ</p>
+        <svg class="gf-line" viewBox="0 0 300 16" aria-hidden="true"><path d="M2 8 H130 M170 8 H298" stroke="url(#goldGrad)" stroke-width="1.4"/><path d="M150 1 L157 8 L150 15 L143 8 Z" fill="url(#goldGrad)"/><circle cx="136" cy="8" r="2" fill="#f6d98b"/><circle cx="164" cy="8" r="2" fill="#f6d98b"/></svg>
+        <p class="gf-names"><span id="introGroom"></span><em>နှင့်</em><span id="introBride"></span></p>
+        <svg class="gf-swirl" viewBox="0 0 400 40" aria-hidden="true">
+          <path d="M20 14 C10 2 0 16 14 24 C40 36 120 22 196 28 M380 14 C390 2 400 16 386 24 C360 36 280 22 204 28" fill="none" stroke="url(#goldGrad)" stroke-width="1.6"/>
+          <path d="M200 20 C196 26 196 32 200 38 C204 32 204 26 200 20 Z" fill="url(#goldGrad)"/>
+        </svg>
+      </div>
+      <button class="gate-btn" id="openBtn" type="button">
+        <span class="gb-shine" aria-hidden="true"></span>
+        <span class="gb-label" id="introBtn">ဖိတ်စာ ဖွင့်ကြည့်ရန်</span>
+      </button>
+      <div class="butterflies" aria-hidden="true"></div>
+      <div class="flash" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <!-- petals / gold dust (above pages, below dialogs) -->
+  <canvas id="petals" class="petals" aria-hidden="true"></canvas>
+
+  <!-- =========================================================
+       APP : PAGES (no scrolling — tap to travel)
+       ========================================================= -->
+  <main id="app" class="app" aria-hidden="true">
+
+    <!-- ---------- PAGE 1 : HOME ---------- -->
+    <section class="page page-home active" data-page="home" aria-label="ပင်မစာမျက်နှာ">
+      <div class="art-backdrop" style="--art:url('../assets/img/mm-home-bg.jpg')" aria-hidden="true"></div>
+      <div class="stage art-stage home-stage" id="homeStage">
+        <img class="stage-bg" src="../assets/img/mm-home-bg.jpg" alt="" draggable="false">
+        <span class="h-sun" aria-hidden="true"></span>
+
+
+        <div class="h-title">
+          <span class="h-title-shine" aria-hidden="true"></span>
+          <p class="ht-main" id="homeTitle"></p>
+        </div>
+
+        <p class="h-names">
+          <span class="hn" id="homeGroom"></span>
+          <svg class="h-heart" viewBox="0 0 64 56" aria-hidden="true"><path d="M32 52 C10 38 2 26 6 15 C10 4 24 2 32 13 C40 2 54 4 58 15 C62 26 54 38 32 52Z" fill="none" stroke="url(#heartGrad)" stroke-width="4.5" stroke-linejoin="round"/></svg>
+          <span class="hn" id="homeBride"></span>
+        </p>
+
+        <p class="h-msg" id="homeMsg"></p>
+
+        <button class="h-card hc-1" type="button" data-go="p2"><span class="hc-glow" aria-hidden="true"></span><span class="hc-text"><span id="hcDay"></span><strong id="hcDate"></strong></span></button>
+        <button class="h-card hc-2" type="button" data-go="p2"><span class="hc-glow" aria-hidden="true"></span><span class="hc-text"><strong id="hcTime"></strong><span id="hcTimeSub"></span></span></button>
+        <button class="h-card hc-3" type="button" data-go="p2"><span class="hc-glow" aria-hidden="true"></span><span class="hc-text"><strong id="hcVenue"></strong><span id="hcCity"></span></span></button>
+
+        <button class="h-cta" type="button" data-go="p2">
+          <span class="h-cta-shine" aria-hidden="true"></span>
+          <span class="h-cta-label" id="homeBtn"></span>
+        </button>
+
+        <div class="butterflies" aria-hidden="true"></div>
+      </div>
+      <span class="turn-shade" aria-hidden="true"></span>
+    </section>
+
+    <!-- ---------- PAGE 2 : INVITATION CARD ---------- -->
+    <section class="page page-p2" data-page="p2" aria-label="ဖိတ်ကြားလွှာ">
+      <div class="art-backdrop" style="--art:url('../assets/img/mm-p2-bg.jpg')" aria-hidden="true"></div>
+      <div class="stage art-stage" id="p2Stage">
+        <img class="stage-bg" src="../assets/img/mm-p2-bg.jpg" alt="" draggable="false">
+        <span class="p2-rays" aria-hidden="true"></span>
+        <span class="p2-moon" aria-hidden="true"></span>
+        <span class="p2-rings" aria-hidden="true"></span>
+
+        <button class="p2-round p2-back" type="button" data-back aria-label="နောက်သို့"></button>
+
+        <div class="p2-title">
+          <p class="p2t-main" id="p2Title"></p>
+        </div>
+
+        <p class="p2-name p2-name-l" id="p2Groom"></p>
+        <p class="p2-name p2-name-r" id="p2Bride"></p>
+
+        <p class="p2-msg" id="p2Msg"></p>
+
+        <button class="p2-info pi-1" type="button" data-go="p3" id="p2Date"></button>
+        <button class="p2-info pi-2" type="button" data-go="p4" id="p2Time"></button>
+        <button class="p2-info pi-3" type="button" data-go="p5" id="p2Venue"></button>
+
+        <button class="p2-btn pb-1" type="button"><span class="pb-label"></span></button>
+        <button class="p2-btn pb-2" type="button"><span class="pb-label"></span></button>
+        <button class="p2-btn pb-3" type="button"><span class="pb-label"></span></button>
+
+        <div class="butterflies" aria-hidden="true"></div>
+      </div>
+      <span class="turn-shade" aria-hidden="true"></span>
+    </section>
+    <!-- ---------- PAGE 3 : INVITATION (tab 1) ---------- -->
+    <section class="page tabpage page-p3" data-page="p3" data-tab="0" aria-label="ဖိတ်စာ">
+      <div class="art-backdrop" style="--art:url('../assets/img/mm-p3-bg.jpg')" aria-hidden="true"></div>
+      <div class="stage art-stage" id="p3Stage">
+        <img class="stage-bg" src="../assets/img/mm-p3-bg.jpg" alt="" draggable="false">
+        <div class="tp-chrome"></div>
+        <p class="p3-title" id="p3Title"></p>
+        <p class="p3-msg" id="p3Msg"></p>
+        <p class="p3-name p3-name-l" id="p3Groom"></p>
+        <span class="p3-heart" aria-hidden="true"></span>
+        <p class="p3-name p3-name-r" id="p3Bride"></p>
+        <p class="p3-info pi3-1" id="p3Date"></p>
+        <p class="p3-info pi3-2" id="p3Time"></p>
+        <p class="p3-info pi3-3" id="p3Venue"></p>
+        <button class="p3-cta" type="button" data-go="p5"><span class="p3-cta-shine" aria-hidden="true"></span><span class="p3-cta-label" id="p3Btn"></span></button>
+        <span class="twinkle tw-1" aria-hidden="true"></span>
+        <span class="twinkle tw-2" aria-hidden="true"></span>
+        <span class="twinkle tw-3" aria-hidden="true"></span>
+        <div class="butterflies" aria-hidden="true"></div>
+      </div>
+      <span class="turn-shade" aria-hidden="true"></span>
+    </section>
+
+    <!-- ---------- PAGE 4 : SCHEDULE (tab 2) ---------- -->
+    <section class="page tabpage tabnew page-p4" data-page="p4" data-tab="1" aria-label="မင်္ဂလာ အစီအစဉ်">
+      <div class="art-backdrop" style="--art:url('../assets/img/mm-p4-bg.jpg')" aria-hidden="true"></div>
+      <div class="stage art-stage" id="p4Stage">
+        <img class="stage-bg" src="../assets/img/mm-p4-bg.jpg" alt="" draggable="false">
+        <span class="p4-sun" aria-hidden="true"></span>
+        <div class="tp-chrome"></div>
+        <p class="p4-title" id="p4Title"></p>
+        <span class="p4-line" aria-hidden="true"></span>
+        <ol class="p4-list" id="p4List"></ol>
+        <div class="butterflies" aria-hidden="true"></div>
+      </div>
+      <span class="turn-shade" aria-hidden="true"></span>
+    </section>
+
+    <!-- ---------- PAGE 5 : VENUE (tab 3) ---------- -->
+    <section class="page tabpage tabnew page-p5" data-page="p5" data-tab="2" aria-label="မင်္ဂလာ ကျင်းပမည့်နေရာ">
+      <div class="art-backdrop" style="--art:url('../assets/img/mm-p5-bg.jpg')" aria-hidden="true"></div>
+      <div class="stage art-stage" id="p5Stage">
+        <img class="stage-bg" src="../assets/img/mm-p5-bg.jpg" alt="" draggable="false">
+        <span class="p4-sun p5-sun" aria-hidden="true"></span>
+        <div class="tp-chrome"></div>
+        <p class="p5-title" id="p5Title"></p>
+        <p class="p5-addr" id="p5Addr"></p>
+        <a class="p5-photo" id="p5Photo" target="_blank" rel="noopener" aria-label="ခန်းမ ဓာတ်ပုံ"></a>
+        <svg class="p5-route" viewBox="0 0 941 1672" aria-hidden="true">
+          <path id="routePath" d="M190 1150 C 236 1152, 252 1120, 298 1122 C 344 1124, 356 1152, 398 1138 C 428 1128, 442 1104, 458 1100" fill="none" stroke="#fff6c8" stroke-width="7" stroke-linecap="round"/>
+          <circle class="route-dot" r="9" fill="#fffbe6"><animateMotion dur="2.6s" repeatCount="indefinite" rotate="auto"><mpath href="#routePath"/></animateMotion></circle>
+          <circle class="pin-ripple r1" cx="458" cy="1100" r="10" fill="none" stroke="#e53935" stroke-width="4"/>
+          <circle class="pin-ripple r2" cx="458" cy="1100" r="10" fill="none" stroke="#e53935" stroke-width="4"/>
+        </svg>
+        <a class="p5-map" id="p5Map" target="_blank" rel="noopener" aria-label="မြေပုံ ဖွင့်ရန်"></a>
+        <a class="p5-btn pb5-1" id="p5Dir" target="_blank" rel="noopener"><span class="p5-btn-label" id="p5DirLabel"></span></a>
+        <a class="p5-btn pb5-2" id="p5Gmap" target="_blank" rel="noopener"><span class="p5-btn-label" id="p5GmapLabel"></span></a>
+        <div class="butterflies" aria-hidden="true"></div>
+      </div>
+      <span class="turn-shade" aria-hidden="true"></span>
+    </section>
+
+    <!-- ---------- PAGE 6 : PHOTO GALLERY (tab 4) ---------- -->
+    <section class="page tabpage tabnew page-p6" data-page="p6" data-tab="3" aria-label="ဓာတ်ပုံများ">
+      <div class="art-backdrop" style="--art:url('../assets/img/mm-p6-bg.jpg')" aria-hidden="true"></div>
+      <div class="stage art-stage" id="p6Stage">
+        <img class="stage-bg" src="../assets/img/mm-p6-bg.jpg" alt="" draggable="false">
+        <div class="tp-chrome"></div>
+        <p class="p6-title" id="p6Title"></p>
+        <div class="gv" id="gv" aria-live="polite">
+          <img class="gv-img cur" alt="">
+          <img class="gv-img nxt" alt="">
+          <span class="gv-shine" aria-hidden="true"></span>
+        </div>
+        <button class="gv-nav gv-prev" type="button" aria-label="ရှေ့ပုံ"></button>
+        <button class="gv-nav gv-next" type="button" aria-label="နောက်ပုံ"></button>
+        <div class="gv-thumbs" id="gvThumbs"></div>
+        <div class="gv-dots" id="gvDots"></div>
+        <button class="gold-pill p6-next" type="button" data-go="p7"><span id="p6NextLabel"></span></button>
+        <div class="butterflies" aria-hidden="true"></div>
+      </div>
+      <span class="turn-shade" aria-hidden="true"></span>
+    </section>
+
+    <!-- ---------- PAGE 7 : THANK-YOU LETTER ---------- -->
+    <section class="page page-p7" data-page="p7" aria-label="ကျေးဇူးတင်လွှာ">
+      <div class="art-backdrop" style="--art:url('../assets/img/mm-p7-bg.jpg')" aria-hidden="true"></div>
+      <div class="stage art-stage" id="p7Stage">
+        <img class="stage-bg" src="../assets/img/mm-p7-bg.jpg" alt="" draggable="false">
+        <span class="p7-sun" aria-hidden="true"></span>
+        <span class="p7-flame" aria-hidden="true"></span>
+        <button class="tp-round tp-back" type="button" data-back aria-label="နောက်သို့"></button>
+        <p class="tp-title p7-head" id="p7Head"></p>
+        <p class="p7-title" id="p7Title"></p>
+        <p class="p7-msg" id="p7Msg"></p>
+        <button class="gold-pill p7-next" type="button" data-go="p8"><span id="p7NextLabel"></span></button>
+        <div class="butterflies" aria-hidden="true"></div>
+      </div>
+      <span class="turn-shade" aria-hidden="true"></span>
+    </section>
+
+    <!-- ---------- PAGE 8 : THE GATE CLOSES (same golden gate as the entrance) ---------- -->
+    <section class="page page-p8" data-page="p8" aria-label="ကျေးဇူးတင်ပါသည်">
+      <div class="art-backdrop" style="--art:url('../assets/img/mm-gate-bg.jpg')" aria-hidden="true"></div>
+      <div class="stage art-stage" id="p8Stage">
+        <img class="stage-bg" src="../assets/img/mm-gate-bg.jpg" alt="" draggable="false">
+        <div class="p8-hall" aria-hidden="true"><span class="hall-sky"></span><span class="hall-rays"></span><span class="hall-mist m1"></span><span class="hall-mist m2"></span><span class="hall-mist m3"></span><span class="hall-motes"></span><span class="hall-core"></span></div>
+        <div class="p8-doors">
+          <img class="p8-leaf p8-l" src="../assets/img/mm-door-left.png" alt="" draggable="false">
+          <img class="p8-leaf p8-r" src="../assets/img/mm-door-right.png" alt="" draggable="false">
+          <span class="p8-seam" aria-hidden="true"></span>
+        </div>
+        <span class="glow g-lantern-l" aria-hidden="true"></span>
+        <span class="glow g-lantern-r" aria-hidden="true"></span>
+        <span class="glow g-candle-l" aria-hidden="true"></span>
+        <span class="glow g-candle-r" aria-hidden="true"></span>
+        <div class="p8-plaque"><p class="p8-main" id="p8Main"></p></div>
+        <div class="p8-floor">
+          <p class="p8-kicker" id="p8Kicker"></p>
+          <p class="p8-names"><span id="p8Groom"></span><em>နှင့်</em><span id="p8Bride"></span></p>
+        </div>
+        <button class="p8-home" type="button" id="p8Home"><span class="p8-home-shine" aria-hidden="true"></span><span class="p8-home-label" id="p8HomeLabel"></span></button>
+        <div class="butterflies" aria-hidden="true"></div>
+      </div>
+      <span class="turn-shade" aria-hidden="true"></span>
+    </section>
+  </main>
+
+  <!-- ============ MENU ============ -->
+  <nav class="menu" id="menu" aria-label="မီနူး" aria-hidden="true">
+    <button class="menu-close" type="button" aria-label="ပိတ်ရန်">✕</button>
+    <svg class="menu-orn" viewBox="0 0 120 60" aria-hidden="true"><use href="#lotus"/></svg>
+    <p class="menu-title">မာတိကာ</p>
+    <ul class="menu-list">
+      <li><button type="button" data-go="home"><span>🏛️</span>ပင်မ စာမျက်နှာ</button></li>
+      <li><button type="button" data-go="p2"><span>💑</span>မင်္ဂလာ ဖိတ်စာ</button></li>
+      <li><button type="button" data-go="p3"><span>💌</span>ဖိတ်ကြားလွှာ</button></li>
+      <li><button type="button" data-go="p4"><span>🕰️</span>မင်္ဂလာ အစီအစဉ်</button></li>
+      <li><button type="button" data-go="p5"><span>📍</span>ကျင်းပမည့် နေရာ</button></li>
+      <li><button type="button" data-go="p6"><span>🖼️</span>ဓာတ်ပုံများ</button></li>
+      <li><button type="button" data-go="p7"><span>🙏</span>ကျေးဇူးတင်လွှာ</button></li>
+    </ul>
+  </nav>
+
+  <!-- silk curtain (between page groups) -->
+  <div class="curtain" id="curtain" aria-hidden="true">
+    <span class="c-panel c-l"></span><span class="c-panel c-r"></span>
+    <span class="c-seal"><svg viewBox="0 0 100 100"><circle cx="38" cy="52" r="20" fill="none" stroke="url(#goldGrad)" stroke-width="7"/><circle cx="62" cy="52" r="20" fill="none" stroke="url(#goldGrad)" stroke-width="7"/><path d="M50 24 l5 -9 l5 9 z" fill="#fff3c4"/></svg></span>
+  </div>
+
+  <!-- light bloom / iris / white-out overlays -->
+  <div class="fx" id="fx" aria-hidden="true"></div>
+
+  <!-- transition ring -->
+  <div class="warp" id="warp" aria-hidden="true"></div>
+
+  <audio id="bgm" loop preload="auto"></audio>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
