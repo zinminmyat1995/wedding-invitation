@@ -426,3 +426,90 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .b3:active { background: radial-gradient(ellipse, rgba(255, 230, 170, .45), transparent 70%); }
 .p2.in .s3 { animation: s2In 1s cubic-bezier(.2, .8, .2, 1) both; }
 #art2.a3 { top: 0; left: 0; width: 100%; height: 100%; }
+
+/* soft mountain mist drifting through the middle of the valley (where the moon gate was) */
+.vale { position: absolute; left: 18%; width: 64%; top: 38%; height: 26%; pointer-events: none; border-radius: 50%;
+  background: radial-gradient(ellipse 50% 42% at 40% 50%, rgba(255, 240, 225, .55), rgba(255, 236, 220, 0) 100%), radial-gradient(ellipse 46% 38% at 64% 58%, rgba(255, 228, 205, .45), rgba(255, 228, 205, 0) 100%);
+  filter: blur(1.5cqw); animation: vale 5s ease-in-out infinite alternate; }
+@keyframes vale { from { transform: translateX(-4%) scale(1); opacity: .75; } to { transform: translateX(4%) scale(1.06); opacity: 1; } }
+
+/* ===== page 2 v3 (artwork 851 × 1848) ===== */
+.p2 .stage.s3 { aspect-ratio: 851 / 1848; }
+.sheet { left: calc(212 / 851 * 100%); width: calc(430 / 851 * 100%); top: calc(428 / 1848 * 100%); height: calc(124 / 1848 * 100%); }
+.sh-card { left: calc(10 / 430 * 100%); }
+.pull-zone { left: calc(120 / 851 * 100%); width: calc(612 / 851 * 100%); top: calc(355 / 1848 * 100%); height: calc(240 / 1848 * 100%); }
+.pull-hint { top: calc(735 / 1848 * 100%); }
+.b3 { top: calc(1375 / 1848 * 100%); }
+.moon2 { left: 9.9%; top: 30%; width: 30cqw; }
+.p2 .pl { width: 9cqw; }
+.fall3 { left: 73.4%; top: 36.4%; width: 10%; height: 6.4%; }
+.fall3.mist { left: 71%; top: 42%; width: 16%; height: 3.2%; }
+.water3 { top: 51.5%; height: 18%; }
+.lo4 img { animation-duration: 1.7s; animation-delay: -.3s; }
+.cl-t img { animation: clM 2.8s ease-in-out infinite alternate; }
+
+/* =========================================================
+   PAGE 3 — Our Story (artwork 1086 × 1448)
+   phones: the page fills the height and pans sideways
+   (photos on the left, the story on the right)
+   ========================================================= */
+.p3 { background: #3a1a18; }
+.backdrop3 { position: absolute; inset: -60px; background: url("img/s-bg.jpg") center / cover; filter: blur(22px) brightness(.85); transform: scale(1.1); }
+.pan3 { position: absolute; left: 50%; top: 50%; transform: translate(calc(-50% + var(--pan, 0px)), -50%); will-change: transform; }
+.p3 .stage.s4 { position: relative; left: 0; top: 0; transform: none; height: 100vh; height: 100dvh; width: auto; aspect-ratio: 1086 / 1448; container-type: inline-size; }
+.s4 .bg, .s-fg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
+.s-fg { left: 0; top: 0; width: calc(520 / 1086 * 100%); height: calc(720 / 1448 * 100%); }
+.u4 { }
+/* the real couple in the moon window */
+.moonPh { position: absolute; left: calc((250 - 262) / 1086 * 100%); top: calc((405 - 262) / 1448 * 100%); width: calc(524 / 1086 * 100%); aspect-ratio: 1; border-radius: 50%; overflow: hidden;
+  box-shadow: 0 0 0 .5cqw #f3cd6e, 0 0 0 .9cqw rgba(140, 60, 10, .55), 0 0 3cqw rgba(255, 200, 120, .8); }
+.moonPh img { width: 100%; height: 100%; object-fit: cover; display: block; animation: ken3 12s ease-in-out infinite alternate; }
+@keyframes ken3 { from { transform: scale(1.02); } to { transform: scale(1.12) translate(1.5%, -1%); } }
+.mp-shine { position: absolute; inset: 0; background: linear-gradient(115deg, transparent 38%, rgba(255, 246, 220, .45) 50%, transparent 62%); transform: translateX(-130%); animation: shine 6s ease-in-out 1.5s infinite; }
+/* polaroids with the real photos */
+.pola { position: absolute; margin: 0; padding: .9cqw .9cqw 1.1cqw; background: #fffaf2; box-shadow: 0 1cqw 2cqw rgba(60, 15, 0, .45); transform: translate(-50%, -50%) rotate(var(--r)); }
+.pola img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.po1 { left: calc(222 / 1086 * 100%); top: calc(752 / 1448 * 100%); width: calc(262 / 1086 * 100%); height: calc(212 / 1448 * 100%); --r: -7deg; animation: polF 4s ease-in-out infinite; }
+.po2 { left: calc(286 / 1086 * 100%); top: calc(924 / 1448 * 100%); width: calc(248 / 1086 * 100%); height: calc(212 / 1448 * 100%); --r: 9deg; animation: polF 4.6s ease-in-out -1.5s infinite; }
+.po3 { left: calc(184 / 1086 * 100%); top: calc(1062 / 1448 * 100%); width: calc(246 / 1086 * 100%); height: calc(196 / 1448 * 100%); --r: -11deg; animation: polF 4.2s ease-in-out -3s infinite; }
+@keyframes polF { 0%, 100% { transform: translate(-50%, -50%) rotate(var(--r)); } 50% { transform: translate(-50%, -52%) rotate(calc(var(--r) + 1.6deg)); } }
+/* the story inside the glass panel */
+.story { position: absolute; left: calc(548 / 1086 * 100%); width: calc(460 / 1086 * 100%); top: calc(282 / 1448 * 100%); height: calc(815 / 1448 * 100%); display: flex; flex-direction: column; align-items: center; }
+.lang { display: flex; gap: .6cqw; padding: .5cqw; border-radius: 99px; background: rgba(120, 40, 10, .12); box-shadow: inset 0 0 0 .15cqw rgba(190, 120, 50, .5); margin-bottom: 1.6cqw; }
+.lang button { font-size: 1.9cqw; font-weight: 700; letter-spacing: .1em; padding: .5cqw 1.8cqw; border-radius: 99px; color: #8a3a14; }
+.lang button.on { background: linear-gradient(180deg, #c3262a, #8f1015); color: #ffe7b0; box-shadow: 0 .3cqw .8cqw rgba(120, 20, 0, .35); }
+.st-text { flex: 1; width: 100%; overflow-y: auto; scrollbar-width: none; text-align: center; color: #4a1a0c; -webkit-mask: linear-gradient(180deg, #000 92%, transparent); mask: linear-gradient(180deg, #000 92%, transparent); }
+.st-text::-webkit-scrollbar { display: none; }
+.st-text p { margin: 0 0 1.9cqw; font-size: 2.15cqw; line-height: 1.85; font-weight: 600; opacity: 0; transform: translateY(1cqw); }
+.st-text.en p { font-family: "Cormorant Garamond", Georgia, serif; font-size: 2.3cqw; line-height: 1.55; font-weight: 600; font-style: italic; }
+.st-text .orn { display: block; margin: .2cqw auto 1.8cqw; width: 40%; height: 1.6cqw; background:
+  radial-gradient(circle, #c0782a 0 .45cqw, transparent .5cqw) center / 1.6cqw 1.6cqw no-repeat, linear-gradient(90deg, transparent, #d39a3a 30%, #d39a3a 70%, transparent) center / 100% .15cqw no-repeat; opacity: 0; }
+.st-text.show p, .st-text.show .orn { animation: lineIn .7s var(--ease) both; animation-delay: calc(var(--i) * .09s + .15s); }
+@keyframes lineIn { from { opacity: 0; transform: translateY(1cqw); filter: blur(3px); } to { opacity: 1; transform: none; filter: none; } }
+/* glows */
+.g4 { position: absolute; pointer-events: none; border-radius: 50%; mix-blend-mode: screen; transform: translate(-50%, -50%); animation: flick2 1.3s steps(6) infinite; }
+.lan1 { left: 5.2%; top: 16.6%; width: 22cqw; aspect-ratio: .8; background: radial-gradient(ellipse, rgba(255, 200, 110, .8), rgba(255, 120, 40, 0) 68%); }
+.lan2 { left: 3.6%; top: 84%; width: 20cqw; aspect-ratio: .8; background: radial-gradient(ellipse, rgba(255, 200, 110, .8), rgba(255, 120, 40, 0) 68%); animation-delay: -.5s; }
+.lan3 { left: 95.6%; top: 84.6%; width: 10cqw; aspect-ratio: .8; background: radial-gradient(ellipse, rgba(255, 210, 130, .8), rgba(255, 120, 40, 0) 68%); animation-delay: -.8s; }
+.lan4 { left: 22.8%; top: 86.8%; width: 8cqw; aspect-ratio: .8; background: radial-gradient(ellipse, rgba(255, 210, 130, .8), rgba(255, 120, 40, 0) 68%); animation-delay: -.3s; }
+.water4 { position: absolute; left: 0; right: 0; top: 89%; height: 8%; pointer-events: none; mix-blend-mode: screen; opacity: .5;
+  background: repeating-linear-gradient(180deg, rgba(255, 236, 200, 0) 0 3px, rgba(255, 236, 200, .45) 4px, rgba(255, 236, 200, 0) 7px) 0 0 / 100% 14px;
+  -webkit-mask: linear-gradient(180deg, transparent, #000 30%, #000 70%, transparent); mask: linear-gradient(180deg, transparent, #000 30%, #000 70%, transparent);
+  animation: water3 1.4s linear infinite; }
+.pan-hint { position: absolute; left: 50%; bottom: calc(40px + var(--safe-b)); transform: translateX(-50%); z-index: 22; margin: 0; padding: 6px 16px; border-radius: 99px; pointer-events: none;
+  background: rgba(90, 10, 10, .65); color: #ffe7b0; font-size: 13px; letter-spacing: .2em; white-space: nowrap; box-shadow: 0 0 0 1px rgba(243, 205, 110, .6); transition: opacity .4s; }
+.pan-hint i { font-style: normal; display: inline-block; animation: nudgeX 1s ease-in-out infinite; }
+.pan-hint i:last-child { animation-direction: reverse; }
+@keyframes nudgeX { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-4px); } }
+.p3.no-pan .pan-hint, .pan-hint.off { opacity: 0; }
+.p3 .back { z-index: 25; top: calc(12px + var(--safe-t)); left: 12px; }
+.p3 .sig { z-index: 25; }
+.p3 .layer { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+/* entrance */
+.p3.in .s4 { animation: s2In 1s cubic-bezier(.2, .8, .2, 1) both; }
+.p3.in .moonPh { animation: moonIn 1.4s cubic-bezier(.2, .9, .2, 1.1) .2s both; }
+@keyframes moonIn { from { opacity: 0; transform: scale(.7) rotate(-10deg); filter: blur(6px); } }
+.p3.in .pola { animation: polIn .9s cubic-bezier(.2, .9, .2, 1.3) both, polF 4s ease-in-out 1.6s infinite; }
+.p3.in .po1 { animation-delay: .5s, 1.6s; } .p3.in .po2 { animation-delay: .7s, 2s; } .p3.in .po3 { animation-delay: .9s, 2.4s; }
+@keyframes polIn { from { opacity: 0; transform: translate(-50%, -20%) rotate(calc(var(--r) * -2)) scale(.6); } to { opacity: 1; transform: translate(-50%, -50%) rotate(var(--r)); } }
+.st-text.en p { font-size: 2.05cqw; line-height: 1.5; padding: 0 1.2cqw; }

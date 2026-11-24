@@ -499,33 +499,32 @@
   }
   $("#enterBtn").addEventListener("click", () => { if (reduce) { showPage2(); return; } startFlight(); });
   $("#backBtn").addEventListener("click", () => (history.state && history.state.p === 2 ? history.back() : showPage1()));
-  addEventListener("popstate", () => { if (p2.classList.contains("on") && !flying) showPage1(); });
+  addEventListener("popstate", () => { if (p3.classList.contains("on")) { closePage3(); return; } if (p2.classList.contains("on") && !flying) showPage1(); });
 
   /* =========================================================
      PAGE 2 — the hanging scroll. The top roller stays where it is;
      hold the scroll and drag down: the lower roller follows the finger
      and the invitation unrolls between them. Let go → it rolls back up.
   ========================================================= */
-  const A2W = 851, A2H = 1849;
+  const A2W = 851, A2H = 1848;
   const META2 = {
-    rodB: [210, 652, 434, 56], knotB: [388, 696, 78, 148], paper: [226, 565, 400, 97],
-    lantern: [768, 404, 84, 290], gknot: [384, 1086, 88, 200],
-    lotus1: [48, 1162, 124, 68], lotus2: [679, 1150, 116, 64], lotus3: [556, 1218, 124, 68],
-    silk: [0, 1460, 851, 300], silkL: [0, 1020, 330, 130], silkR: [560, 1010, 291, 120],
-    cloudB: [0, 1690, 851, 159], cloudM: [70, 1500, 781, 110], cloudL: [0, 580, 200, 80],
+    rodB: [198, 543, 464, 56], knotB: [388, 576, 84, 158], paper: [212, 428, 430, 124],
+    lantern: [772, 296, 76, 376],
+    lotus1: [85, 1062, 140, 76], lotus2: [687, 1030, 132, 72], lotus3: [542, 1140, 132, 72], lotus4: [766, 922, 80, 44],
+    silk: [0, 1470, 851, 300], cloudB: [0, 1690, 851, 158], cloudM: [0, 1460, 851, 110], cloudT: [90, 235, 710, 65],
   };
   const place = (el, x, y, w, h) => Object.assign(el.style, { left: `${(x / A2W) * 100}%`, top: `${(y / A2H) * 100}%`, width: `${(w / A2W) * 100}%`, height: `${(h / A2H) * 100}%` });
   document.querySelectorAll("#art2 .l3[data-k]").forEach((el) => { const m = META2[el.dataset.k]; place(el, ...m); });
   const art2 = $("#art2"), sheet = $("#sheet"), shCard = $("#shCard"), rollB = $("#rollB"), knotB = $("#knotB"), shLabel = $(".sh-label", sheet);
-  const SHEET_X = 226, SHEET_W = 400, SHEET_Y = 565, SHEET_H0 = 97, CARD_W = 641, CARD_H = 842;
-  const CARD_S = SHEET_W / CARD_W, CARD_TOP = 24;                     // card scale + its gap under the top roller
+  const SHEET_X = 212, SHEET_W = 430, SHEET_Y = 428, SHEET_H0 = 124, CARD_W = 641, CARD_H = 842;
+  const CARD_S = (SHEET_W - 20) / CARD_W, CARD_TOP = 16;                     // card scale + its gap under the top roller
   const PULL_MAX = CARD_TOP + CARD_H * CARD_S + 22 - SHEET_H0;      // fully unrolled
   let pull = 0, pullTarget = 0, vel = 0, dragging = false, pinned = false, anim = null, sY = 0, sPull = 0;
   function sheetLayout() {
     const p = Math.max(0, pull), h = SHEET_H0 + p;
     place(sheet, SHEET_X, SHEET_Y, SHEET_W, h);
-    place(rollB, 210, 652 + p, 434, 56);
-    place(knotB, 388, 696 + p, 78, 148);
+    place(rollB, 198, 543 + p, 464, 56);
+    place(knotB, 388, 576 + p, 84, 158);
     const px = art2.getBoundingClientRect().width / A2W;              // css px per artwork unit
     shCard.style.transform = `translate(0, ${CARD_TOP * px}px) scale(${CARD_S * px})`;
     const show = smooth(p / 140);
@@ -569,13 +568,13 @@
   });
   rollB.style.pointerEvents = "auto"; rollB.style.touchAction = "none";
   // as the roller comes down the hit area grows with it
-  const zoneFollow = () => { zone.style.height = `${((250 + Math.max(0, pull)) / A2H) * 100}%`; requestAnimationFrame(zoneFollow); };
+  const zoneFollow = () => { zone.style.height = `${((240 + Math.max(0, pull)) / A2H) * 100}%`; requestAnimationFrame(zoneFollow); };
   zoneFollow();
   // 邀请函 button: unroll fully and keep it open; tap the scroll to roll it up
   function openScroll() { pinned = true; pullTarget = PULL_MAX; kick(); }
   const toast2 = $("#toast2");
   function say(msg) { toast2.textContent = msg; toast2.classList.add("on"); clearTimeout(say.t); say.t = setTimeout(() => toast2.classList.remove("on"), 1600); }
-  document.querySelectorAll(".b3").forEach((b) => b.addEventListener("click", () => { if (b.dataset.b === "invite") openScroll(); else say("敬请期待 ✦"); }));
+  document.querySelectorAll(".b3").forEach((b) => b.addEventListener("click", () => { if (b.dataset.b === "story") showPage3(); else if (b.dataset.b === "place") window.open("https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent("Royal Myeik Hotel, Myeik"), "_blank", "noopener"); else say("敬请期待 ✦"); }));
   addEventListener("resize", sheetLayout);
   sheetLayout();
 
@@ -603,6 +602,92 @@
     g.globalAlpha = 1;
   }
 
+  /* =========================================================
+     PAGE 3 — Our Story: photos on the left, the story on the right.
+     On phones the page is taller than it is wide, so it pans sideways:
+     it opens on the photos, glides over to the story, and can be dragged.
+  ========================================================= */
+  const p3 = $("#p3"), pan3 = $("#pan3"), st3 = $("#st3"), stText = $("#stText"), panHint = $("#panHint");
+  const STORY = C.story || {};
+  let lang = "cn";
+  function renderStory() {
+    const paras = STORY[lang] || [];
+    let i = 0;
+    stText.className = "st-text" + (lang === "en" ? " en" : "");
+    stText.innerHTML = paras.map((p, k) => (p === "*" ? `<i class="orn" style="--i:${i++}"></i>` : `<p style="--i:${i++}">${lang === "en" ? p.replace(/\n/g, " ") : p.replace(/\n/g, "<br>")}</p>`)).join("");
+    stText.scrollTop = 0;
+    void stText.offsetWidth; stText.classList.add("show");
+  }
+  document.querySelectorAll(".lang button").forEach((b) => b.addEventListener("click", () => {
+    if (b.dataset.l === lang) return;
+    lang = b.dataset.l;
+    document.querySelectorAll(".lang button").forEach((x) => x.classList.toggle("on", x === b));
+    renderStory();
+  }));
+  // sideways pan
+  let panX = 0, panMin = 0, panAnim = null;
+  function panBounds() {
+    const w = st3.getBoundingClientRect().width, extra = Math.max(0, w - innerWidth);
+    panMin = -extra / 2;                                    // pan offsets measured from the centred position
+    p3.classList.toggle("no-pan", extra < 2);
+    return extra / 2;
+  }
+  const setPan = (x) => { const max = panBounds(); panX = Math.max(-max, Math.min(max, x)); pan3.style.setProperty("--pan", `${panX}px`); };
+  function glideTo(x, ms = 1400) {
+    cancelAnimationFrame(panAnim);
+    const from = panX, t0 = performance.now();
+    const step = (t) => { const k = Math.min(1, (t - t0) / ms), e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2; setPan(from + (x - from) * e); if (k < 1) panAnim = requestAnimationFrame(step); };
+    panAnim = requestAnimationFrame(step);
+  }
+  {
+    let sx = null, s0 = 0, moved = false;
+    p3.addEventListener("pointerdown", (e) => { if (e.target.closest("button, .st-text")) return; sx = e.clientX; s0 = panX; moved = false; cancelAnimationFrame(panAnim); clearTimeout(p3.autoT); });
+    addEventListener("pointermove", (e) => { if (sx === null) return; const d = e.clientX - sx; if (Math.abs(d) > 4) moved = true; setPan(s0 + d); if (moved) panHint.classList.add("off"); });
+    addEventListener("pointerup", () => { if (sx === null) return; sx = null; const max = panBounds(); if (max > 1) glideTo(panX > 0 ? max : -max, 450); });
+    // horizontal swipes inside the text still pan the page
+    let tx = null, ty = 0;
+    stText.addEventListener("touchstart", (e) => { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
+    stText.addEventListener("touchend", (e) => { if (tx === null) return; const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty; tx = null; if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.3) { const max = panBounds(); glideTo(dx > 0 ? max : -max, 450); } });
+  }
+  addEventListener("resize", () => { if (p3.classList.contains("on")) setPan(panX); });
+  function showPage3(push = true) {
+    p2.classList.remove("on", "in"); p2.setAttribute("aria-hidden", "true");
+    p3.classList.add("on"); p3.removeAttribute("aria-hidden");
+    p3.classList.remove("in"); void p3.offsetWidth; p3.classList.add("in");
+    renderStory();
+    panHint.classList.remove("off");
+    const max = panBounds(); setPan(max);                   // open on the photos (left side)…
+    clearTimeout(p3.autoT); p3.autoT = setTimeout(() => glideTo(-max, 1600), 2600);   // …then glide to the story
+    if (push) history.pushState({ p: 3 }, "", "#story");
+  }
+  function closePage3() {
+    p3.classList.remove("on", "in"); p3.setAttribute("aria-hidden", "true");
+    p2.classList.add("on"); p2.removeAttribute("aria-hidden");
+    p2.classList.remove("in"); void p2.offsetWidth; p2.classList.add("in");
+  }
+  $("#back3").addEventListener("click", () => (history.state && history.state.p === 3 ? history.back() : closePage3()));
+
+  /* petals on the story page */
+  const cv3 = $("#p3Petals"), g3 = cv3.getContext("2d"), pet3 = [];
+  const mkP3 = (top) => ({ x: top ? rnd(-0.2, 0.9) : Math.random(), y: top ? -0.03 : Math.random(), s: rnd(5, 10), vx: rnd(0.03, 0.08), vy: rnd(0.05, 0.11), r: rnd(0, 6.28), vr: rnd(-4, 4), ph: rnd(0, 6.28) });
+  for (let i = 0; i < 20; i++) pet3.push(mkP3(false));
+  let last3 = performance.now();
+  function drawP3(t) {
+    const r = st3.getBoundingClientRect(), W = r.width, H = r.height, dt = Math.min(0.05, (t - last3) / 1000); last3 = t;
+    fit(cv3, W, H); g3.setTransform(DPR, 0, 0, DPR, 0, 0); g3.clearRect(0, 0, W, H);
+    if (pet3.length < 26 && Math.random() < 0.12) pet3.push(mkP3(true));
+    for (let i = pet3.length - 1; i >= 0; i--) {
+      const p = pet3[i]; p.x += (p.vx + Math.sin(t * 0.002 + p.ph) * 0.04) * dt; p.y += p.vy * dt; p.r += p.vr * dt;
+      if (p.y > 1.03 || p.x > 1.08) { pet3.splice(i, 1); continue; }
+      g3.save(); g3.translate(p.x * W, p.y * H); g3.rotate(p.r); g3.scale(1, 0.4 + Math.abs(Math.sin(t * 0.005 + p.ph)) * 0.6);
+      const gr = g3.createLinearGradient(0, -p.s, 0, p.s); gr.addColorStop(0, "#ffd3dc"); gr.addColorStop(1, "#ef6f86");
+      g3.fillStyle = gr; g3.globalAlpha = 0.9;
+      g3.beginPath(); g3.moveTo(0, -p.s); g3.bezierCurveTo(p.s * 0.9, -p.s * 0.5, p.s * 0.55, p.s * 0.8, 0, p.s * 0.75); g3.bezierCurveTo(-p.s * 0.55, p.s * 0.8, -p.s * 0.9, -p.s * 0.5, 0, -p.s); g3.fill();
+      g3.restore();
+    }
+    g3.globalAlpha = 1;
+  }
+
   /* ---------- main loop ---------- */
   let last = performance.now();
   function loop(now) {
@@ -610,6 +695,7 @@
     if (p1.classList.contains("on")) { drawSky(dt, now); drawPetals(dt, now); }
     if (flying) { try { flightFrame(dt); } catch (e) { console.error(e); endFlight(); } }
     if (p2.classList.contains("on")) drawDust(now);
+    if (p3.classList.contains("on")) drawP3(now);
     requestAnimationFrame(loop);
   }
   requestAnimationFrame(loop);
@@ -631,6 +717,7 @@
 
   // preview shortcuts:  ?fly  (play the dragons right away)   ?p2  (open page 2)
   if (/[?&]p2\b/.test(location.search)) showPage2(false);
+  if (/[?&]story/.test(location.search)) { showPage2(false); showPage3(false); }
   if (/[?&]fly\b/.test(location.search)) setTimeout(startFlight, 1900);
   window.__cn = { startFlight, get t() { return tFly; }, pullTo(d) { pull = Math.min(d, PULL_MAX); pullTarget = pull; sheetLayout(); } };
 })();
