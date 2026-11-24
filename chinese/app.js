@@ -103,6 +103,57 @@
       el.style.height = `${Math.max(60, (cfg.fitBottom - m - cfg.fitTop) * k)}px`;
     });
   }
+  /* several trimmable regions: cuts = [[from, to], …] in artwork units, trimmed in that order */
+  function multiFit(page, stage, AW, AH, cfg) {
+    const W = page.clientWidth || innerWidth, H = page.clientHeight || innerHeight, S = cfg.seam || 24;
+    const k = W / AW, h = AH * k;
+    stage.style.width = `${W}px`; stage.style.height = `${h}px`;
+    const pct = (v) => `${(v / AH) * 100}%`;
+    const cuts = cfg.cuts;
+    // bands: fixed, cut, fixed, cut, …, fixed
+    const segs = []; let y = 0;
+    cuts.forEach(([f, t]) => { segs.push({ fixed: true, s: y, e: f }); segs.push({ fixed: false, s: f, e: t }); y = t; });
+    segs.push({ fixed: true, s: y, e: AH });
+    if (!stage._mbands) {
+      void stage.offsetHeight;
+      const sh = stage.offsetHeight || 1, bg = stage.querySelector(":scope > .bg");
+      const keep = new Set((cfg.fitMid || []).map((s) => stage.querySelector(s)).filter(Boolean));
+      const kids = [...stage.children].filter((el) => el !== bg && !keep.has(el) && !el.classList.contains("layer"));
+      segs.forEach((g) => { g.el = document.createElement("div"); g.el.className = "band " + (g.fixed ? "b-top" : "b-mid"); stage.insertBefore(g.el, stage.firstChild); g.el.appendChild(bg.cloneNode()); });
+      bg.remove();
+      kids.forEach((el) => { const c = ((el.offsetTop + el.offsetHeight / 2) / sh) * AH; const g = segs.find((q) => c >= q.s && c < q.e) || segs[segs.length - 1]; g.el.appendChild(el); });
+      keep.forEach((el) => stage.appendChild(el)); stage.querySelectorAll(":scope > .layer").forEach((c) => stage.appendChild(c));
+      stage._mbands = segs.map((g) => g.el);
+    }
+    segs.forEach((g, i) => { g.el = stage._mbands[i]; });
+    let need = Math.max(0, (h - H) / k);
+    cuts.forEach((c, i) => { const g = segs[2 * i + 1], cap = Math.max(0, g.e - g.s - 2 * S); g.r = Math.min(need, cap); need -= g.r; });
+    stage.style.marginTop = `${(h - H) / 2 - need * k}px`;          // only if the cuts can't absorb it all
+    let above = 0;
+    segs.forEach((g, i) => {
+      const b = g.el;
+      if (g.fixed) {
+        b.style.transform = `translateY(${-above * k}px)`;
+        b.style.clipPath = `inset(${pct(g.s)} 0 ${pct(AH - g.e)} 0)`;
+        const top = i > 0, bot = i < segs.length - 1;
+        const m = `linear-gradient(180deg, transparent ${pct(g.s)}, #000 ${pct(top ? g.s + S : g.s)}, #000 ${pct(bot ? g.e - S : g.e)}, transparent ${pct(g.e)})`;
+        b.style.webkitMaskImage = b.style.maskImage = m;
+      } else {
+        const a = g.r * (cfg.focus ?? 0.5);
+        b.style.transform = `translateY(${-(above + a) * k}px)`;
+        b.style.clipPath = `inset(${pct(g.s + a - S)} 0 ${pct(AH - (g.e - (g.r - a)) - S)} 0)`;
+        b.style.webkitMaskImage = b.style.maskImage = "";
+        above += g.r;
+      }
+    });
+    (cfg.fitMid || []).forEach((s) => {
+      const el = stage.querySelector(s); if (!el) return;
+      const before = segs.filter((g, i) => !g.fixed && g.e <= cfg.fitTop).reduce((t, g) => t + g.r, 0);
+      const inside = segs.filter((g) => !g.fixed && g.s >= cfg.fitTop && g.e <= cfg.fitBottom).reduce((t, g) => t + g.r, 0);
+      el.style.top = `${(cfg.fitTop - before) * k}px`;
+      el.style.height = `${Math.max(80, (cfg.fitBottom - cfg.fitTop - inside) * k)}px`;
+    });
+  }
   const FIT = {
     p2: { T: 770, B: 1275, focus: 0.45, host: document.getElementById("art2"), free: ["#sheet", "#rollB", "#knotB", "#pullZone", "#pullHint"] },
     p3: { T: 935, B: 1545, focus: 0.5, topFirst: 170, fitMid: ["#stText"], fitTop: 950, fitBottom: 1562 },
@@ -739,7 +790,7 @@
   const OS_W = 851, OS_H = 1848;
   let lang = "cn";
   // size the stage from the page box itself (dvh is unreliable in some phone browsers)
-  function fitStory() { bandFit(p3, st3, 851, 1848, FIT.p3); }
+  function fitStory() { multiFit(p3, st3, 851, 1848, { cuts: [[440, 640], [1000, 1545]], focus: 0.5, fitMid: ["#stText"], fitTop: 950, fitBottom: 1562 }); }
 
   function renderStory() {
     const paras = STORY[lang] || [];
@@ -907,7 +958,7 @@
   function openV7() { $("#viewer7Img").src = GAL[gi5].src; v7.classList.add("open"); v7.setAttribute("aria-hidden", "false"); }
   const closeV7 = () => { v7.classList.remove("open"); v7.setAttribute("aria-hidden", "true"); };
   $("#viewer7X").addEventListener("click", closeV7); v7.addEventListener("click", (e) => { if (e.target === v7) closeV7(); });
-  function fitGallery() { bandFit(p5, st5, 851, 1848, FIT.p5); layout5(); }
+  function fitGallery() { multiFit(p5, st5, 851, 1848, { cuts: [[140, 345], [1450, 1848]], focus: 0.5 }); layout5(); }
 
   addEventListener("resize", () => { if (p5.classList.contains("on")) { fitGallery(); layout5(); } });
   function showPage5(push = true) {
@@ -1160,8 +1211,19 @@
     }).catch(() => {});
   }
   function startMusic() { unlockMusic(); }
-  // if the browser still blocked it, the next touch anywhere after page 2 starts it
-  ["pointerdown", "touchstart", "click", "keydown"].forEach((ev) => addEventListener(ev, () => { if (wantMusic && !playing) playMusic(); }, { passive: true, capture: true }));
+  // keep the song alive from page 2 on, whatever the guest does:
+  //  · if the phone pauses it (gesture, call, app switch…), it resumes where it stopped
+  //  · touchend / pointerup / click count as a "gesture" on iPhone (touchstart doesn't)
+  const resumeMusic = () => {
+    if (!wantMusic || !audio.paused || audio.ended) return;
+    if (!playing) { playMusic(); return; }
+    audio.muted = false;
+    audio.play().catch(() => {});
+  };
+  audio.addEventListener("pause", () => { if (wantMusic) setTimeout(resumeMusic, 60); });
+  ["pointerdown", "pointerup", "touchstart", "touchend", "click", "keydown"].forEach((ev) => addEventListener(ev, resumeMusic, { passive: true, capture: true }));
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) resumeMusic(); });
+  setInterval(resumeMusic, 1500);
 
   // preview shortcuts:  ?fly  (play the dragons right away)   ?p2  (open page 2)
   if (/[?&]p2\b/.test(location.search)) showPage2(false);

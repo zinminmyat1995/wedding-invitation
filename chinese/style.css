@@ -896,3 +896,6 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .ty-btn { top: calc(1585 / 1848 * 100%); width: 44%; padding: 1.4cqw 0 1cqw; }
 .ty-btn .cn { font-size: 4.2cqw; } .ty-btn .mm { font-size: 2.5cqw; }
 #st2 > .sheet { z-index: 3; } #st2 > .knotB { z-index: 4; } #st2 > .rollB { z-index: 5; } #st2 > .pull-hint { z-index: 4; } #st2 > .pull-zone { z-index: 6; }
+.cf-card { -webkit-box-reflect: none; }
+.cf-dots { top: calc(1316 / 1848 * 100%); padding: .6cqw 2cqw; border-radius: 99px; background: radial-gradient(ellipse, rgba(110, 14, 14, .95), rgba(110, 14, 14, .7) 70%, rgba(110, 14, 14, 0)); }
+.cf-count { top: calc(1352 / 1848 * 100%); }
