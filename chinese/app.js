@@ -557,10 +557,7 @@
     // dragon sound: unlocked inside the tap (silent), started 1 s later, fading in.
     // The fade goes through Web Audio, because iPhones ignore audio.volume.
     sfxOn = false;
-    try {
-      if (!sfxCtx) { const AC = window.AudioContext || window.webkitAudioContext; if (AC) { sfxCtx = new AC(); sfxGain = sfxCtx.createGain(); sfxCtx.createMediaElementSource(sfx).connect(sfxGain); sfxGain.connect(sfxCtx.destination); } }
-      if (sfxCtx && sfxCtx.state === "suspended") sfxCtx.resume();
-    } catch (e) { sfxCtx = null; }
+    // plain audio only — Web Audio on iPhone / Messenger can stop the page-2 song later on
     const setVol = (v) => { if (sfxGain) sfxGain.gain.value = v; else sfx.volume = v; };
     setVol(0); try { sfx.currentTime = 0; } catch (e) {}
     const sp = sfx.play(); if (sp) sp.then(() => { if (!sfxOn) { sfx.pause(); try { sfx.currentTime = 0; } catch (e) {} } }).catch(() => {});
@@ -572,12 +569,12 @@
       const p = sfx.play();
       const fadeIn = () => {
         sfxOn = true;
-        if (sfxGain) { const t = sfxCtx.currentTime; sfxGain.gain.cancelScheduledValues(t); sfxGain.gain.setValueAtTime(0, t); sfxGain.gain.linearRampToValueAtTime(1, t + SFX_FADE); }
-        else { const t0 = performance.now(); const st = (n) => { const k = Math.min(1, (n - t0) / (SFX_FADE * 1000)); sfx.volume = k; if (k < 1) requestAnimationFrame(st); }; requestAnimationFrame(st); }
+        { const t0 = performance.now(); const st = (n) => { const k = Math.max(0, Math.min(1, (n - t0) / (SFX_FADE * 1000))); sfx.volume = k; if (k < 1) requestAnimationFrame(st); }; requestAnimationFrame(st); }
       };
       if (p) p.then(fadeIn).catch(() => {}); else fadeIn();
     }, (AWAKE + SFX_DELAY) * 1000);
     // start (and pause) both clips inside the tap, so phones allow playback later
+    DRAG.forEach((d) => { if (!d.v.getAttribute("src")) { d.v.src = "img/dragon.mp4"; d.v.load(); } });
     DRAG.forEach((d) => { d.out = false; d.vOn = false; d.done = false; try { d.v.currentTime = V0; } catch (e) {} const pr = d.v.play(); if (pr) pr.then(() => { if (!d.vOn) d.v.pause(); }).catch(() => {}); });
     startMusic();
     if (navigator.vibrate) navigator.vibrate([20, 60, 30]);
@@ -652,7 +649,8 @@
   }
   function endFlight() {
     flying = false; puffs.length = 0; haze.length = 0;
-    DRAG.forEach((d) => d.v.pause());
+    DRAG.forEach((d) => { d.v.pause(); });
+    setTimeout(() => DRAG.forEach((d) => { try { d.v.removeAttribute("src"); d.v.load(); } catch (e) {} }), 400);   // free them so they never touch the song
     if (!swapped) { swapped = true; showPage2(); }
     gDF.setTransform(1, 0, 0, 1, 0, 0); gDF.clearRect(0, 0, cvDF.width, cvDF.height);
     gDB.setTransform(1, 0, 0, 1, 0, 0); gDB.clearRect(0, 0, cvDB.width, cvDB.height);
