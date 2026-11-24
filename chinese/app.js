@@ -15,6 +15,25 @@
   const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
   const smooth = (x) => { x = clamp(x); return x * x * (3 - 2 * x); };
 
+  /* ---------- full-screen fit for every page ---------- */
+  // focus: which part survives when the screen is wider than the art (0 = keep the top, 1 = keep the bottom)
+  function coverFit(page, stage, aw, ah, focus, maxTop = 1e9) {
+    const W = page.clientWidth || innerWidth, H = page.clientHeight || innerHeight;
+    const k = Math.max(W / aw, H / ah), w = aw * k, h = ah * k;
+    stage.style.width = `${w}px`; stage.style.height = `${h}px`;
+    const cut = Math.min((h - H) * focus, maxTop * k);                    // px cut from the top
+    stage.style.marginTop = `${(h - H) / 2 - cut}px`;          // keeps translate(-50%,-50%) centring for the animations
+  }
+  // move the back button and the signature out of the artwork so cropping can never hide them
+  function pinChrome(page) {
+    page.querySelectorAll(".stage .back6, .stage .back5").forEach((b) => {
+      if (b.classList.contains("back5")) { b.classList.remove("back5"); b.classList.add("back6"); b.innerHTML = '<svg viewBox="0 0 24 24"><path d="M14.5 6 8.5 12l6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'; }
+      b.classList.add("pin-back"); page.appendChild(b);
+    });
+    page.querySelectorAll(".stage .sig5").forEach((s) => { s.classList.add("pin-sig"); page.appendChild(s); });
+  }
+  document.querySelectorAll(".page").forEach(pinChrome);
+
   /* ---------- page 2 text ---------- */
   set("c2Groom", C.groom); set("c2Bride", C.bride);
   set("c2Kicker", P2.kicker); set("c2Date", P2.dateLong); set("c2Week", P2.week); set("c2Time", P2.time);
@@ -513,6 +532,7 @@
 
   /* ---------- pages ---------- */
   function showPage2(push = true) {
+    requestAnimationFrame(() => coverFit(p2, $("#st2"), 851, 1848, 1, 50));
     playMusic();
     p1.classList.remove("on", "in", "flying", "awaken");
     p1.setAttribute("aria-hidden", "true");
@@ -606,7 +626,7 @@
   const toast2 = $("#toast2");
   function say(msg) { toast2.textContent = msg; toast2.classList.add("on"); clearTimeout(say.t); say.t = setTimeout(() => toast2.classList.remove("on"), 1600); }
   document.querySelectorAll(".b3").forEach((b) => b.addEventListener("click", () => { if (b.dataset.b === "story") showPage3(); else if (b.dataset.b === "gallery") showPage5(); else if (b.dataset.b === "fortune") showPage6(); else if (b.dataset.b === "place") showPage4(); else say("敬请期待 ✦"); }));
-  addEventListener("resize", sheetLayout);
+  addEventListener("resize", () => { if (p2.classList.contains("on")) coverFit(p2, $("#st2"), 851, 1848, 1, 50); sheetLayout(); });
   sheetLayout();
 
   /* ---------- page 2: cherry petals blown across ---------- */
@@ -642,14 +662,8 @@
   const OS_W = 851, OS_H = 1848;
   let lang = "cn";
   // size the stage from the page box itself (dvh is unreliable in some phone browsers)
-  function fitStory() {
-    const W = p3.clientWidth || innerWidth, H = p3.clientHeight || innerHeight, r = OS_W / OS_H;
-    // always the full height (never cut the top or bottom); in-app browsers like Messenger are
-    // wider than the artwork, so the sides are filled by the soft backdrop of the same picture
-    let w = H * r;
-    p3.classList.toggle("wide", w < W - 1);
-    st3.style.width = `${w}px`; st3.style.height = `${w / r}px`;
-  }
+  function fitStory() { coverFit(p3, st3, 851, 1848, 0.4); }
+
   function renderStory() {
     const paras = STORY[lang] || [];
     let i = 0;
@@ -714,12 +728,8 @@
   $("#cDateV").innerHTML = `${PL.dateCn || ""}<span class="en">${PL.dateEn || ""}</span>`;
   set("go4L", PL.go);
   let mapLoaded = false;
-  function fitPlace() {
-    const W = p4.clientWidth || innerWidth, H = p4.clientHeight || innerHeight, r = 851 / 1849;
-    const w = H * r;                                     // always full height, never cut top or bottom
-    st4.style.width = `${w}px`; st4.style.height = `${H}px`;
-    p4.classList.toggle("wide", w < W - 1);
-  }
+  function fitPlace() { coverFit(p4, st4, 851, 1849, 1); }
+
   addEventListener("resize", () => { if (p4.classList.contains("on")) fitPlace(); });
   function showPage4(push = true) {
     p2.classList.remove("on", "in"); p2.setAttribute("aria-hidden", "true");
@@ -760,37 +770,41 @@
      the others peek from both sides in 3D; swipe / arrows / thumbnails
   ========================================================= */
   const p5 = $("#p5"), st5 = $("#st5"), cfEl = $("#cf"), cfFlow = $("#cfFlow"), thumbs7 = $("#thumbs7"), cfDots = $("#cfDots");
-  const GAL = (C.gallery || []).map((n) => ({ src: `img/gal/${n}.jpg`, thumb: `img/gal/${n}-t.jpg` }));
+  const GAL = (C.gallery || []).map((n) => ({ src: `../assets/img/gallery-en/g${n.n}.jpg`, thumb: `../assets/img/gallery-en/t${n.n}.jpg`, w: n.w, h: n.h }));
   let gi5 = 0;
   const cards5 = GAL.map((p, i) => {
     const el = document.createElement("div"); el.className = "cf-card"; el.dataset.i = i;
-    el.innerHTML = `<img src="${p.src}" alt="" draggable="false" loading="lazy"><i class="sh"></i>`;
+    el.innerHTML = `<img src="${p.thumb}" data-full="${p.src}" alt="" draggable="false"><i class="sh"></i>`;
     cfFlow.appendChild(el); return el;
   });
+  thumbs7.style.display = "none";
   thumbs7.innerHTML = GAL.map((p, i) => `<button type="button" data-i="${i}" aria-label="照片 ${i + 1}"><img src="${p.thumb}" alt="" loading="lazy"></button>`).join("");
   const thumbEls = [...thumbs7.children];
   const DOTS = 5;
   cfDots.innerHTML = Array.from({ length: DOTS }, () => "<i></i>").join("");
   function layout5() {
     const fw = cfEl.clientWidth, fh = cfEl.clientHeight; if (!fw) return;
-    const n = GAL.length, big = Math.min(fh * 0.96, fw * 0.69), side = big * 0.62;
+    const n = GAL.length, maxH = fh * 0.94, maxW = fw * 0.66;
+    const side = { h: maxH * 0.6 }; side.w = side.h * 0.68;
+    const c = GAL[gi5], r = c.w / c.h; let ch = maxH, cw = ch * r; if (cw > maxW) { cw = maxW; ch = cw / r; }
     cards5.forEach((el, i) => {
       let d = i - gi5; if (d > n / 2) d -= n; if (d < -n / 2) d += n;
       const a = Math.abs(d), s = el.style;
-      el.classList.toggle("center", d === 0); el.classList.toggle("hide", a > 3);
-      if (d === 0) { s.setProperty("--w", `${big}px`); s.setProperty("--h", `${big}px`); s.setProperty("--x", "0px"); s.setProperty("--z", "40px"); s.setProperty("--ry", "0deg"); s.setProperty("--o", 1); s.setProperty("--b", 1); s.setProperty("--zi", 50); }
-      else {
+      el.classList.toggle("center", d === 0); el.classList.toggle("hide", a > 4);
+      if (d === 0) {
+        s.setProperty("--w", `${cw}px`); s.setProperty("--h", `${ch}px`); s.setProperty("--x", "0px"); s.setProperty("--z", "60px"); s.setProperty("--ry", "0deg"); s.setProperty("--o", 1); s.setProperty("--b", 1); s.setProperty("--zi", 50);
+        const im = el.querySelector("img"); if (im.dataset.full && im.src.indexOf(im.dataset.full) < 0) { const big = new Image(); big.onload = () => { im.src = im.dataset.full; }; big.src = im.dataset.full; }
+      } else {
         const sg = Math.sign(d);
-        s.setProperty("--w", `${side}px`); s.setProperty("--h", `${side}px`);
-        s.setProperty("--x", `${sg * (big / 2 + side * 0.08 + (a - 1) * side * 0.32)}px`); s.setProperty("--z", `${-140 - a * 70}px`); s.setProperty("--ry", `${-sg * 45}deg`);
-        s.setProperty("--o", a > 2 ? 0 : 1 - a * 0.15); s.setProperty("--b", 0.8 - a * 0.12); s.setProperty("--zi", 50 - a);
+        s.setProperty("--w", `${side.w}px`); s.setProperty("--h", `${side.h}px`);
+        s.setProperty("--x", `${sg * (cw / 2 + side.w * 0.05 + (a - 1) * side.w * 0.32)}px`); s.setProperty("--z", `${-140 - a * 70}px`); s.setProperty("--ry", `${-sg * 42}deg`);
+        s.setProperty("--o", a > 3 ? 0 : 1 - a * 0.12); s.setProperty("--b", 0.9 - a * 0.1); s.setProperty("--zi", 50 - a);
       }
     });
-    thumbEls.forEach((b, i) => b.classList.toggle("on", i === gi5));
-    const tb = thumbEls[gi5]; if (tb) thumbs7.scrollTo({ left: tb.offsetLeft - thumbs7.clientWidth / 2 + tb.clientWidth / 2, behavior: "smooth" });
     [...cfDots.children].forEach((d, k) => d.classList.toggle("on", k === Math.round((gi5 / Math.max(1, n - 1)) * (DOTS - 1))));
     $("#cfCount").textContent = `${String(gi5 + 1).padStart(2, "0")} / ${String(n).padStart(2, "0")}`;
   }
+
   const go5 = (i) => { gi5 = (i + GAL.length) % GAL.length; layout5(); };
   const tap5 = (el, fn) => { let t = false; el.addEventListener("touchend", (e) => { e.preventDefault(); t = true; fn(); }, { passive: false }); el.addEventListener("click", () => { if (t) { t = false; return; } fn(); }); };
   tap5($("#cfPrev"), () => go5(gi5 - 1)); tap5($("#cfNext"), () => go5(gi5 + 1));
@@ -816,10 +830,8 @@
   function openV7() { $("#viewer7Img").src = GAL[gi5].src; v7.classList.add("open"); v7.setAttribute("aria-hidden", "false"); }
   const closeV7 = () => { v7.classList.remove("open"); v7.setAttribute("aria-hidden", "true"); };
   $("#viewer7X").addEventListener("click", closeV7); v7.addEventListener("click", (e) => { if (e.target === v7) closeV7(); });
-  function fitGallery() {
-    const W = p5.clientWidth || innerWidth, H = p5.clientHeight || innerHeight, r = 851 / 1848;
-    st5.style.width = `${H * r}px`; st5.style.height = `${H}px`;
-  }
+  function fitGallery() { coverFit(p5, st5, 851, 1848, 0.45); }
+
   addEventListener("resize", () => { if (p5.classList.contains("on")) { fitGallery(); layout5(); } });
   function showPage5(push = true) {
     p2.classList.remove("on", "in"); p2.setAttribute("aria-hidden", "true");
@@ -949,10 +961,8 @@
   $("#close8").addEventListener("click", () => { closeRes(); resetCup(); });
   $("#again8").addEventListener("click", () => { closeRes(); setTimeout(shakeCup, 450); });
   $("#foShake").addEventListener("click", () => { if (!p6.classList.contains("ready") && !foRes.classList.contains("open")) shakeCup(); });
-  function fitFortune() {
-    const H = p6.clientHeight || innerHeight, r = 851 / 1848;
-    st6.style.width = `${H * r}px`; st6.style.height = `${H}px`;
-  }
+  function fitFortune() { coverFit(p6, st6, 851, 1848, 0.45); }
+
   addEventListener("resize", () => { if (p6.classList.contains("on")) fitFortune(); });
   function showPage6(push = true) {
     p2.classList.remove("on", "in"); p2.setAttribute("aria-hidden", "true");
@@ -993,12 +1003,8 @@
      PAGE 7 — Thank You
   ========================================================= */
   const p7 = $("#p7"), st7 = $("#st7");
-  function fitThanks() {
-    const W = p7.clientWidth || innerWidth, H = p7.clientHeight || innerHeight, r = 1086 / 1448;
-    // full height on phones (the sides are decoration), whole picture on wide screens
-    const w = Math.max(H * r * (W / H < 0.75 ? 1 : 0), Math.min(W, H * r)) || H * r;
-    st7.style.width = `${w}px`; st7.style.height = `${w / r}px`;
-  }
+  function fitThanks() { coverFit(p7, st7, 1086, 1448, 0.4); }
+
   addEventListener("resize", () => { if (p7.classList.contains("on")) fitThanks(); });
   function showPage7(push = true) {
     p2.classList.remove("on", "in"); p2.setAttribute("aria-hidden", "true");

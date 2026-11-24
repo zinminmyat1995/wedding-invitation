@@ -31,7 +31,8 @@ window.WEDDING_CN = {
   },
 
   // Gallery photos (chinese/img/gal — web copies of chinese/image a–p)
-  gallery: ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "l", "m", "n", "o", "p"],
+  // Gallery — the same photos as the English version (assets/img/gallery-en)
+  gallery: [{ n: 1, w: 2, h: 3 }, { n: 2, w: 3, h: 2 }, { n: 3, w: 2, h: 3 }, { n: 4, w: 2, h: 3 }, { n: 5, w: 3, h: 2 }, { n: 6, w: 3, h: 2 }, { n: 7, w: 3, h: 2 }, { n: 8, w: 2, h: 3 }, { n: 9, w: 2, h: 3 }, { n: 10, w: 2, h: 3 }, { n: 11, w: 2, h: 3 }, { n: 12, w: 3, h: 2 }, { n: 13, w: 3, h: 2 }, { n: 14, w: 3, h: 2 }, { n: 15, w: 3, h: 2 }, { n: 16, w: 3, h: 2 }, { n: 17, w: 2, h: 3 }, { n: 18, w: 3, h: 2 }],
 
   // Place page (from the real invitation card)
   place: {

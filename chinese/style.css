@@ -869,3 +869,19 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .ty-text .cn { font-size: 2.2cqw; line-height: 1.6; }
 .ty-text .mm { font-size: 1.65cqw; line-height: 1.95; }
 .ty-text .nm { font-size: 2.9cqw; }
+
+/* ===== every page: back button + signature pinned to the screen ===== */
+.page > .pin-back { position: absolute; left: 14px; top: calc(14px + var(--safe-t)); width: 44px; height: 44px; z-index: 40; }
+.page > .pin-sig { position: absolute; left: 50%; bottom: calc(8px + var(--safe-b)); transform: translateX(-50%); z-index: 40; }
+.page > .pin-sig .sig-pre { font-size: 12px; } .page > .pin-sig .sig-name { font-size: 20px; }
+.p2 .stage.s3, .p3 .stage.s5, .p4 .stage.s6, .p5 .stage.s7, .p6 .stage.s8, .p7 .stage.s9 { max-width: none; aspect-ratio: auto; }
+/* page 2: thank-you button just under the four buttons (the bottom may be cropped on wide phones) */
+.ty-btn { top: calc(1520 / 1848 * 100%); }
+/* gallery: English-version look */
+.cf-card { border-radius: 14px; border: 1.5px solid rgba(240, 220, 175, .8); box-shadow: 0 20px 50px rgba(30, 0, 0, .55); -webkit-box-reflect: below 6px linear-gradient(transparent 70%, rgba(255, 255, 255, .18)); }
+.cf-card.center { border: 2px solid #ecd39b; border-radius: 18px; box-shadow: 0 0 0 1px rgba(255, 236, 190, .4), 0 0 28px rgba(255, 214, 140, .6), 0 30px 70px rgba(30, 0, 0, .6); }
+.cf-count { top: calc(1355 / 1848 * 100%); }
+.cf-dots { top: calc(1395 / 1848 * 100%); }
+.ty-btn { top: calc(1218 / 1848 * 100%); width: 40%; padding: 1.1cqw 0 .8cqw; }
+.ty-btn .cn { font-size: 3.9cqw; }
+.ty-btn .mm { font-size: 2.4cqw; }
