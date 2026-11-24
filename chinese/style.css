@@ -678,3 +678,148 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .cf-count { top: calc(1322 / 1848 * 100%); }
 .cf-dots { top: calc(1360 / 1848 * 100%); }
 .thumbs7 { top: calc(1385 / 1848 * 100%); }
+.b3 { display: flex; align-items: flex-end; justify-content: center; }
+.b3-mm { position: absolute; left: 0; right: 0; top: 68%; text-align: center; font-family: "Noto Serif Myanmar", serif; font-weight: 700; font-size: 2.05cqw; line-height: 1.6; color: #6b2a10; white-space: nowrap; letter-spacing: 0; pointer-events: none; }
+.b3[data-b="story"] .b3-mm { font-size: 1.7cqw; }
+.b3-mm { top: 71%; font-size: 2.35cqw; line-height: 1.5; }
+.b3[data-b="story"] .b3-mm { font-size: 2.2cqw; }
+.b3-mm { top: 77%; }
+.b3-mm { top: 70%; }
+
+/* =========================================================
+   PAGE 6 — Fortune Reading (artwork 851 x 1848)
+   ========================================================= */
+.p6 { background: #3a0808; }
+.backdrop6 { position: absolute; inset: -60px; background: url("img/fo-bg.jpg") center / cover; filter: blur(14px) brightness(.9); transform: scale(1.1); }
+.p6 .stage.s8 { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); container-type: inline-size; }
+.s8 .bg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
+.fo-mm { position: absolute; left: 0; right: 0; top: calc(326 / 1848 * 100%); margin: 0; text-align: center; font-family: "Noto Serif Myanmar", serif; font-weight: 700; font-size: 3.6cqw; line-height: 1.7;
+  color: transparent; background: linear-gradient(180deg, #fff1c4, #e9b24c 60%, #b47c1e); -webkit-background-clip: text; background-clip: text; filter: drop-shadow(0 .2cqw .3cqw rgba(60, 0, 0, .7)); }
+.g8 { position: absolute; pointer-events: none; border-radius: 50%; mix-blend-mode: screen; transform: translate(-50%, -50%); animation: flick2 1.3s steps(6) infinite; }
+.lanA8 { left: 3.8%; top: 22.6%; width: 24cqw; aspect-ratio: .7; background: radial-gradient(ellipse, rgba(255, 200, 110, .8), rgba(255, 110, 40, 0) 68%); }
+.lanB8 { left: 94%; top: 11%; width: 22cqw; aspect-ratio: .7; background: radial-gradient(ellipse, rgba(255, 200, 110, .8), rgba(255, 110, 40, 0) 68%); animation-delay: -.6s; }
+.moon8 { left: 22.4%; top: 25.4%; width: 30cqw; aspect-ratio: 1; background: radial-gradient(circle, rgba(255, 240, 205, .65), rgba(255, 220, 170, 0) 66%); animation: moon3 3s ease-in-out infinite; }
+.xi-glow8 { position: absolute; left: 50%; top: 8.4%; width: 18cqw; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; mix-blend-mode: screen; pointer-events: none; background: radial-gradient(circle, rgba(255, 220, 140, .7), rgba(255, 200, 110, 0) 66%); animation: xiPulse 2.4s ease-in-out infinite; }
+/* the cup and the sticks (design units) */
+.cupWrap { position: absolute; left: 0; top: 0; width: 100%; height: 100%; transform-origin: 50% calc(1290 / 1848 * 100%); pointer-events: none; }
+.fo-sticks { position: absolute; left: calc(190 / 851 * 100%); top: calc(440 / 1848 * 100%); width: calc(480 / 851 * 100%); height: calc(360 / 1848 * 100%); transform-origin: 50% 100%; transition: opacity .5s; }
+.fo-cup { position: absolute; left: calc(220 / 851 * 100%); top: calc(730 / 1848 * 100%); width: calc(412 / 851 * 100%); height: calc(582 / 1848 * 100%); }
+.p6.shaking .cupWrap { animation: cupShake 1.6s cubic-bezier(.36, .07, .19, .97) both; }
+.p6.shaking .fo-sticks { animation: stickRattle .16s linear 10; }
+@keyframes cupShake {
+  0%, 100% { transform: none; }
+  10% { transform: rotate(-6deg) translateX(-1.5%); } 20% { transform: rotate(6deg) translateX(1.5%); }
+  30% { transform: rotate(-7deg) translateX(-2%); } 40% { transform: rotate(7deg) translateX(2%); }
+  50% { transform: rotate(-6deg) translateX(-1.5%); } 60% { transform: rotate(6deg) translateX(1.5%); }
+  70% { transform: rotate(-4deg); } 80% { transform: rotate(3deg); } 90% { transform: rotate(-1.5deg); }
+}
+@keyframes stickRattle { 0%, 100% { transform: translateY(0) rotate(0); } 25% { transform: translateY(-1.5%) rotate(1.5deg); } 50% { transform: translateY(.5%) rotate(-1deg); } 75% { transform: translateY(-1%) rotate(1deg); } }
+.p6.ready .fo-sticks { opacity: 0; }
+/* the 12 sticks you can pick */
+.pick { position: absolute; left: calc(425 / 851 * 100%); top: calc(800 / 1848 * 100%); width: 0; height: 0; }
+.stk { position: absolute; left: 0; bottom: 0; width: 6.4cqw; height: 46cqw; margin-left: -3.2cqw; transform-origin: 50% 100%; pointer-events: auto; cursor: pointer;
+  transform: rotate(var(--a)) translateY(18cqw); opacity: 0; transition: transform .7s cubic-bezier(.2, .9, .2, 1.2), opacity .4s, filter .3s; transition-delay: var(--dl); }
+.stk svg { width: 100%; height: 100%; display: block; overflow: visible; filter: drop-shadow(0 .4cqw .6cqw rgba(60, 10, 0, .55)); }
+.p6.ready .stk { opacity: 1; transform: rotate(var(--a)) translateY(var(--up)); }
+.stk:hover svg, .stk:active svg { filter: drop-shadow(0 0 1.6cqw rgba(255, 210, 120, 1)); }
+.p6.ready .stk { animation: stkBreath 2.4s ease-in-out infinite; animation-delay: calc(var(--dl) + .8s); }
+@keyframes stkBreath { 0%, 100% { translate: 0 0; } 50% { translate: 0 -1.2cqw; } }
+.stk.chosen { transition: transform .9s cubic-bezier(.2, .8, .2, 1), filter .3s; transform: rotate(0deg) translateY(-34cqw) scale(1.25) !important; z-index: 5; animation: none; }
+.stk.chosen svg { filter: drop-shadow(0 0 3cqw rgba(255, 220, 130, 1)); }
+.p6.picked .stk:not(.chosen) { opacity: .15; }
+.fo-hint { position: absolute; left: 0; right: 0; top: calc(300 / 1848 * 100% + 0px); margin: 0; display: none; }
+.fo-banner { position: absolute; left: calc(64 / 851 * 100%); width: calc(724 / 851 * 100%); top: calc(1348 / 1848 * 100%); height: calc(180 / 1848 * 100%); z-index: 4; border-radius: 3cqw; }
+.fo-banner::after { content: ""; position: absolute; inset: 14% 4%; border-radius: 2cqw; box-shadow: 0 0 3cqw rgba(255, 210, 120, .9); opacity: 0; animation: btnGlow 2.2s ease-in-out infinite; }
+.p6.ready .fo-banner::after, .p6.picked .fo-banner::after { animation: none; }
+.fo-mm2 { position: absolute; left: 0; right: 0; top: calc(1545 / 1848 * 100%); margin: 0; text-align: center; font-family: "Noto Serif Myanmar", serif; font-weight: 600; font-size: 2.9cqw; line-height: 1.8; color: #ffe7b8; text-shadow: 0 .2cqw .5cqw rgba(40, 0, 0, .9); }
+.p6 .layer { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+.p6.in .s8 { animation: s2In 1s cubic-bezier(.2, .8, .2, 1) both; }
+/* result scroll */
+.fo-res { position: absolute; inset: 0; z-index: 30; display: flex; align-items: flex-start; justify-content: center; padding: calc(56px + var(--safe-t)) 3vw 18px; visibility: hidden;
+  background: radial-gradient(ellipse at 50% 40%, rgba(60, 6, 6, .55), rgba(20, 0, 0, .85)); opacity: 0; transition: opacity .5s, visibility 0s .5s; }
+.fo-res.open { visibility: visible; opacity: 1; transition: opacity .5s; }
+.scroll8 { position: relative; width: min(94vw, 480px); }
+.rod8 { position: relative; display: block; height: 30px; margin: 0 -18px; border-radius: 15px; z-index: 2;
+  background: linear-gradient(180deg, #ff7a5c 0%, #c3262a 30%, #7d0c10 75%, #4a0608 100%);
+  box-shadow: inset 0 0 0 2px rgba(243, 205, 110, .6), 0 6px 14px rgba(40, 0, 0, .5); }
+.rod8::before, .rod8::after { content: ""; position: absolute; top: -4px; width: 26px; height: 38px; border-radius: 8px; background: linear-gradient(180deg, #fff1c4, #e9b24c 45%, #8a5a14); box-shadow: 0 2px 6px rgba(0, 0, 0, .45); }
+.rod8::before { left: -14px; } .rod8::after { right: -14px; }
+.paper8 { position: relative; margin: -6px 6px; overflow: hidden; height: 0; z-index: 1;
+  background: radial-gradient(ellipse at 50% 20%, #fffaf0, #f7ead2 60%, #ecd9b6); box-shadow: inset 0 0 0 2px #d9a648, inset 0 0 0 7px #fff7e6, inset 0 0 0 8.5px rgba(200, 140, 50, .7), 0 8px 24px rgba(40, 0, 0, .5); }
+.fo-res.open .paper8 { transition: height 1.6s cubic-bezier(.45, 0, .2, 1) .25s; }
+.lang8 { display: flex; justify-content: center; gap: 6px; margin: 16px auto 4px; }
+.lang8 button { font: 700 14px/1.6 var(--serif); padding: 3px 14px; border-radius: 99px; color: #8a3a14; box-shadow: inset 0 0 0 1.5px rgba(190, 120, 50, .6); }
+.lang8 button[data-l="mm"] { font-family: "Noto Serif Myanmar", serif; font-size: 13px; padding-top: 6px; }
+.lang8 button.on { background: linear-gradient(180deg, #c3262a, #8f1015); color: #ffe7b0; box-shadow: none; }
+.res8 { padding: 6px 22px 8px; text-align: center; color: #4a1a0c; }
+.res8 .no { display: inline-block; margin: 6px auto 8px; padding: 4px 26px; border-radius: 10px; font: 900 22px/1.4 var(--serif); letter-spacing: .2em; color: #ffe7b0;
+  background: linear-gradient(180deg, #c3262a, #7d0c10); box-shadow: 0 0 0 2px #e9b24c, 0 4px 10px rgba(120, 20, 0, .35); }
+.res8 .ttl { margin: 4px 0 8px; font: 900 26px/1.3 var(--serif); color: #8f1015; }
+.res8 .ttl small { display: block; font-size: 15px; font-weight: 700; color: #b0602a; letter-spacing: .08em; }
+.res8 .quote { margin: 8px 0 4px; padding: 10px 12px; border-radius: 12px; font: 700 20px/1.6 var(--serif); color: #8f1015; background: linear-gradient(90deg, transparent, rgba(255, 228, 180, .85), transparent); }
+.res8 .orn8 { display: block; width: 50%; height: 12px; margin: 8px auto; background: radial-gradient(circle, #c3262a 0 3px, transparent 3.5px) center / 12px 12px no-repeat, linear-gradient(90deg, transparent, #c98a3a 25%, #c98a3a 75%, transparent) center / 100% 1.5px no-repeat; }
+.res8 .body { margin: 6px 0 12px; font: 500 15px/1.85 var(--serif); white-space: pre-line; }
+.res8 table { width: 100%; border-collapse: collapse; margin: 6px 0 12px; border-radius: 12px; overflow: hidden; background: rgba(255, 246, 228, .7); box-shadow: inset 0 0 0 1.5px rgba(200, 140, 50, .55); }
+.res8 td { padding: 8px 8px; font-size: 14px; line-height: 1.6; text-align: left; border-bottom: 1px solid rgba(200, 140, 50, .3); vertical-align: middle; }
+.res8 tr:last-child td { border-bottom: 0; }
+.res8 td.ic { width: 34px; text-align: center; font-size: 18px; }
+.res8 td.lb { width: 26%; font-weight: 800; color: #8f1015; white-space: nowrap; }
+.res8 .lucky { margin: 0 0 12px; font-size: 14px; color: #7a3a14; }
+.res8 .lucky b { color: #8f1015; }
+.res8 .guide { position: relative; margin: 14px 0 6px; padding: 26px 14px 14px; border-radius: 16px; background: rgba(255, 236, 200, .8); box-shadow: inset 0 0 0 1.5px rgba(200, 140, 50, .6); font: 700 16px/1.75 var(--serif); color: #8f1015; }
+.res8 .guide span { position: absolute; left: 50%; top: -14px; transform: translateX(-50%); padding: 2px 18px; border-radius: 8px; white-space: nowrap; font-size: 15px; color: #ffe7b0; background: linear-gradient(180deg, #c3262a, #7d0c10); box-shadow: 0 0 0 1.5px #e9b24c; }
+.res8.mm, .res8.mm .quote, .res8.mm .body, .res8.mm td, .res8.mm .guide, .res8.mm .ttl { font-family: "Noto Serif Myanmar", serif; }
+.res8.mm .quote { font-size: 16px; line-height: 1.9; }
+.res8.mm .body { font-size: 14px; line-height: 2; white-space: normal; }
+.res8.mm td { font-size: 13px; line-height: 1.9; }
+.res8.mm .guide { font-size: 14px; line-height: 1.95; }
+.res8.mm .ttl { font-size: 22px; line-height: 1.7; }
+.res8 > * { opacity: 0; transform: translateY(8px); }
+.res8.show > * { animation: lineIn .6s var(--ease) both; animation-delay: calc(var(--i) * .1s + .2s); }
+.again8 { display: block; margin: 8px auto 20px; padding: 8px 22px; border-radius: 99px; font: 700 14px/1.6 var(--serif); color: #6a0d0d; background: linear-gradient(180deg, #f8dc8c, #d39a3a); box-shadow: 0 4px 12px rgba(160, 80, 0, .35); }
+.again8.mm { font-family: "Noto Serif Myanmar", serif; font-size: 13px; padding-top: 10px; }
+.close8 { position: absolute; top: calc(12px + var(--safe-t)); right: 12px; width: 40px; height: 40px; border-radius: 50%; color: #ffe7b0; background: #5a0a0a; box-shadow: 0 0 0 2px #e9b24c; font-size: 16px; z-index: 3; }
+/* ===== fortune sticks v2: they stand inside the cup, random heights ===== */
+.pick { top: calc(1010 / 1848 * 100%); }
+.stk { width: 5.6cqw; margin-left: -2.8cqw; height: 64cqw; z-index: var(--z);
+  transform: translateX(var(--x)) rotate(var(--a)) translateY(14cqw); opacity: 0;
+  transition: transform .75s cubic-bezier(.2, .9, .25, 1.25), opacity .25s, filter .3s; transition-delay: var(--dl); }
+.p6.ready .fo-sticks { opacity: 0; transition: opacity .15s; }
+.p6.ready .stk { opacity: 1; transform: translateX(var(--x)) rotate(var(--a)) translateY(var(--up)); animation: none; }
+.p6.ready .stk:hover, .p6.ready .stk:focus-visible { transform: translateX(var(--x)) rotate(var(--a)) translateY(calc(var(--up) - 2.5cqw)); transition-delay: 0s; }
+.stk.chosen { transform: translateX(0) rotate(0deg) translateY(-44cqw) scale(1.12) !important; z-index: 30 !important; transition-delay: 0s !important; }
+.p6.picked .stk:not(.chosen) { opacity: 1; filter: brightness(.6); }
+.p6:not(.ready) .stk { pointer-events: none; }
+.stk { width: 7.6cqw; margin-left: -3.8cqw; height: 62cqw; }
+.stk svg { filter: drop-shadow(0 .5cqw .7cqw rgba(60, 10, 0, .55)); }
+/* ===== fortune sticks v3: the painted stick itself ===== */
+.pick { top: calc(992 / 1848 * 100%); }
+.stk { width: calc(98 / 851 * 100cqw); margin-left: calc(-49 / 851 * 100cqw); height: calc(546 / 851 * 100cqw); }
+.stk img { display: block; width: 100%; height: 100%; pointer-events: none; filter: brightness(var(--tone)) drop-shadow(-.3cqw .2cqw .5cqw rgba(60, 10, 0, .45)); transform: scaleX(var(--flip)); }
+.stk.chosen img { filter: brightness(1.12) drop-shadow(0 0 2.6cqw rgba(255, 220, 130, 1)); }
+.p6.picked .stk:not(.chosen) { filter: brightness(.55); }
+/* the painted bundle disappears at once, so the two never overlap */
+.p6.ready .fo-sticks { transition: none; }
+.pick { z-index: 1; }
+.fo-cup { z-index: 2; }
+.fo-sticks { z-index: 0; }
+.b3-mm { color: #5a1e0a; font-weight: 700; text-shadow: 0 0 .4cqw rgba(255, 246, 230, .9); }
+/* ===== fortune sticks v4: rows of different lengths, bottoms lined up ===== */
+.stk { height: var(--len); transform: rotate(var(--a)) translateY(16cqw); }
+.stk img { height: auto; min-height: 100%; object-fit: cover; object-position: top; position: absolute; left: 0; top: 0; }
+.stk { overflow: hidden; }
+.p6.ready .stk { transform: rotate(var(--a)) translateY(0); }
+.p6.ready .stk:hover, .p6.ready .stk:focus-visible { transform: rotate(var(--a)) translateY(-2.5cqw); }
+.stk.chosen { transform: rotate(0deg) translateY(-40cqw) scale(1.12) !important; overflow: visible; }
+/* ===== fortune page fixes ===== */
+.fo-mm { padding: .5em 0 .25em; margin-top: -.5em; top: calc(318 / 1848 * 100%); line-height: 1.5; }
+.backdrop6 { background-image: url("img/fo-bg2.jpg") !important; }
+.fo-cupB { left: calc(220 / 851 * 100%); top: calc(730 / 1848 * 100%); width: calc(412 / 851 * 100%); height: calc(70 / 1848 * 100%); z-index: 1; }
+.fo-cupF { z-index: 3; }
+.pick { z-index: 2; }
+/* the painted bundle in the mouth is hidden only while the picked sticks are shown */
+.p6:not(.ready) .fo-cupB { opacity: 0; }
+.fo-label { position: absolute; left: calc(120 / 851 * 100%); right: calc(120 / 851 * 100%); top: calc(1395 / 1848 * 100%); height: calc(80 / 1848 * 100%); margin: 0; z-index: 4;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; pointer-events: none; }
+.fo-label .cn { font-family: var(--serif); font-weight: 900; font-size: 5.2cqw; letter-spacing: .12em; line-height: 1.25; color: #5e1208; text-shadow: 0 .15cqw 0 rgba(255, 240, 210, .7); }
+.fo-label .mm { font-family: "Noto Serif Myanmar", serif; font-weight: 700; font-size: 2.6cqw; line-height: 1.9; color: #7a2a10; }

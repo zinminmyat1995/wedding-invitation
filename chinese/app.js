@@ -530,7 +530,7 @@
   }
   $("#enterBtn").addEventListener("click", () => { unlockMusic(); if (reduce) { showPage2(); return; } startFlight(); });
   $("#backBtn").addEventListener("click", () => (history.state && history.state.p === 2 ? history.back() : showPage1()));
-  addEventListener("popstate", () => { if (p5.classList.contains("on")) { closePage5(); return; } if (p4.classList.contains("on")) { closePage4(); return; } if (p3.classList.contains("on")) { closePage3(); return; } if (p2.classList.contains("on") && !flying) showPage1(); });
+  addEventListener("popstate", () => { if (p6.classList.contains("on")) { closePage6(); return; } if (p5.classList.contains("on")) { closePage5(); return; } if (p4.classList.contains("on")) { closePage4(); return; } if (p3.classList.contains("on")) { closePage3(); return; } if (p2.classList.contains("on") && !flying) showPage1(); });
 
   /* =========================================================
      PAGE 2 — the hanging scroll. The top roller stays where it is;
@@ -605,7 +605,7 @@
   function openScroll() { pinned = true; pullTarget = PULL_MAX; kick(); }
   const toast2 = $("#toast2");
   function say(msg) { toast2.textContent = msg; toast2.classList.add("on"); clearTimeout(say.t); say.t = setTimeout(() => toast2.classList.remove("on"), 1600); }
-  document.querySelectorAll(".b3").forEach((b) => b.addEventListener("click", () => { if (b.dataset.b === "story") showPage3(); else if (b.dataset.b === "gallery") showPage5(); else if (b.dataset.b === "place") showPage4(); else say("敬请期待 ✦"); }));
+  document.querySelectorAll(".b3").forEach((b) => b.addEventListener("click", () => { if (b.dataset.b === "story") showPage3(); else if (b.dataset.b === "gallery") showPage5(); else if (b.dataset.b === "fortune") showPage6(); else if (b.dataset.b === "place") showPage4(); else say("敬请期待 ✦"); }));
   addEventListener("resize", sheetLayout);
   sheetLayout();
 
@@ -855,6 +855,140 @@
     g5.globalAlpha = 1;
   }
 
+  /* =========================================================
+     PAGE 6 — Fortune Reading: the cup shakes, 12 sticks rise,
+     the guest picks one and its answer unrolls on a scroll (中文 / မြန်မာ)
+  ========================================================= */
+  const p6 = $("#p6"), st6 = $("#st6"), pick = $("#pick"), foRes = $("#foRes"), paper8 = $("#paper8"), res8 = $("#res8");
+  const FORT = window.FORTUNES || [];
+  const CN_NUM = ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二"];
+  // wooden stick with a red cloud-shaped head (like the painted ones)
+  const stickSVG = (k) => `<svg viewBox="0 0 80 460" aria-hidden="true">
+    <defs>
+      <linearGradient id="wd${k}" x1="0" x2="1"><stop offset="0" stop-color="#a86c34"/><stop offset=".22" stop-color="#e2b676"/><stop offset=".55" stop-color="#f0d29a"/><stop offset=".85" stop-color="#c88c4e"/><stop offset="1" stop-color="#8a5424"/></linearGradient>
+      <linearGradient id="hd${k}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e03a32"/><stop offset=".6" stop-color="#b81c22"/><stop offset="1" stop-color="#8a0f14"/></linearGradient>
+    </defs>
+    <rect x="13" y="96" width="54" height="362" rx="5" fill="url(#wd${k})"/>
+    <path d="M22 110 V452 M58 110 V452" stroke="rgba(140,80,30,.3)" stroke-width="1.4"/>
+    <path d="M40 150 l5 7 -5 7 -5 -7 z M40 172 v24 M34 182 h12" stroke="#b0702a" stroke-width="2.2" fill="#c08236" opacity=".85"/>
+    <path d="M40 3 C49 3 54 11 54 18 C64 15 74 23 72 35 C71 43 66 47 66 47 L66 104 L14 104 L14 47 C14 47 9 43 8 35 C6 23 16 15 26 18 C26 11 31 3 40 3 Z" fill="url(#hd${k})" stroke="#f3cd6e" stroke-width="3.2"/>
+    <path d="M40 10 C46 10 49 16 49 21 C57 19 64 25 63 34 C62 40 59 43 59 43 L59 96 L21 96 L21 43 C21 43 18 40 17 34 C16 25 23 19 31 21 C31 16 34 10 40 10 Z" fill="none" stroke="rgba(255,220,150,.55)" stroke-width="1.4"/>
+    <g fill="#f3cd6e"><circle cx="40" cy="52" r="5"/><circle cx="40" cy="40" r="3.4"/><circle cx="40" cy="64" r="3.4"/><circle cx="28" cy="52" r="3.4"/><circle cx="52" cy="52" r="3.4"/></g>
+    <path d="M40 72 v20" stroke="#f3cd6e" stroke-width="2"/>
+  </svg>`;
+  // three rows like a real bundle in the cup: tall at the back, medium, short in front.
+  // Every stick pivots from the same point deep in the cup, so all the bottoms line up;
+  // only how far each one sticks out (its length) and its tilt differ.
+  const ROWS = [
+    { len: 68, z: 10, ang: [-17, -6, 6, 17] },
+    { len: 56, z: 20, ang: [-24, -11.5, 0, 11.5, 24] },
+    { len: 44, z: 30, ang: [-14, 0, 14] },
+  ];
+  function buildSticks() {
+    const order = FORT.map((_, k) => k).sort(() => Math.random() - 0.5);      // random: which fortune each stick holds
+    let s = 0;
+    pick.innerHTML = ROWS.map((row) => row.ang.map((ang) => {
+      const k = order[s++ % order.length];
+      const a = ang + rnd(-1.6, 1.6), len = row.len + rnd(-1.8, 1.8);
+      return `<button type="button" class="stk" data-k="${k}" style="--a:${a.toFixed(1)}deg;--len:${len.toFixed(1)}cqw;--z:${row.z};--dl:${rnd(0, 0.3).toFixed(2)}s" aria-label="签"><img src="img/fo-stick.png" alt="" draggable="false" style="--tone:${rnd(0.92, 1.06).toFixed(2)};--flip:${Math.random() < 0.5 ? -1 : 1}"></button>`;
+    }).join("")).join("");
+  }
+  buildSticks();
+  let foLang = "cn", foPick = -1, foBusy = false;
+  function renderFortune() {
+    const f = FORT[foPick]; if (!f) return;
+    const mm = foLang === "mm";
+    let i = 0; const I = () => `style="--i:${i++}"`;
+    res8.className = "res8" + (mm ? " mm" : "");
+    res8.innerHTML = `
+      <div ${I()}><span class="no">${mm ? `စာ ${f.no}` : `第 ${f.no} 签`}</span></div>
+      <p class="ttl" ${I()}>${mm ? f.titleMm : f.title}<small>${mm ? f.grade + " · " + f.gradeMm : f.grade}</small></p>
+      <p class="quote" ${I()}>“${f.quote}”${mm ? `<br><span style="font-size:14px;font-weight:600;color:#7a3a14">${f.quoteMm}</span>` : ""}</p>
+      <i class="orn8" ${I()}></i>
+      <p class="body" ${I()}>${mm ? f.bodyMm : f.body}</p>
+      <table ${I()}>${f.r.map((r) => `<tr><td class="ic">${r[0]}</td><td class="lb">${mm ? r[2] : r[1]}</td><td>${mm ? r[4] : r[3]}</td></tr>`).join("")}</table>
+      <p class="lucky" ${I()}><b>${mm ? "🍀 ကံကောင်းစေမည့်အရာ" : "🍀 幸运"}</b> · ${mm ? f.luckyMm : f.lucky}</p>
+      <div class="guide" ${I()}><span>${mm ? "အကြံပြုချက်" : "求签指引"}</span>${mm ? f.adviceMm : f.advice}</div>`;
+    const ag = $("#again8"); ag.textContent = mm ? "↻ နောက်တစ်ကြိမ် ဆွဲမယ်" : "↻ 再抽一签"; ag.classList.toggle("mm", mm);
+    void res8.offsetWidth; res8.classList.add("show");
+  }
+  function unroll() {
+    paper8.style.height = "0px";
+    foRes.classList.add("open"); foRes.setAttribute("aria-hidden", "false");
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const max = foRes.clientHeight - 56 - 18 - 60;
+      paper8.style.height = `${Math.min(paper8.scrollHeight, max)}px`;
+      paper8.style.overflowY = paper8.scrollHeight > max ? "auto" : "hidden";
+    }));
+  }
+  document.querySelectorAll(".lang8 button").forEach((b) => b.addEventListener("click", () => {
+    if (b.dataset.l === foLang) return; foLang = b.dataset.l;
+    document.querySelectorAll(".lang8 button").forEach((x) => x.classList.toggle("on", x === b));
+    renderFortune();
+    const max = foRes.clientHeight - 56 - 18 - 60; paper8.style.height = `${Math.min(paper8.scrollHeight, max)}px`; paper8.style.overflowY = paper8.scrollHeight > max ? "auto" : "hidden";
+  }));
+  function shakeCup() {
+    if (foBusy) return; foBusy = true;
+    p6.classList.remove("ready", "picked", "shaking"); buildSticks();
+    void p6.offsetWidth; p6.classList.add("shaking");
+    if (navigator.vibrate) navigator.vibrate([30, 60, 30, 60, 30, 60, 40]);
+    setTimeout(() => { p6.classList.remove("shaking"); p6.classList.add("ready"); foBusy = false; }, 1700);
+  }
+  pick.addEventListener("click", (e) => {
+    const s = e.target.closest(".stk"); if (!s || foBusy || !p6.classList.contains("ready")) return;
+    foBusy = true; foPick = +s.dataset.k;
+    s.classList.add("chosen"); p6.classList.add("picked");
+    if (navigator.vibrate) navigator.vibrate(20);
+    setTimeout(() => { renderFortune(); unroll(); foBusy = false; }, 1100);
+  });
+  function closeRes() {
+    foRes.classList.remove("open"); foRes.setAttribute("aria-hidden", "true"); paper8.style.height = "0px";
+  }
+  // closing the answer puts the cup back exactly as it was painted
+  function resetCup() { p6.classList.remove("ready", "picked", "shaking"); buildSticks(); foBusy = false; }
+  $("#close8").addEventListener("click", () => { closeRes(); resetCup(); });
+  $("#again8").addEventListener("click", () => { closeRes(); setTimeout(shakeCup, 450); });
+  $("#foShake").addEventListener("click", () => { if (!p6.classList.contains("ready") && !foRes.classList.contains("open")) shakeCup(); });
+  function fitFortune() {
+    const H = p6.clientHeight || innerHeight, r = 851 / 1848;
+    st6.style.width = `${H * r}px`; st6.style.height = `${H}px`;
+  }
+  addEventListener("resize", () => { if (p6.classList.contains("on")) fitFortune(); });
+  function showPage6(push = true) {
+    p2.classList.remove("on", "in"); p2.setAttribute("aria-hidden", "true");
+    p6.classList.add("on"); p6.removeAttribute("aria-hidden");
+    fitFortune(); closeRes();
+    p6.classList.remove("in", "ready", "picked"); void p6.offsetWidth; p6.classList.add("in");
+    foBusy = false; setTimeout(shakeCup, 900);          // the cup shakes as soon as the page opens
+    if (push) history.pushState({ p: 6 }, "", "#fortune");
+  }
+  function closePage6() {
+    closeRes();
+    p6.classList.remove("on", "in", "ready", "picked", "shaking"); p6.setAttribute("aria-hidden", "true");
+    p2.classList.add("on"); p2.removeAttribute("aria-hidden");
+    p2.classList.remove("in"); void p2.offsetWidth; p2.classList.add("in");
+  }
+  $("#back6").addEventListener("click", () => (history.state && history.state.p === 6 ? history.back() : closePage6()));
+  const cv6 = $("#p6Petals"), g6 = cv6.getContext("2d"), pet6 = [];
+  const mkP6 = (top) => ({ x: top ? rnd(-0.2, 0.9) : Math.random(), y: top ? -0.03 : Math.random(), s: rnd(5, 10), vx: rnd(0.03, 0.08), vy: rnd(0.05, 0.11), r: rnd(0, 6.28), vr: rnd(-4, 4), ph: rnd(0, 6.28) });
+  for (let i = 0; i < 16; i++) pet6.push(mkP6(false));
+  let last6 = performance.now();
+  function drawP6(t) {
+    const r = st6.getBoundingClientRect(), W = r.width, H = r.height, dt = Math.min(0.05, (t - last6) / 1000); last6 = t;
+    fit(cv6, W, H); g6.setTransform(DPR, 0, 0, DPR, 0, 0); g6.clearRect(0, 0, W, H);
+    if (pet6.length < 22 && Math.random() < 0.1) pet6.push(mkP6(true));
+    for (let i = pet6.length - 1; i >= 0; i--) {
+      const p = pet6[i]; p.x += (p.vx + Math.sin(t * 0.002 + p.ph) * 0.04) * dt; p.y += p.vy * dt; p.r += p.vr * dt;
+      if (p.y > 1.03 || p.x > 1.08) { pet6.splice(i, 1); continue; }
+      g6.save(); g6.translate(p.x * W, p.y * H); g6.rotate(p.r); g6.scale(1, 0.4 + Math.abs(Math.sin(t * 0.005 + p.ph)) * 0.6);
+      const gr = g6.createLinearGradient(0, -p.s, 0, p.s); gr.addColorStop(0, "#ffd3dc"); gr.addColorStop(1, "#ef6f86");
+      g6.fillStyle = gr; g6.globalAlpha = 0.9;
+      g6.beginPath(); g6.moveTo(0, -p.s); g6.bezierCurveTo(p.s * 0.9, -p.s * 0.5, p.s * 0.55, p.s * 0.8, 0, p.s * 0.75); g6.bezierCurveTo(-p.s * 0.55, p.s * 0.8, -p.s * 0.9, -p.s * 0.5, 0, -p.s); g6.fill();
+      g6.restore();
+    }
+    g6.globalAlpha = 1;
+  }
+
   /* ---------- main loop ---------- */
   let last = performance.now();
   function loop(now) {
@@ -865,6 +999,7 @@
     if (p3.classList.contains("on")) drawP3(now);
     if (p4.classList.contains("on")) drawP4(now);
     if (p5.classList.contains("on")) drawP5(now);
+    if (p6.classList.contains("on")) drawP6(now);
     requestAnimationFrame(loop);
   }
   requestAnimationFrame(loop);
@@ -901,6 +1036,7 @@
 
   // preview shortcuts:  ?fly  (play the dragons right away)   ?p2  (open page 2)
   if (/[?&]p2\b/.test(location.search)) showPage2(false);
+  if (/[?&]fortune/.test(location.search)) { showPage2(false); showPage6(false); }
   if (/[?&]gallery/.test(location.search)) { showPage2(false); showPage5(false); }
   if (/[?&]place/.test(location.search)) { showPage2(false); showPage4(false); }
   if (/[?&]story/.test(location.search)) { showPage2(false); showPage3(false); }

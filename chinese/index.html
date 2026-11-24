@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+Myanmar:wght@500;700&family=Noto+Serif+SC:wght@500;700&family=Cinzel:wght@500;600;700&family=Pinyon+Script&display=swap" rel="stylesheet">
   <link rel="preload" as="image" href="img/cn-bg.jpg">
-  <link rel="stylesheet" href="style.css?v=44">
+  <link rel="stylesheet" href="style.css?v=56">
 </head>
 <body>
 
@@ -69,7 +69,7 @@
   <main class="page p2" id="p2" aria-label="邀请函" aria-hidden="true">
     <div class="backdrop2" aria-hidden="true"></div>
     <div class="stage s3" id="st2">
-      <img class="bg" src="img/p2-bg.jpg" alt="我们的婚礼 · 邀请函" draggable="false">
+      <img class="bg" src="img/p2-bg.jpg?v=2" alt="我们的婚礼 · 邀请函" draggable="false">
       <div class="a3" id="art2">
         <i class="g3 moon2" aria-hidden="true"></i>
         <i class="g3 pl" style="--x:183;--y:895" aria-hidden="true"></i><i class="g3 pl" style="--x:333;--y:880" aria-hidden="true"></i><i class="g3 pl" style="--x:470;--y:892" aria-hidden="true"></i>
@@ -121,10 +121,10 @@
         <div class="l3 knotB" id="knotB" data-k="knotB" aria-hidden="true"><img src="img/p2-knotB.png" alt=""></div>
         <button class="pull-zone" id="pullZone" type="button" aria-label="向下拉开画轴 · Pull the scroll down"></button>
         <p class="pull-hint" id="pullHint" aria-hidden="true"><i></i><i></i></p>
-        <button class="b3" style="--x:117" type="button" data-b="story" aria-label="我们的故事"></button>
-        <button class="b3" style="--x:322" type="button" data-b="place" aria-label="地点 · Place"></button>
-        <button class="b3" style="--x:530" type="button" data-b="gallery" aria-label="婚纱相册"></button>
-        <button class="b3" style="--x:736" type="button" data-b="fortune" aria-label="姻缘签"></button>
+        <button class="b3" style="--x:117" type="button" data-b="story" aria-label="我们的故事"><span class="b3-mm">အချစ်ဇာတ်လမ်း</span></button>
+        <button class="b3" style="--x:322" type="button" data-b="place" aria-label="地点 · Place"><span class="b3-mm">နေရာ</span></button>
+        <button class="b3" style="--x:530" type="button" data-b="gallery" aria-label="婚纱相册"><span class="b3-mm">ဓာတ်ပုံများ</span></button>
+        <button class="b3" style="--x:736" type="button" data-b="fortune" aria-label="姻缘签"><span class="b3-mm">ဗေဒင်</span></button>
       </div>
       <canvas class="layer" id="p2Dust" aria-hidden="true"></canvas>
     </div>
@@ -193,13 +193,49 @@
     <div class="viewer7" id="viewer7" aria-hidden="true"><img id="viewer7Img" alt=""><button type="button" id="viewer7X" aria-label="关闭 · Close">✕</button></div>
   </main>
 
+  <!-- ================= PAGE 6 : Fortune Reading ================= -->
+  <main class="page p6" id="p6" aria-label="中国传统求签 · Fortune Reading" aria-hidden="true">
+    <div class="backdrop6" aria-hidden="true"></div>
+    <div class="stage s8" id="st6">
+      <img class="bg" src="img/fo-bg2.jpg" alt="" draggable="false">
+      <p class="fo-mm">ဗေဒင်မေးကြည့်ရအောင်</p>
+      <i class="g8 lanA8" aria-hidden="true"></i><i class="g8 lanB8" aria-hidden="true"></i><i class="g8 moon8" aria-hidden="true"></i><i class="xi-glow8" aria-hidden="true"></i>
+      <div class="cupWrap" id="cupWrap">
+        <img class="fo-sticks" src="img/fo-sticks.png" alt="" aria-hidden="true">
+        <img class="fo-cup fo-cupB" src="img/fo-cupB.png" alt="" aria-hidden="true">
+        <div class="pick" id="pick"></div>
+        <img class="fo-cup fo-cupF" src="img/fo-cupF.png" alt="" aria-hidden="true">
+      </div>
+      <p class="fo-hint" id="foHint"><span>抽一支签</span><span class="mm">တုတ်တစ်ချောင်း ရွေးပါ</span></p>
+      <button class="fo-banner" id="foShake" type="button" aria-label="抽一支签 · 探知您的运势"></button>
+      <p class="fo-label"><span class="cn">抽一支签 · 探知您的运势</span><span class="mm">တုတ်တစ်ချောင်း ဆွဲပြီး သင့်ကံကြမ္မာကို သိလိုက်ပါ</span></p>
+      <canvas class="layer" id="p6Petals" aria-hidden="true"></canvas>
+      <button class="back6" id="back6" type="button" aria-label="返回 · Back"><svg viewBox="0 0 24 24"><path d="M14.5 6 8.5 12l6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <p class="sig5"><i class="sig-line" aria-hidden="true"></i><span class="sig-pre">love story crafted by</span><span class="sig-name">Zin Min Myat</span><i class="sig-line r" aria-hidden="true"></i></p>
+    </div>
+    <!-- the answer: a scroll that unrolls by itself -->
+    <div class="fo-res" id="foRes" aria-hidden="true">
+      <div class="scroll8" id="scroll8">
+        <i class="rod8 top"></i>
+        <div class="paper8" id="paper8">
+          <div class="lang8"><button type="button" class="on" data-l="cn">中文</button><button type="button" data-l="mm">မြန်မာ</button></div>
+          <div class="res8" id="res8"></div>
+          <button class="again8" id="again8" type="button"></button>
+        </div>
+        <i class="rod8 bot"></i>
+      </div>
+      <button class="close8" id="close8" type="button" aria-label="关闭 · Close">✕</button>
+    </div>
+  </main>
+
   <!-- the dragons fly over everything during the page change -->
   <canvas class="dragon-front" id="dragonFront" aria-hidden="true"></canvas>
   <link rel="preload" as="video" href="img/dragon.mp4">
 
   <audio id="bgm" loop preload="auto"></audio>
 
-  <script src="config.js?v=44"></script>
-  <script src="app.js?v=44"></script>
+  <script src="config.js?v=56"></script>
+  <script src="fortune.js?v=1"></script>
+  <script src="app.js?v=56"></script>
 </body>
 </html>
