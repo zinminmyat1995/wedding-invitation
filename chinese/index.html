@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@500;700&family=Cinzel:wght@500;600;700&family=Pinyon+Script&display=swap" rel="stylesheet">
   <link rel="preload" as="image" href="img/cn-bg.jpg">
-  <link rel="stylesheet" href="style.css?v=15">
+  <link rel="stylesheet" href="style.css?v=21">
 </head>
 <body>
 
@@ -31,6 +31,7 @@
         <path d="M18 62 C4 62 4 42 18 40 C16 26 34 20 44 30 C48 12 76 10 82 30 C92 20 112 24 110 40 C126 34 140 48 128 60 C150 58 170 44 160 30 C154 22 142 26 146 34 M128 60 L18 62" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
         <path d="M44 46 C44 38 54 38 54 45 C54 50 48 50 48 47 M82 44 C82 36 94 36 93 44 C92 49 86 49 86 46" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
       </symbol>
+      <filter id="silkWave" x="-5%" y="-10%" width="110%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.006 0.02" numOctaves="2" seed="3"><animate attributeName="baseFrequency" dur="3s" values="0.006 0.02;0.008 0.028;0.006 0.02" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="SourceGraphic" scale="14"/></filter>
     </defs>
   </svg>
 
@@ -64,32 +65,76 @@
     </div>
   </main>
 
-  <!-- ================= PAGE 2 (temporary) ================= -->
+  <!-- ================= PAGE 2 : hanging scroll — pull the lower roller down ================= -->
   <main class="page p2" id="p2" aria-label="邀请函" aria-hidden="true">
-    <div class="p2-bg" aria-hidden="true"></div>
-    <canvas class="p2-dust" id="p2Dust" aria-hidden="true"></canvas>
-    <div class="stage" id="st2">
-      <div class="card">
-        <i class="cn-corner tl"></i><i class="cn-corner tr"></i><i class="cn-corner bl"></i><i class="cn-corner br"></i>
-        <p class="c-xi" aria-hidden="true">囍</p>
-        <p class="c-names"><span id="c2Groom"></span><em>&amp;</em><span id="c2Bride"></span></p>
-        <svg class="divider" viewBox="0 0 400 24" aria-hidden="true">
-          <path d="M6 12 H160 M240 12 H394" stroke="url(#cnGold)" stroke-width="1.6"/>
-          <use href="#xiangyun" x="165" y="-4" width="70" height="28" style="color:#f0c86a"/>
-        </svg>
-        <p class="c-kicker" id="c2Kicker"></p>
-        <p class="c-date" id="c2Date"></p>
-        <p class="c-week" id="c2Week"></p>
-        <p class="c-time" id="c2Time"></p>
-        <p class="c-venue" id="c2Venue"></p>
-        <p class="c-city" id="c2City"></p>
-        <p class="c-close" id="c2Close"></p>
+    <div class="backdrop2" aria-hidden="true"></div>
+    <div class="stage s3" id="st2">
+      <img class="bg" src="img/p2-bg.jpg" alt="我们的婚礼 · 邀请函" draggable="false">
+      <div class="a3" id="art2">
+        <i class="g3 moon1" aria-hidden="true"></i><i class="g3 moon2" aria-hidden="true"></i>
+        <i class="g3 pl" style="--x:145;--y:962" aria-hidden="true"></i><i class="g3 pl" style="--x:273;--y:966" aria-hidden="true"></i><i class="g3 pl" style="--x:617;--y:912" aria-hidden="true"></i>
+        <i class="fall3" aria-hidden="true"></i><i class="fall3 mist" aria-hidden="true"></i>
+        <i class="water3" aria-hidden="true"></i>
+        <div class="l3 cl-l" data-k="cloudL" aria-hidden="true"><img src="img/p2-cloudL.png" alt=""></div>
+        <div class="l3 sk-l" data-k="silkL" aria-hidden="true"><img src="img/p2-silkL.png" alt=""></div>
+        <div class="l3 sk-r" data-k="silkR" aria-hidden="true"><img src="img/p2-silkR.png" alt=""></div>
+        <div class="l3 sw-g" data-k="gknot" aria-hidden="true"><img src="img/p2-gknot.png" alt=""></div>
+        <div class="l3 lotus lo1" data-k="lotus1" aria-hidden="true"><i class="rip"></i><i class="rip r2"></i><img src="img/p2-lotus1.png" alt=""></div>
+        <div class="l3 lotus lo2" data-k="lotus2" aria-hidden="true"><i class="rip"></i><i class="rip r2"></i><img src="img/p2-lotus2.png" alt=""></div>
+        <div class="l3 lotus lo3" data-k="lotus3" aria-hidden="true"><i class="rip"></i><i class="rip r2"></i><img src="img/p2-lotus3.png" alt=""></div>
+        <div class="l3 sw-lan" data-k="lantern" aria-hidden="true"><img src="img/p2-lantern.png" alt=""><i class="lan-glow"></i></div>
+        <div class="l3 silk" data-k="silk" aria-hidden="true"><img src="img/p2-silk.png" alt=""></div>
+        <div class="l3 cl-m" data-k="cloudM" aria-hidden="true"><img src="img/p2-cloudM.png" alt=""></div>
+        <div class="l3 cl-b" data-k="cloudB" aria-hidden="true"><img src="img/p2-cloudB.png" alt=""></div>
+        <!-- the sheet that comes out of the scroll -->
+        <div class="sheet" id="sheet" aria-hidden="true">
+          <img class="sh-label" src="img/p2-paper.png" alt="">
+          <div class="sh-card" id="shCard"><div class="iv" id="iv">
+            <i class="iv-fr"></i><i class="iv-c tl"></i><i class="iv-c tr"></i><i class="iv-c bl"></i><i class="iv-c br"></i>
+            <p class="v" style="--x:350;--y:58;--f:32;--ls:4">台驾</p>
+            <p class="v" style="--x:276;--y:58;--f:32;--ls:4">光临</p>
+            <p class="v xi" style="--x:316;--y:196;--f:124">囍</p>
+            <p class="v" style="--x:122;--y:148;--f:21;--ls:30">恕催</p>
+            <p class="v" style="--x:120;--y:334;--f:21;--ls:12">茶会</p>
+            <p class="v" style="--x:305;--y:316;--f:25;--ls:3">主婚人</p>
+            <p class="v b" style="--x:337;--y:410;--f:33;--ls:2">林佐索</p>
+            <p class="v b" style="--x:337;--y:540;--f:33;--ls:2">杜妙答</p>
+            <p class="v b" style="--x:283;--y:410;--f:33;--ls:2">张山松</p>
+            <p class="v b" style="--x:283;--y:540;--f:33;--ls:2">杜薇丹</p>
+            <p class="v b" style="--x:318;--y:668;--f:33;--ls:9">同鞠躬</p>
+            <p class="v" style="--x:158;--y:424;--f:23;--ls:10">地点：皇家丹老酒店大礼堂</p>
+            <p class="v" style="--x:102;--y:424;--f:23;--ls:13">时间：中午十二时至三时</p>
+            <p class="v" style="--x:455;--y:40;--f:19.5;--ls:4.6">在丹老埠皇家丹老酒店大禮堂举行结婚典礼同日敬备薄茗</p>
+            <p class="v" style="--x:455;--y:746;--f:19.5;--ls:8">恭候</p>
+            <p class="v" style="--x:548;--y:96;--f:21;--ls:3">谨订于</p>
+            <p class="v" style="--x:560;--y:172;--f:19.5;--ls:6.2">公历二〇二六年十一月廿九日</p>
+            <p class="v k" style="--x:520;--y:172;--f:19.5">农</p><p class="v k" style="--x:520;--y:236;--f:19.5;--ls:6.2">丙午</p>
+            <p class="v k" style="--x:520;--y:328;--f:19.5">年</p><p class="v k" style="--x:520;--y:380;--f:19.5">十</p>
+            <p class="v k" style="--x:520;--y:406;--f:19.5;--ls:6.2">月廿一日</p>
+            <p class="v" style="--x:556;--y:528;--f:19.5;--ls:2">（星期日）</p>
+            <p class="v" style="--x:540;--y:656;--f:19.5">为</p>
+            <p class="v" style="--x:577;--y:688;--f:17;--ls:1">长男</p>
+            <p class="v b" style="--x:577;--y:735;--f:24;--ls:2">沛然</p>
+            <p class="v" style="--x:535;--y:700;--f:17;--ls:1">幼女</p>
+            <p class="v b" style="--x:535;--y:745;--f:24;--ls:2">清涵</p>
+          </div></div>
+        </div>
+        <div class="l3 rollB" id="rollB" data-k="rodB" aria-hidden="true"><img src="img/p2-rodB.png" alt=""></div>
+        <div class="l3 knotB" id="knotB" data-k="knotB" aria-hidden="true"><img src="img/p2-knotB.png" alt=""></div>
+        <button class="pull-zone" id="pullZone" type="button" aria-label="向下拉开画轴 · Pull the scroll down"></button>
+        <p class="pull-hint" id="pullHint" aria-hidden="true"><i></i><i></i></p>
+        <button class="b3" style="--x:117" type="button" data-b="story" aria-label="我们的故事"></button>
+        <button class="b3" style="--x:322" type="button" data-b="invite" aria-label="邀请函"></button>
+        <button class="b3" style="--x:530" type="button" data-b="gallery" aria-label="婚纱相册"></button>
+        <button class="b3" style="--x:736" type="button" data-b="fortune" aria-label="姻缘签"></button>
       </div>
-      <button class="back" id="backBtn" type="button" aria-label="返回">
-        <span class="bk-orb" aria-hidden="true"><i class="bk-halo"></i><svg viewBox="0 0 24 24"><path d="M14.5 6 8.5 12l6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        <span class="bk-label" id="backLabel"></span>
-      </button>
+      <canvas class="layer" id="p2Dust" aria-hidden="true"></canvas>
     </div>
+    <button class="back" id="backBtn" type="button" aria-label="返回">
+      <span class="bk-orb" aria-hidden="true"><i class="bk-halo"></i><svg viewBox="0 0 24 24"><path d="M14.5 6 8.5 12l6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <span class="bk-label" id="backLabel"></span>
+    </button>
+    <div class="toast2" id="toast2" role="status" aria-live="polite"></div>
     <p class="sig"><i class="sig-line" aria-hidden="true"></i><span class="sig-pre">love story crafted by</span><span class="sig-name">Zin Min Myat</span><i class="sig-line r" aria-hidden="true"></i></p>
   </main>
 
@@ -99,7 +144,7 @@
 
   <audio id="bgm" loop preload="auto"></audio>
 
-  <script src="config.js?v=15"></script>
-  <script src="app.js?v=15"></script>
+  <script src="config.js?v=21"></script>
+  <script src="app.js?v=21"></script>
 </body>
 </html>

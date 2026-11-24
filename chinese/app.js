@@ -311,7 +311,7 @@
       const kk = p.age / p.life; p.x += p.vx * dt; p.y += p.vy * dt;
       if (p.spr == null) { p.spr = (Math.random() * sprites.length) | 0; p.fl = Math.random() < 0.5; }
       const w = p.r * 2.6 * (0.7 + kk * 0.6), h = w * 0.5;
-      g.globalAlpha = Math.sin(Math.PI * Math.min(1, kk * 1.15)) * 0.75;
+      g.globalAlpha = Math.sin(Math.PI * Math.min(1, kk * 1.15)) * 0.5;
       g.save(); g.translate(p.x, p.y); if (p.fl) g.scale(-1, 1); g.drawImage(sprites[p.spr], -w / 2, -h * 0.65, w, h); g.restore();
     }
     g.globalAlpha = 1;
@@ -323,7 +323,7 @@
       const p = haze[i]; p.age += dt;
       if (p.age > p.life) { haze.splice(i, 1); continue; }
       const k = p.age / p.life; p.x += p.vx * dt; p.y += p.vy * dt;
-      const r = p.r * (0.5 + k * 1.2), a = Math.sin(Math.PI * k) * 0.22;
+      const r = p.r * (0.5 + k * 1.1), a = Math.sin(Math.PI * k) * 0.14;
       const rg = g.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
       rg.addColorStop(0, `rgba(255,205,90,${a})`); rg.addColorStop(0.5, `rgba(240,160,40,${a * 0.45})`); rg.addColorStop(1, "rgba(220,140,30,0)");
       g.fillStyle = rg; g.beginPath(); g.arc(p.x, p.y, r, 0, Math.PI * 2); g.fill();
@@ -380,13 +380,16 @@
       const b = clipBox(d);
       const sx = b.cx + (d.mirror ? -1 : 1) * (EMERGE.fx - 0.5) * b.bw, sy = b.cy + (EMERGE.fy - 0.5) * b.bh;
       const ex = (sx - SR.left) / K, ey = (sy - SR.top) / K;            // screen → artwork units
-      const side = d.mirror ? 1 : -1, a = d.anchor;
+      // the painted dragon rears up, then plunges straight down into the cloud bank just below it
       const wp = d.mirror
-        ? [[a.x, a.y, 1, 0], [a.x - 70, a.y + 40, 1.04, 0], [a.x - 40, a.y + 170, 1.08, 0], [RING.x + 345, RING.y - 40, 1.12, 0], [(RING.x + 345 + ex) / 2 + 30, (RING.y + ey) / 2 + 120, 1.15, 0], [ex, ey, 1.1, 0], [ex, ey + 300, 1.0, 0]]
-        : [[a.x, a.y, 1, 0], [a.x + 70, a.y + 30, 1.04, 0], [a.x + 40, a.y + 170, 1.08, 0], [RING.x - 345, RING.y - 40, 1.12, 0], [(RING.x - 345 + ex) / 2 - 30, (RING.y + ey) / 2 + 120, 1.15, 0], [ex, ey, 1.1, 0], [ex, ey + 300, 1.0, 0]];
-      void side;
+        ? [[700, 515, 1, 0], [672, 528, 1.02, 0], [648, 572, 1.04, 0], [668, 610, 1.05, 0], [712, 630, 1.05, 0], [730, 660, 1.04, 0], [736, 760, 1, 0], [736, 980, 1, 0]]
+        : [[205, 440, 1, 0], [238, 462, 1.02, 0], [256, 520, 1.04, 0], [236, 580, 1.05, 0], [186, 612, 1.05, 0], [164, 652, 1.04, 0], [158, 760, 1, 0], [158, 980, 1, 0]];
+      d.line = d.mirror ? 646 : 654;                                         // top of the cloud bank under it
+      d.cloudX = d.mirror ? 726 : 166;
       d.tr = mkTrack(wp);
-      d.diveLen = d.tr.len - 300 * 0.98;                                  // distance at which the head enters the clouds
+      // distance along the track where the head meets the clouds, plus the whole body sliding in after it
+      let hit = 0; for (let k = 1; k < d.tr.pts.length; k++) if (d.tr.pts[k].y >= d.line) { hit = d.tr.L[k]; break; }
+      d.diveLen = hit + d.sp.len * 1.05;
       d.diveT = 0; while (d.diveT < 19 && dist(d, d.diveT) < d.diveLen) d.diveT += 0.01;
       d.ex = ex; d.ey = ey;
     });
@@ -423,16 +426,22 @@
         d.out = true; p1.classList.add(d.mirror ? "looseR" : "looseL");
         for (let k = 0; k < 10; k++) puffs.push({ x: d.anchor.x + rnd(-110, 110), y: d.anchor.y + rnd(-40, 150), r: rnd(50, 120), vx: rnd(-70, 70), vy: rnd(-50, 50), life: rnd(1.1, 1.8), age: 0 });
       }
-      const fade = 1 - smooth((ud - (d.diveT - 0.4)) / 0.5);   // dissolves into golden smoke as the real dragon rises
+      const fade = 1 - smooth((ud - d.diveT + 0.05) / 0.3);
       if (fade > 0.01) {
         alive = true;
         const { P, R } = bodyAt(d, ud);
         toArt(gDF);
+        // only the part above the cloud bank is visible — the rest has gone into the cloud
+        gDF.save(); gDF.beginPath(); gDF.rect(-3000, -3000, 7000, 3000 + d.line + 6); gDF.clip();
         drawKit(gDF, P, R, { alpha: fade, exp, t: ud, flip: d.mirror });
-        const nH = fade < 0.95 ? 6 : 2;
-        for (let k = 0; k < nH; k++) { const i = ((Math.random() * NPTS) | 0), q = P[i]; haze.push({ x: q.x, y: q.y, r: R[i] * rnd(2.2, 3.4), vx: rnd(-20, 20), vy: rnd(-24, 6), life: rnd(1.1, 1.8), age: 0 }); }
+        gDF.restore();
+        // the cloud churns where the body slides in
+        const inC = P.findIndex((q) => q.y > d.line - 8);
+        if (inC >= 0 && Math.random() < 0.55) { const q = P[inC]; puffs.push({ x: q.x + rnd(-30, 30), y: d.line + rnd(-6, 14), r: rnd(45, 80), vx: rnd(-35, 35), vy: rnd(-22, -4), life: rnd(0.9, 1.5), age: 0 }); }
+        const nH = Math.random() < 0.5 ? 1 : 0;
+        for (let k = 0; k < nH; k++) { const i = ((Math.random() * NPTS) | 0), q = P[i]; if (q.y > d.line) continue; haze.push({ x: q.x, y: q.y, r: R[i] * rnd(2.2, 3.4), vx: rnd(-20, 20), vy: rnd(-24, 6), life: rnd(1.1, 1.8), age: 0 }); }
         // the cloud sea swallows it
-        if (ud > d.diveT - 0.35 && ud < d.diveT + 0.4) for (let k = 0; k < 2; k++) puffs.push({ x: d.ex + rnd(-80, 80), y: d.ey + rnd(0, 80), r: rnd(55, 110), vx: rnd(-40, 40), vy: rnd(-40, -5), life: rnd(1.2, 1.9), age: 0 });
+        if (ud < 0.1) for (let k = 0; k < 6; k++) puffs.push({ x: d.cloudX + rnd(-80, 80), y: d.line + rnd(8, 26), r: rnd(55, 95), vx: rnd(-20, 20), vy: rnd(-10, 0), life: d.diveT + 0.6, age: 0 });   // a cloud bank the dragon sinks into
       }
       if (ud < 0.5) flash(gDF, d.anchor.x, d.anchor.y + 60, 220, 0.9 * (1 - ud / 0.5));
     });
@@ -492,17 +501,106 @@
   $("#backBtn").addEventListener("click", () => (history.state && history.state.p === 2 ? history.back() : showPage1()));
   addEventListener("popstate", () => { if (p2.classList.contains("on") && !flying) showPage1(); });
 
-  /* ---------- page 2 gold dust ---------- */
-  const cvDust = $("#p2Dust"), gDust = cvDust.getContext("2d");
-  const dust = Array.from({ length: 50 }, () => ({ x: Math.random(), y: Math.random(), r: rnd(0.6, 2.2), v: rnd(0.005, 0.02), ph: rnd(0, 6.28) }));
-  function drawDust(t) {
-    fit(cvDust, innerWidth, innerHeight);
-    const g = gDust; g.setTransform(DPR, 0, 0, DPR, 0, 0); g.clearRect(0, 0, innerWidth, innerHeight);
-    for (const d of dust) {
-      d.y -= d.v / 60; if (d.y < -0.02) d.y = 1.02;
-      g.fillStyle = `rgba(255,214,120,${0.35 + 0.65 * (0.5 + 0.5 * Math.sin(t * 0.003 + d.ph))})`;
-      g.beginPath(); g.arc(d.x * innerWidth + Math.sin(t * 0.001 + d.ph) * 12, d.y * innerHeight, d.r, 0, Math.PI * 2); g.fill();
+  /* =========================================================
+     PAGE 2 — the hanging scroll. The top roller stays where it is;
+     hold the scroll and drag down: the lower roller follows the finger
+     and the invitation unrolls between them. Let go → it rolls back up.
+  ========================================================= */
+  const A2W = 851, A2H = 1849;
+  const META2 = {
+    rodB: [210, 652, 434, 56], knotB: [388, 696, 78, 148], paper: [226, 565, 400, 97],
+    lantern: [768, 404, 84, 290], gknot: [384, 1086, 88, 200],
+    lotus1: [48, 1162, 124, 68], lotus2: [679, 1150, 116, 64], lotus3: [556, 1218, 124, 68],
+    silk: [0, 1460, 851, 300], silkL: [0, 1020, 330, 130], silkR: [560, 1010, 291, 120],
+    cloudB: [0, 1690, 851, 159], cloudM: [70, 1500, 781, 110], cloudL: [0, 580, 200, 80],
+  };
+  const place = (el, x, y, w, h) => Object.assign(el.style, { left: `${(x / A2W) * 100}%`, top: `${(y / A2H) * 100}%`, width: `${(w / A2W) * 100}%`, height: `${(h / A2H) * 100}%` });
+  document.querySelectorAll("#art2 .l3[data-k]").forEach((el) => { const m = META2[el.dataset.k]; place(el, ...m); });
+  const art2 = $("#art2"), sheet = $("#sheet"), shCard = $("#shCard"), rollB = $("#rollB"), knotB = $("#knotB"), shLabel = $(".sh-label", sheet);
+  const SHEET_X = 226, SHEET_W = 400, SHEET_Y = 565, SHEET_H0 = 97, CARD_W = 641, CARD_H = 842;
+  const CARD_S = SHEET_W / CARD_W, CARD_TOP = 24;                     // card scale + its gap under the top roller
+  const PULL_MAX = CARD_TOP + CARD_H * CARD_S + 22 - SHEET_H0;      // fully unrolled
+  let pull = 0, pullTarget = 0, vel = 0, dragging = false, pinned = false, anim = null, sY = 0, sPull = 0;
+  function sheetLayout() {
+    const p = Math.max(0, pull), h = SHEET_H0 + p;
+    place(sheet, SHEET_X, SHEET_Y, SHEET_W, h);
+    place(rollB, 210, 652 + p, 434, 56);
+    place(knotB, 388, 696 + p, 78, 148);
+    const px = art2.getBoundingClientRect().width / A2W;              // css px per artwork unit
+    shCard.style.transform = `translate(0, ${CARD_TOP * px}px) scale(${CARD_S * px})`;
+    const show = smooth(p / 140);
+    shCard.style.opacity = String(show);
+    shLabel.style.height = `${SHEET_H0 * px}px`;
+    shLabel.style.opacity = String(1 - show);
+    p2.classList.toggle("pulling", p > 0.5 || dragging);
+  }
+  function tick() {
+    if (!dragging) {
+      // a quick, springy roll back (or snap open when pinned)
+      vel += (pullTarget - pull) * 0.22; vel *= 0.62; pull += vel;
+      if (Math.abs(pullTarget - pull) < 0.4 && Math.abs(vel) < 0.4) { pull = pullTarget; vel = 0; sheetLayout(); anim = null; return; }
     }
+    sheetLayout();
+    anim = requestAnimationFrame(tick);
+  }
+  const kick = () => { if (!anim) anim = requestAnimationFrame(tick); };
+  const zone = $("#pullZone");
+  const toUnits = (dy) => dy / (art2.getBoundingClientRect().width / A2W);
+  function down(e) {
+    if (pinned) { pinned = false; pullTarget = 0; kick(); return; }
+    dragging = true; sY = e.clientY; sPull = pull;
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch (_) {}
+    if (navigator.vibrate) navigator.vibrate(8);
+    kick();
+  }
+  function move(e) {
+    if (!dragging) return;
+    let d = sPull + toUnits(e.clientY - sY);
+    d = d < 0 ? 0 : d > PULL_MAX ? PULL_MAX + (d - PULL_MAX) * 0.2 : d;   // a little give past the end
+    pull = d;
+  }
+  function up() { if (!dragging) return; dragging = false; pullTarget = 0; vel = 0; kick(); }
+  [zone, rollB].forEach((el) => {
+    el.addEventListener("pointerdown", down);
+    el.addEventListener("pointermove", move);
+    el.addEventListener("pointerup", up);
+    el.addEventListener("pointercancel", up);
+    el.addEventListener("lostpointercapture", up);
+  });
+  rollB.style.pointerEvents = "auto"; rollB.style.touchAction = "none";
+  // as the roller comes down the hit area grows with it
+  const zoneFollow = () => { zone.style.height = `${((250 + Math.max(0, pull)) / A2H) * 100}%`; requestAnimationFrame(zoneFollow); };
+  zoneFollow();
+  // 邀请函 button: unroll fully and keep it open; tap the scroll to roll it up
+  function openScroll() { pinned = true; pullTarget = PULL_MAX; kick(); }
+  const toast2 = $("#toast2");
+  function say(msg) { toast2.textContent = msg; toast2.classList.add("on"); clearTimeout(say.t); say.t = setTimeout(() => toast2.classList.remove("on"), 1600); }
+  document.querySelectorAll(".b3").forEach((b) => b.addEventListener("click", () => { if (b.dataset.b === "invite") openScroll(); else say("敬请期待 ✦"); }));
+  addEventListener("resize", sheetLayout);
+  sheetLayout();
+
+  /* ---------- page 2: cherry petals blown across ---------- */
+  const cvDust = $("#p2Dust"), gDust = cvDust.getContext("2d");
+  const st2 = $("#st2"), petals2 = [];
+  const mkP2 = (top) => ({ x: top ? rnd(-0.2, 0.9) : Math.random(), y: top ? -0.03 : Math.random(), s: rnd(5, 11), vx: rnd(0.05, 0.12), vy: rnd(0.08, 0.15), r: rnd(0, 6.28), vr: rnd(-5, 5), ph: rnd(0, 6.28), c: Math.random() < 0.7 ? ["#ffd3dc", "#f37d93"] : ["#ffe9ee", "#ffb3c1"] });
+  for (let i = 0; i < 26; i++) petals2.push(mkP2(false));
+  let lastD = performance.now();
+  function drawDust(t) {
+    const sr = st2.getBoundingClientRect(), W = sr.width, H = sr.height, dt = Math.min(0.05, (t - lastD) / 1000); lastD = t;
+    fit(cvDust, W, H);
+    const g = gDust; g.setTransform(DPR, 0, 0, DPR, 0, 0); g.clearRect(0, 0, W, H);
+    if (petals2.length < 34 && Math.random() < 0.18) petals2.push(mkP2(true));
+    for (let i = petals2.length - 1; i >= 0; i--) {
+      const p = petals2[i];
+      p.x += (p.vx + Math.sin(t * 0.003 + p.ph) * 0.06) * dt; p.y += p.vy * dt; p.r += p.vr * dt;
+      if (p.y > 1.03 || p.x > 1.08) { petals2.splice(i, 1); continue; }
+      g.save(); g.translate(p.x * W, p.y * H); g.rotate(p.r); g.scale(1, 0.4 + Math.abs(Math.sin(t * 0.006 + p.ph)) * 0.6);
+      const gr = g.createLinearGradient(0, -p.s, 0, p.s); gr.addColorStop(0, p.c[0]); gr.addColorStop(1, p.c[1]);
+      g.fillStyle = gr; g.globalAlpha = 0.92;
+      g.beginPath(); g.moveTo(0, -p.s); g.bezierCurveTo(p.s * 0.9, -p.s * 0.5, p.s * 0.55, p.s * 0.8, 0, p.s * 0.75); g.bezierCurveTo(-p.s * 0.55, p.s * 0.8, -p.s * 0.9, -p.s * 0.5, 0, -p.s); g.fill();
+      g.restore();
+    }
+    g.globalAlpha = 1;
   }
 
   /* ---------- main loop ---------- */
@@ -534,5 +632,5 @@
   // preview shortcuts:  ?fly  (play the dragons right away)   ?p2  (open page 2)
   if (/[?&]p2\b/.test(location.search)) showPage2(false);
   if (/[?&]fly\b/.test(location.search)) setTimeout(startFlight, 1900);
-  window.__cn = { startFlight, get t() { return tFly; } };
+  window.__cn = { startFlight, get t() { return tFly; }, pullTo(d) { pull = Math.min(d, PULL_MAX); pullTarget = pull; sheetLayout(); } };
 })();
