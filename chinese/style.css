@@ -885,3 +885,14 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .ty-btn { top: calc(1218 / 1848 * 100%); width: 40%; padding: 1.1cqw 0 .8cqw; }
 .ty-btn .cn { font-size: 3.9cqw; }
 .ty-btn .mm { font-size: 2.4cqw; }
+
+/* ===== three-layer fit ===== */
+.band { position: absolute; inset: 0; pointer-events: none; }
+.band > * { pointer-events: auto; }
+.band > .bg, .band > i, .band > .l3, .band > .g3, .band > .g5, .band > .g6, .band > .g8, .band > .g9 { pointer-events: none; }
+.b-mid { z-index: 0; } .b-top { z-index: 1; } .b-bot { z-index: 1; }
+.band > .bg { position: absolute; inset: 0; width: 100%; height: 100%; }
+/* page 2: thank-you button back in the silk band at the bottom */
+.ty-btn { top: calc(1585 / 1848 * 100%); width: 44%; padding: 1.4cqw 0 1cqw; }
+.ty-btn .cn { font-size: 4.2cqw; } .ty-btn .mm { font-size: 2.5cqw; }
+#st2 > .sheet { z-index: 3; } #st2 > .knotB { z-index: 4; } #st2 > .rollB { z-index: 5; } #st2 > .pull-hint { z-index: 4; } #st2 > .pull-zone { z-index: 6; }

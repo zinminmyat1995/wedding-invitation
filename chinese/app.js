@@ -34,6 +34,83 @@
   }
   document.querySelectorAll(".page").forEach(pinChrome);
 
+  /* ---------- three-layer fit ----------
+     The artwork is split into a top band (title …), a middle band (scenery) and a bottom band
+     (buttons …). Full width always; the top band sticks to the top of the screen, the bottom
+     band to the bottom, and only the middle scenery gives up height when the screen is short.
+     cfg: { T, B }   band edges in artwork units
+          focus      0…1  where the middle is trimmed (0 = from its bottom, 1 = from its top)
+          free       elements that stay in top-band coordinates and are never clipped
+          fitMid     elements stretched to exactly the visible middle (e.g. a scrolling text) */
+  const SEAM = 36;
+  function buildBands(stage, cfg) {
+    if (stage._bands) return stage._bands;
+    const AH = cfg.AH, host = cfg.host || stage;
+    const sh = stage.offsetHeight || 1;
+    const mk = (c) => { const b = document.createElement("div"); b.className = "band " + c; return b; };
+    const bands = { top: mk("b-top"), mid: mk("b-mid"), bot: mk("b-bot") };
+    const keep = new Set([...(cfg.free || []), ...(cfg.fitMid || [])].map((s) => stage.querySelector(s)).filter(Boolean));
+    const bg = stage.querySelector(":scope > .bg");
+    const kids = [...host.children].filter((el) => !keep.has(el) && !el.classList.contains("layer") && !el.classList.contains("band"));
+    stage.insertBefore(bands.mid, stage.firstChild); stage.insertBefore(bands.top, bands.mid.nextSibling); stage.insertBefore(bands.bot, bands.top.nextSibling);
+    if (bg) { bands.mid.appendChild(bg.cloneNode()); bands.bot.appendChild(bg.cloneNode()); bands.top.appendChild(bg); }
+    kids.forEach((el) => {
+      if (el === bg) return;
+      const y = ((el.offsetTop + el.offsetHeight / 2) / sh) * AH;
+      (y < cfg.T ? bands.top : y > cfg.B ? bands.bot : bands.mid).appendChild(el);
+    });
+    // free elements go above the bands, in top-band coordinates
+    keep.forEach((el) => stage.appendChild(el));
+    stage.querySelectorAll(":scope > .layer").forEach((c) => stage.appendChild(c));
+    stage._bands = bands;
+    return bands;
+  }
+  function bandFit(page, stage, AW, AH, cfg) {
+    cfg.AH = AH;
+    const W = page.clientWidth || innerWidth, H = page.clientHeight || innerHeight;
+    let k = W / AW, h = AH * k;
+    if (!stage._bands) { stage.style.width = `${W}px`; stage.style.height = `${h}px`; void stage.offsetHeight; }   // measure at the real size
+    const bands = buildBands(stage, cfg);
+    const pct = (v) => `${(v / AH) * 100}%`;
+    if (h <= H) {                                   // screen taller than the art: cover by height, no trimming
+      k = H / AH; h = H;
+      stage.style.width = `${AW * k}px`; stage.style.height = `${h}px`; stage.style.marginTop = "0px";
+      Object.values(bands).forEach((b) => { b.style.transform = ""; b.style.clipPath = ""; b.style.webkitMaskImage = b.style.maskImage = ""; });
+      bands.top.style.clipPath = `inset(0 0 ${pct(AH - cfg.T)} 0)`; bands.bot.style.clipPath = `inset(${pct(cfg.B)} 0 0 0)`;
+      (cfg.fitMid || []).forEach((s) => { const el = stage.querySelector(s); if (el) { el.style.top = ""; el.style.height = ""; } });
+      return;
+    }
+    const Dm = (h - H) / k;                         // artwork units that have to go
+    const pre = Math.min(Dm, cfg.topFirst || 0);
+    const m = Math.min(Dm - pre, Math.max(0, cfg.B - cfg.T - 2 * SEAM)), rest = Dm - m;
+    const a = m * (cfg.focus ?? 0.5), b = m - a;
+    stage.style.width = `${W}px`; stage.style.height = `${h}px`;
+    stage.style.marginTop = `${(h - H) / 2 - rest * k}px`;  // anything the middle can't absorb comes off the very top
+    const fadeEnd = (from, to) => `linear-gradient(180deg, #000 0, #000 ${pct(from)}, transparent ${pct(to)}, transparent 100%)`;
+    const fadeStart = (from, to) => `linear-gradient(180deg, transparent 0, transparent ${pct(from)}, #000 ${pct(to)}, #000 100%)`;
+    bands.top.style.transform = "";
+    bands.top.style.clipPath = `inset(0 0 ${pct(AH - cfg.T)} 0)`;
+    bands.top.style.webkitMaskImage = bands.top.style.maskImage = cfg.T > 0 ? fadeEnd(cfg.T - SEAM, cfg.T) : "";
+    bands.mid.style.transform = `translateY(${-a * k}px)`;
+    bands.mid.style.clipPath = `inset(${pct(Math.max(0, cfg.T + a - SEAM))} 0 ${pct(Math.max(0, AH - (cfg.B - b) - SEAM))} 0)`;
+    bands.mid.style.webkitMaskImage = bands.mid.style.maskImage = "";
+    bands.bot.style.transform = `translateY(${-m * k}px)`;
+    bands.bot.style.clipPath = `inset(${pct(cfg.B)} 0 0 0)`;
+    bands.bot.style.webkitMaskImage = bands.bot.style.maskImage = cfg.B < AH ? fadeStart(cfg.B, cfg.B + SEAM) : "";
+    (cfg.fitMid || []).forEach((s) => {
+      const el = stage.querySelector(s); if (!el) return;
+      el.style.top = `${cfg.fitTop * k}px`;
+      el.style.height = `${Math.max(60, (cfg.fitBottom - m - cfg.fitTop) * k)}px`;
+    });
+  }
+  const FIT = {
+    p2: { T: 770, B: 1275, focus: 0.45, host: document.getElementById("art2"), free: ["#sheet", "#rollB", "#knotB", "#pullZone", "#pullHint"] },
+    p3: { T: 935, B: 1545, focus: 0.5, topFirst: 170, fitMid: ["#stText"], fitTop: 950, fitBottom: 1562 },
+    p4: { T: 0, B: 610, focus: 1 },
+    p5: { T: 1415, B: 1848, focus: 0 },
+    p6: { T: 1545, B: 1848, focus: 0 },
+  };
+
   /* ---------- page 2 text ---------- */
   set("c2Groom", C.groom); set("c2Bride", C.bride);
   set("c2Kicker", P2.kicker); set("c2Date", P2.dateLong); set("c2Week", P2.week); set("c2Time", P2.time);
@@ -532,7 +609,7 @@
 
   /* ---------- pages ---------- */
   function showPage2(push = true) {
-    requestAnimationFrame(() => coverFit(p2, $("#st2"), 851, 1848, 1, 50));
+    requestAnimationFrame(() => bandFit(p2, $("#st2"), 851, 1848, FIT.p2));
     playMusic();
     p1.classList.remove("on", "in", "flying", "awaken");
     p1.setAttribute("aria-hidden", "true");
@@ -626,7 +703,7 @@
   const toast2 = $("#toast2");
   function say(msg) { toast2.textContent = msg; toast2.classList.add("on"); clearTimeout(say.t); say.t = setTimeout(() => toast2.classList.remove("on"), 1600); }
   document.querySelectorAll(".b3").forEach((b) => b.addEventListener("click", () => { if (b.dataset.b === "story") showPage3(); else if (b.dataset.b === "gallery") showPage5(); else if (b.dataset.b === "fortune") showPage6(); else if (b.dataset.b === "place") showPage4(); else say("敬请期待 ✦"); }));
-  addEventListener("resize", () => { if (p2.classList.contains("on")) coverFit(p2, $("#st2"), 851, 1848, 1, 50); sheetLayout(); });
+  addEventListener("resize", () => { if (p2.classList.contains("on")) bandFit(p2, $("#st2"), 851, 1848, FIT.p2); sheetLayout(); });
   sheetLayout();
 
   /* ---------- page 2: cherry petals blown across ---------- */
@@ -662,7 +739,7 @@
   const OS_W = 851, OS_H = 1848;
   let lang = "cn";
   // size the stage from the page box itself (dvh is unreliable in some phone browsers)
-  function fitStory() { coverFit(p3, st3, 851, 1848, 0.4); }
+  function fitStory() { bandFit(p3, st3, 851, 1848, FIT.p3); }
 
   function renderStory() {
     const paras = STORY[lang] || [];
@@ -728,7 +805,7 @@
   $("#cDateV").innerHTML = `${PL.dateCn || ""}<span class="en">${PL.dateEn || ""}</span>`;
   set("go4L", PL.go);
   let mapLoaded = false;
-  function fitPlace() { coverFit(p4, st4, 851, 1849, 1); }
+  function fitPlace() { bandFit(p4, st4, 851, 1849, FIT.p4); }
 
   addEventListener("resize", () => { if (p4.classList.contains("on")) fitPlace(); });
   function showPage4(push = true) {
@@ -830,7 +907,7 @@
   function openV7() { $("#viewer7Img").src = GAL[gi5].src; v7.classList.add("open"); v7.setAttribute("aria-hidden", "false"); }
   const closeV7 = () => { v7.classList.remove("open"); v7.setAttribute("aria-hidden", "true"); };
   $("#viewer7X").addEventListener("click", closeV7); v7.addEventListener("click", (e) => { if (e.target === v7) closeV7(); });
-  function fitGallery() { coverFit(p5, st5, 851, 1848, 0.45); }
+  function fitGallery() { bandFit(p5, st5, 851, 1848, FIT.p5); layout5(); }
 
   addEventListener("resize", () => { if (p5.classList.contains("on")) { fitGallery(); layout5(); } });
   function showPage5(push = true) {
@@ -961,7 +1038,7 @@
   $("#close8").addEventListener("click", () => { closeRes(); resetCup(); });
   $("#again8").addEventListener("click", () => { closeRes(); setTimeout(shakeCup, 450); });
   $("#foShake").addEventListener("click", () => { if (!p6.classList.contains("ready") && !foRes.classList.contains("open")) shakeCup(); });
-  function fitFortune() { coverFit(p6, st6, 851, 1848, 0.45); }
+  function fitFortune() { bandFit(p6, st6, 851, 1848, FIT.p6); }
 
   addEventListener("resize", () => { if (p6.classList.contains("on")) fitFortune(); });
   function showPage6(push = true) {
