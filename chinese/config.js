@@ -30,6 +30,22 @@ window.WEDDING_CN = {
     back: "返回",
   },
 
+  // Gallery photos (chinese/img/gal — web copies of chinese/image a–p)
+  gallery: ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "l", "m", "n", "o", "p"],
+
+  // Place page (from the real invitation card)
+  place: {
+    name: "Royal Myeik",
+    hall: "Ballroom · 宴会厅",
+    address: "No. 144/(A), Kyan Taw Road, Kan Phyar Ward, Myeik",
+    query: "Royal Myeik Hotel, Myeik",
+    timeCn: "12:00 – 15:00",
+    timeEn: "12 PM – 3 PM",
+    dateCn: "2026.11.29",
+    dateEn: "Sunday",
+    go: "导航前往 · Directions",
+  },
+
   // Our Story — sample text (replace with the couple's own words). "*" = a small ornament line
   story: {
     cn: [

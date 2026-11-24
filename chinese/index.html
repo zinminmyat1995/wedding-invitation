@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+Myanmar:wght@500;700&family=Noto+Serif+SC:wght@500;700&family=Cinzel:wght@500;600;700&family=Pinyon+Script&display=swap" rel="stylesheet">
   <link rel="preload" as="image" href="img/cn-bg.jpg">
-  <link rel="stylesheet" href="style.css?v=38">
+  <link rel="stylesheet" href="style.css?v=44">
 </head>
 <body>
 
@@ -154,13 +154,52 @@
     </div>
   </main>
 
+  <!-- ================= PAGE 4 : Place ================= -->
+  <main class="page p4" id="p4" aria-label="我们的地点 · Place" aria-hidden="true">
+    <div class="backdrop4" aria-hidden="true"></div>
+    <div class="stage s6" id="st4">
+      <img class="bg" src="img/pl-bg.jpg" alt="" draggable="false">
+      <div class="map4" id="map4"><iframe id="mapFrame" title="Royal Myeik Hotel map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe><i class="map-tint" aria-hidden="true"></i></div>
+      <img class="ring4" src="img/pl-ring.png" alt="" aria-hidden="true">
+      <i class="g6 lan6a" aria-hidden="true"></i><i class="g6 lan6b" aria-hidden="true"></i><i class="g6 lan6c" aria-hidden="true"></i><i class="g6 sun6" aria-hidden="true"></i>
+      <i class="xi-glow6" aria-hidden="true"></i>
+      <a class="cell c1" id="cPlace" target="_blank" rel="noopener"><b class="ct" id="cPlaceT"></b><span class="cv" id="cPlaceV"></span></a>
+      <div class="cell c2"><b class="ct" id="cTimeT"></b><span class="cv" id="cTimeV"></span></div>
+      <div class="cell c3"><b class="ct" id="cDateT"></b><span class="cv" id="cDateV"></span></div>
+      <a class="go4" id="go4" target="_blank" rel="noopener"><span id="go4L"></span></a>
+      <canvas class="layer" id="p4Petals" aria-hidden="true"></canvas>
+      <button class="back6" id="back4" type="button" aria-label="返回 · Back"><svg viewBox="0 0 24 24"><path d="M14.5 6 8.5 12l6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <p class="sig5"><i class="sig-line" aria-hidden="true"></i><span class="sig-pre">love story crafted by</span><span class="sig-name">Zin Min Myat</span><i class="sig-line r" aria-hidden="true"></i></p>
+    </div>
+  </main>
+
+  <!-- ================= PAGE 5 : Gallery ================= -->
+  <main class="page p5" id="p5" aria-label="我们的相册 · Gallery" aria-hidden="true">
+    <div class="backdrop5" aria-hidden="true"></div>
+    <div class="stage s7" id="st5">
+      <img class="bg" src="img/gl-bg.jpg" alt="" draggable="false">
+      <i class="xi-glow7" aria-hidden="true"></i><i class="moon7" aria-hidden="true"></i>
+      <div class="cf" id="cf"><div class="cf-flow" id="cfFlow"></div></div>
+      <img class="frame7" src="img/gl-frame.png" alt="" aria-hidden="true">
+      <button class="nav7 prev" id="cfPrev" type="button" aria-label="上一张 · Previous"></button>
+      <button class="nav7 next" id="cfNext" type="button" aria-label="下一张 · Next"></button>
+      <p class="cf-count" id="cfCount"></p>
+      <div class="cf-dots" id="cfDots"></div>
+      <div class="thumbs7" id="thumbs7"></div>
+      <canvas class="layer" id="p5Petals" aria-hidden="true"></canvas>
+      <button class="back6" id="back5" type="button" aria-label="返回 · Back"><svg viewBox="0 0 24 24"><path d="M14.5 6 8.5 12l6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <p class="sig5"><i class="sig-line" aria-hidden="true"></i><span class="sig-pre">love story crafted by</span><span class="sig-name">Zin Min Myat</span><i class="sig-line r" aria-hidden="true"></i></p>
+    </div>
+    <div class="viewer7" id="viewer7" aria-hidden="true"><img id="viewer7Img" alt=""><button type="button" id="viewer7X" aria-label="关闭 · Close">✕</button></div>
+  </main>
+
   <!-- the dragons fly over everything during the page change -->
   <canvas class="dragon-front" id="dragonFront" aria-hidden="true"></canvas>
   <link rel="preload" as="video" href="img/dragon.mp4">
 
   <audio id="bgm" loop preload="auto"></audio>
 
-  <script src="config.js?v=38"></script>
-  <script src="app.js?v=38"></script>
+  <script src="config.js?v=44"></script>
+  <script src="app.js?v=44"></script>
 </body>
 </html>

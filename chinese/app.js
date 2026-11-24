@@ -343,7 +343,7 @@
      2. at that very spot the real 3D dragon (img/dragon.mp4, keyed: black → transparent)
         rises back out of the clouds and coils round the moon gate exactly as in the clip
      3. its body sweeps past the camera → page 2 */
-  const AWAKE = 0.05, SFX_DELAY = 1, SFX_FADE = 1.8;   // dragon sound: starts 1 s after the tap, fades in
+  const AWAKE = 0.05, SFX_DELAY = 1.5, SFX_FADE = 1.8;   // dragon sound: starts 1.5 s after the tap, fades in
   let SFX_LEN = 12.18, RATE = (V_SWAP_ - 0.75) / (SFX_DELAY + SFX_LEN);   // the clip reaches the camera exactly when the dragon sound ends
   const V0 = 0.75, V_SWAP = V_SWAP_, V_END = 10.45, V_RFADE = 8.2;   // times inside the clip
   const EMERGE = { fx: 0.47, fy: 0.95 };    // where the clip's dragon rises from (fraction of its frame)
@@ -530,7 +530,7 @@
   }
   $("#enterBtn").addEventListener("click", () => { unlockMusic(); if (reduce) { showPage2(); return; } startFlight(); });
   $("#backBtn").addEventListener("click", () => (history.state && history.state.p === 2 ? history.back() : showPage1()));
-  addEventListener("popstate", () => { if (p3.classList.contains("on")) { closePage3(); return; } if (p2.classList.contains("on") && !flying) showPage1(); });
+  addEventListener("popstate", () => { if (p5.classList.contains("on")) { closePage5(); return; } if (p4.classList.contains("on")) { closePage4(); return; } if (p3.classList.contains("on")) { closePage3(); return; } if (p2.classList.contains("on") && !flying) showPage1(); });
 
   /* =========================================================
      PAGE 2 — the hanging scroll. The top roller stays where it is;
@@ -605,7 +605,7 @@
   function openScroll() { pinned = true; pullTarget = PULL_MAX; kick(); }
   const toast2 = $("#toast2");
   function say(msg) { toast2.textContent = msg; toast2.classList.add("on"); clearTimeout(say.t); say.t = setTimeout(() => toast2.classList.remove("on"), 1600); }
-  document.querySelectorAll(".b3").forEach((b) => b.addEventListener("click", () => { if (b.dataset.b === "story") showPage3(); else if (b.dataset.b === "place") window.open("https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent("Royal Myeik Hotel, Myeik"), "_blank", "noopener"); else say("敬请期待 ✦"); }));
+  document.querySelectorAll(".b3").forEach((b) => b.addEventListener("click", () => { if (b.dataset.b === "story") showPage3(); else if (b.dataset.b === "gallery") showPage5(); else if (b.dataset.b === "place") showPage4(); else say("敬请期待 ✦"); }));
   addEventListener("resize", sheetLayout);
   sheetLayout();
 
@@ -644,8 +644,10 @@
   // size the stage from the page box itself (dvh is unreliable in some phone browsers)
   function fitStory() {
     const W = p3.clientWidth || innerWidth, H = p3.clientHeight || innerHeight, r = OS_W / OS_H;
-    let w = Math.max(W, H * r);                          // cover: full width and full height
-    if (W / H > r * 1.35) w = H * r;                     // wide screens: show the whole artwork
+    // always the full height (never cut the top or bottom); in-app browsers like Messenger are
+    // wider than the artwork, so the sides are filled by the soft backdrop of the same picture
+    let w = H * r;
+    p3.classList.toggle("wide", w < W - 1);
     st3.style.width = `${w}px`; st3.style.height = `${w / r}px`;
   }
   function renderStory() {
@@ -699,6 +701,160 @@
     g3.globalAlpha = 1;
   }
 
+  /* =========================================================
+     PAGE 4 — Place: real map in the moon window, the hotel in the scene,
+     place / time / date from the printed invitation
+  ========================================================= */
+  const p4 = $("#p4"), st4 = $("#st4"), PL = C.place || {};
+  const mapQ = encodeURIComponent(PL.query || "Royal Myeik Hotel, Myeik");
+  const mapsLink = `https://www.google.com/maps/search/?api=1&query=${mapQ}`;
+  $("#cPlace").href = mapsLink; $("#go4").href = `https://www.google.com/maps/dir/?api=1&destination=${mapQ}`;
+  $("#cPlaceV").innerHTML = `${PL.name || ""}<span class="en">${PL.hall || ""}</span>`;
+  $("#cTimeV").innerHTML = `${PL.timeCn || ""}<span class="en">${PL.timeEn || ""}</span>`;
+  $("#cDateV").innerHTML = `${PL.dateCn || ""}<span class="en">${PL.dateEn || ""}</span>`;
+  set("go4L", PL.go);
+  let mapLoaded = false;
+  function fitPlace() {
+    const W = p4.clientWidth || innerWidth, H = p4.clientHeight || innerHeight, r = 851 / 1849;
+    const w = H * r;                                     // always full height, never cut top or bottom
+    st4.style.width = `${w}px`; st4.style.height = `${H}px`;
+    p4.classList.toggle("wide", w < W - 1);
+  }
+  addEventListener("resize", () => { if (p4.classList.contains("on")) fitPlace(); });
+  function showPage4(push = true) {
+    p2.classList.remove("on", "in"); p2.setAttribute("aria-hidden", "true");
+    p4.classList.add("on"); p4.removeAttribute("aria-hidden");
+    fitPlace();
+    if (!mapLoaded) { mapLoaded = true; $("#mapFrame").src = `https://maps.google.com/maps?q=${mapQ}&z=15&output=embed`; }
+    p4.classList.remove("in"); void p4.offsetWidth; p4.classList.add("in");
+    if (push) history.pushState({ p: 4 }, "", "#place");
+  }
+  function closePage4() {
+    p4.classList.remove("on", "in"); p4.setAttribute("aria-hidden", "true");
+    p2.classList.add("on"); p2.removeAttribute("aria-hidden");
+    p2.classList.remove("in"); void p2.offsetWidth; p2.classList.add("in");
+  }
+  $("#back4").addEventListener("click", () => (history.state && history.state.p === 4 ? history.back() : closePage4()));
+  const cv4 = $("#p4Petals"), g4 = cv4.getContext("2d"), pet4 = [];
+  const mkP4 = (top) => ({ x: top ? rnd(-0.2, 0.9) : Math.random(), y: top ? -0.03 : Math.random(), s: rnd(5, 10), vx: rnd(0.03, 0.08), vy: rnd(0.05, 0.11), r: rnd(0, 6.28), vr: rnd(-4, 4), ph: rnd(0, 6.28) });
+  for (let i = 0; i < 18; i++) pet4.push(mkP4(false));
+  let last4 = performance.now();
+  function drawP4(t) {
+    const r = st4.getBoundingClientRect(), W = r.width, H = r.height, dt = Math.min(0.05, (t - last4) / 1000); last4 = t;
+    fit(cv4, W, H); g4.setTransform(DPR, 0, 0, DPR, 0, 0); g4.clearRect(0, 0, W, H);
+    if (pet4.length < 24 && Math.random() < 0.12) pet4.push(mkP4(true));
+    for (let i = pet4.length - 1; i >= 0; i--) {
+      const p = pet4[i]; p.x += (p.vx + Math.sin(t * 0.002 + p.ph) * 0.04) * dt; p.y += p.vy * dt; p.r += p.vr * dt;
+      if (p.y > 1.03 || p.x > 1.08) { pet4.splice(i, 1); continue; }
+      g4.save(); g4.translate(p.x * W, p.y * H); g4.rotate(p.r); g4.scale(1, 0.4 + Math.abs(Math.sin(t * 0.005 + p.ph)) * 0.6);
+      const gr = g4.createLinearGradient(0, -p.s, 0, p.s); gr.addColorStop(0, "#ffd3dc"); gr.addColorStop(1, "#ef6f86");
+      g4.fillStyle = gr; g4.globalAlpha = 0.9;
+      g4.beginPath(); g4.moveTo(0, -p.s); g4.bezierCurveTo(p.s * 0.9, -p.s * 0.5, p.s * 0.55, p.s * 0.8, 0, p.s * 0.75); g4.bezierCurveTo(-p.s * 0.55, p.s * 0.8, -p.s * 0.9, -p.s * 0.5, 0, -p.s); g4.fill();
+      g4.restore();
+    }
+    g4.globalAlpha = 1;
+  }
+
+  /* =========================================================
+     PAGE 5 — Gallery: big photo in the middle of the scroll frame,
+     the others peek from both sides in 3D; swipe / arrows / thumbnails
+  ========================================================= */
+  const p5 = $("#p5"), st5 = $("#st5"), cfEl = $("#cf"), cfFlow = $("#cfFlow"), thumbs7 = $("#thumbs7"), cfDots = $("#cfDots");
+  const GAL = (C.gallery || []).map((n) => ({ src: `img/gal/${n}.jpg`, thumb: `img/gal/${n}-t.jpg` }));
+  let gi5 = 0;
+  const cards5 = GAL.map((p, i) => {
+    const el = document.createElement("div"); el.className = "cf-card"; el.dataset.i = i;
+    el.innerHTML = `<img src="${p.src}" alt="" draggable="false" loading="lazy"><i class="sh"></i>`;
+    cfFlow.appendChild(el); return el;
+  });
+  thumbs7.innerHTML = GAL.map((p, i) => `<button type="button" data-i="${i}" aria-label="照片 ${i + 1}"><img src="${p.thumb}" alt="" loading="lazy"></button>`).join("");
+  const thumbEls = [...thumbs7.children];
+  const DOTS = 5;
+  cfDots.innerHTML = Array.from({ length: DOTS }, () => "<i></i>").join("");
+  function layout5() {
+    const fw = cfEl.clientWidth, fh = cfEl.clientHeight; if (!fw) return;
+    const n = GAL.length, big = Math.min(fh * 0.96, fw * 0.69), side = big * 0.62;
+    cards5.forEach((el, i) => {
+      let d = i - gi5; if (d > n / 2) d -= n; if (d < -n / 2) d += n;
+      const a = Math.abs(d), s = el.style;
+      el.classList.toggle("center", d === 0); el.classList.toggle("hide", a > 3);
+      if (d === 0) { s.setProperty("--w", `${big}px`); s.setProperty("--h", `${big}px`); s.setProperty("--x", "0px"); s.setProperty("--z", "40px"); s.setProperty("--ry", "0deg"); s.setProperty("--o", 1); s.setProperty("--b", 1); s.setProperty("--zi", 50); }
+      else {
+        const sg = Math.sign(d);
+        s.setProperty("--w", `${side}px`); s.setProperty("--h", `${side}px`);
+        s.setProperty("--x", `${sg * (big / 2 + side * 0.08 + (a - 1) * side * 0.32)}px`); s.setProperty("--z", `${-140 - a * 70}px`); s.setProperty("--ry", `${-sg * 45}deg`);
+        s.setProperty("--o", a > 2 ? 0 : 1 - a * 0.15); s.setProperty("--b", 0.8 - a * 0.12); s.setProperty("--zi", 50 - a);
+      }
+    });
+    thumbEls.forEach((b, i) => b.classList.toggle("on", i === gi5));
+    const tb = thumbEls[gi5]; if (tb) thumbs7.scrollTo({ left: tb.offsetLeft - thumbs7.clientWidth / 2 + tb.clientWidth / 2, behavior: "smooth" });
+    [...cfDots.children].forEach((d, k) => d.classList.toggle("on", k === Math.round((gi5 / Math.max(1, n - 1)) * (DOTS - 1))));
+    $("#cfCount").textContent = `${String(gi5 + 1).padStart(2, "0")} / ${String(n).padStart(2, "0")}`;
+  }
+  const go5 = (i) => { gi5 = (i + GAL.length) % GAL.length; layout5(); };
+  const tap5 = (el, fn) => { let t = false; el.addEventListener("touchend", (e) => { e.preventDefault(); t = true; fn(); }, { passive: false }); el.addEventListener("click", () => { if (t) { t = false; return; } fn(); }); };
+  tap5($("#cfPrev"), () => go5(gi5 - 1)); tap5($("#cfNext"), () => go5(gi5 + 1));
+  thumbs7.addEventListener("click", (e) => { const b = e.target.closest("[data-i]"); if (b) go5(+b.dataset.i); });
+  {
+    let sx = null, sy = 0, dx = 0, horiz = null, t0 = 0;
+    cfEl.addEventListener("pointerdown", (e) => { sx = e.clientX; sy = e.clientY; dx = 0; horiz = null; t0 = performance.now(); try { cfEl.setPointerCapture(e.pointerId); } catch (_) {} });
+    cfEl.addEventListener("pointermove", (e) => {
+      if (sx === null) return; const x = e.clientX - sx, y = e.clientY - sy;
+      if (horiz === null && (Math.abs(x) > 6 || Math.abs(y) > 6)) horiz = Math.abs(x) > Math.abs(y);
+      if (!horiz) return; dx = x; cfFlow.style.transform = `translateX(${x * 0.4}px)`;
+    });
+    const up = (e) => {
+      if (sx === null) return; sx = null;
+      cfFlow.style.transition = "transform .4s cubic-bezier(.2,.8,.2,1)"; cfFlow.style.transform = ""; setTimeout(() => { cfFlow.style.transition = ""; }, 420);
+      const fast = Math.abs(dx) / Math.max(1, performance.now() - t0) > 0.5;
+      if (horiz && (Math.abs(dx) > 40 || (fast && Math.abs(dx) > 15))) { go5(gi5 + (dx < 0 ? 1 : -1)); return; }
+      if (Math.abs(dx) < 6) { const c = document.elementFromPoint(e.clientX, e.clientY); const card = c && c.closest && c.closest(".cf-card"); if (card) { if (+card.dataset.i === gi5) openV7(); else go5(+card.dataset.i); } }
+    };
+    cfEl.addEventListener("pointerup", up); cfEl.addEventListener("pointercancel", () => { sx = null; cfFlow.style.transform = ""; });
+  }
+  const v7 = $("#viewer7");
+  function openV7() { $("#viewer7Img").src = GAL[gi5].src; v7.classList.add("open"); v7.setAttribute("aria-hidden", "false"); }
+  const closeV7 = () => { v7.classList.remove("open"); v7.setAttribute("aria-hidden", "true"); };
+  $("#viewer7X").addEventListener("click", closeV7); v7.addEventListener("click", (e) => { if (e.target === v7) closeV7(); });
+  function fitGallery() {
+    const W = p5.clientWidth || innerWidth, H = p5.clientHeight || innerHeight, r = 851 / 1848;
+    st5.style.width = `${H * r}px`; st5.style.height = `${H}px`;
+  }
+  addEventListener("resize", () => { if (p5.classList.contains("on")) { fitGallery(); layout5(); } });
+  function showPage5(push = true) {
+    p2.classList.remove("on", "in"); p2.setAttribute("aria-hidden", "true");
+    p5.classList.add("on"); p5.removeAttribute("aria-hidden");
+    fitGallery(); layout5();
+    p5.classList.remove("in"); void p5.offsetWidth; p5.classList.add("in");
+    if (push) history.pushState({ p: 5 }, "", "#gallery");
+  }
+  function closePage5() {
+    closeV7();
+    p5.classList.remove("on", "in"); p5.setAttribute("aria-hidden", "true");
+    p2.classList.add("on"); p2.removeAttribute("aria-hidden");
+    p2.classList.remove("in"); void p2.offsetWidth; p2.classList.add("in");
+  }
+  $("#back5").addEventListener("click", () => (history.state && history.state.p === 5 ? history.back() : closePage5()));
+  const cv5 = $("#p5Petals"), g5 = cv5.getContext("2d"), pet5 = [];
+  const mkP5 = (top) => ({ x: top ? rnd(-0.2, 0.9) : Math.random(), y: top ? -0.03 : Math.random(), s: rnd(5, 10), vx: rnd(0.03, 0.08), vy: rnd(0.05, 0.11), r: rnd(0, 6.28), vr: rnd(-4, 4), ph: rnd(0, 6.28) });
+  for (let i = 0; i < 16; i++) pet5.push(mkP5(false));
+  let last5 = performance.now();
+  function drawP5(t) {
+    const r = st5.getBoundingClientRect(), W = r.width, H = r.height, dt = Math.min(0.05, (t - last5) / 1000); last5 = t;
+    fit(cv5, W, H); g5.setTransform(DPR, 0, 0, DPR, 0, 0); g5.clearRect(0, 0, W, H);
+    if (pet5.length < 22 && Math.random() < 0.1) pet5.push(mkP5(true));
+    for (let i = pet5.length - 1; i >= 0; i--) {
+      const p = pet5[i]; p.x += (p.vx + Math.sin(t * 0.002 + p.ph) * 0.04) * dt; p.y += p.vy * dt; p.r += p.vr * dt;
+      if (p.y > 1.03 || p.x > 1.08) { pet5.splice(i, 1); continue; }
+      g5.save(); g5.translate(p.x * W, p.y * H); g5.rotate(p.r); g5.scale(1, 0.4 + Math.abs(Math.sin(t * 0.005 + p.ph)) * 0.6);
+      const gr = g5.createLinearGradient(0, -p.s, 0, p.s); gr.addColorStop(0, "#ffd3dc"); gr.addColorStop(1, "#ef6f86");
+      g5.fillStyle = gr; g5.globalAlpha = 0.9;
+      g5.beginPath(); g5.moveTo(0, -p.s); g5.bezierCurveTo(p.s * 0.9, -p.s * 0.5, p.s * 0.55, p.s * 0.8, 0, p.s * 0.75); g5.bezierCurveTo(-p.s * 0.55, p.s * 0.8, -p.s * 0.9, -p.s * 0.5, 0, -p.s); g5.fill();
+      g5.restore();
+    }
+    g5.globalAlpha = 1;
+  }
+
   /* ---------- main loop ---------- */
   let last = performance.now();
   function loop(now) {
@@ -707,6 +863,8 @@
     if (flying) { try { flightFrame(dt); } catch (e) { console.error(e); endFlight(); } }
     if (p2.classList.contains("on")) drawDust(now);
     if (p3.classList.contains("on")) drawP3(now);
+    if (p4.classList.contains("on")) drawP4(now);
+    if (p5.classList.contains("on")) drawP5(now);
     requestAnimationFrame(loop);
   }
   requestAnimationFrame(loop);
@@ -743,6 +901,8 @@
 
   // preview shortcuts:  ?fly  (play the dragons right away)   ?p2  (open page 2)
   if (/[?&]p2\b/.test(location.search)) showPage2(false);
+  if (/[?&]gallery/.test(location.search)) { showPage2(false); showPage5(false); }
+  if (/[?&]place/.test(location.search)) { showPage2(false); showPage4(false); }
   if (/[?&]story/.test(location.search)) { showPage2(false); showPage3(false); }
   if (/[?&]fly\b/.test(location.search)) setTimeout(startFlight, 1900);
   window.__cn = { get vol() { return sfxGain ? +sfxGain.gain.value.toFixed(2) : sfx.volume; }, get sfx() { return { on: sfxOn, paused: sfx.paused, t: sfx.currentTime }; }, startFlight, get t() { return tFly; }, pullTo(d) { pull = Math.min(d, PULL_MAX); pullTarget = pull; sheetLayout(); } };
