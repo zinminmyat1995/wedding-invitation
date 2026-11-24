@@ -224,3 +224,20 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .mistR { left: 73.5%; top: 23.6%; width: 26%; height: 12%; }
 .enter { left: 24.3%; top: 65.8%; width: 50.6%; height: 6.1%; }
 .en-shine { left: 10.4%; right: 9.5%; top: 9%; bottom: 9%; }
+
+/* phones: cover the whole screen (no side gaps); wide screens still show the whole artwork */
+@media (max-aspect-ratio: 3/4) {
+  .p1 .stage { width: max(100vw, 100vh * 873 / 1802); width: max(100vw, 100dvh * 873 / 1802); }
+}
+/* the scene dims while the gold dragons fly, so they glow */
+.dim { position: absolute; inset: -50%; pointer-events: none; z-index: 4; opacity: 0; transition: opacity 1.4s ease;
+  background: radial-gradient(ellipse at 50% 48%, rgba(40, 14, 0, .35), rgba(14, 4, 0, .72) 75%); }
+.p1.flying .dim { opacity: 1; }
+
+/* each painted dragon leaves the picture at its own moment */
+.p1.loose .drg, .p1.loose .eye { opacity: 1; }
+.p1.looseL .drgL, .p1.looseR .drgR { opacity: 0; }
+.p1.looseL .eyeL, .p1.looseR .eyeR { opacity: 0; transition: opacity .3s; }
+.p1.loose .mist { opacity: 0; }
+.p1.looseL .mistL, .p1.looseR .mistR { opacity: 1; animation: mistDrift 6s ease-in-out infinite alternate; }
+.dim { background: radial-gradient(ellipse at 50% 48%, rgba(40, 14, 0, .18), rgba(20, 6, 0, .5) 75%); }

@@ -231,71 +231,104 @@
     const f = (a - L[i - 1]) / (L[i] - L[i - 1]);
     return { x: pts[i - 1][0] + (pts[i][0] - pts[i - 1][0]) * f, y: pts[i - 1][1] + (pts[i][1] - pts[i - 1][1]) * f };
   }
-  const NPTS = 64, LAG = 0.034, ACC = 300, ORB = 338, OMEGA = (Math.PI * 2) / 6;
-  const ORBIT_END = 4.9;
-  const profile = (f) => (f < 0.15 ? 1 : f < 0.6 ? 1 - (f - 0.15) * 0.22 : Math.max(0.34, 0.9 - (f - 0.6) * 1.45));
-  const DRAG = [
-    { sp: mkSpine([[205, 440], [165, 450], [125, 480], [100, 520], [110, 560], [150, 585], [200, 600], [235, 625], [245, 660]]),
-      fwd: { x: 0.95, y: -0.3 }, R0: 17, exit: { x: 1500, y: 300 }, exitScale: 2.0 },
-    { sp: mkSpine([[700, 515], [735, 495], [780, 470], [830, 480], [855, 530], [835, 585], [790, 610], [740, 600]]),
-      fwd: { x: 0.2, y: 0.98 }, R0: 15, exit: { x: -600, y: -300 }, exitScale: 0.5, fade: true },
+  const NPTS = 70, LAG = 0.036;
+  const profile = (f) => (f < 0.12 ? 1 : f < 0.6 ? 1 - (f - 0.12) * 0.2 : Math.max(0.3, 0.9 - (f - 0.6) * 1.5));
+
+  /* Flight choreography (taken from the reference clip): the dragon leaves its painted pose,
+     glides along the top, drops down the right side and throws a full loop, sweeps across the
+     bottom in front of the couple, climbs the left side, then dives THROUGH the moon window
+     (behind the couple), comes out again and rushes at the camera.
+     waypoint = [x, y, scale (depth), behind-the-gate 0/1] in artwork units (873 × 1802) */
+  const WP_L = [
+    [205, 440, 1, 0], [330, 410, 1.04, 0], [480, 402, 1.06, 0], [640, 440, 1.08, 0], [760, 560, 1.1, 0],
+    [820, 720, 1.12, 0], [760, 860, 1.16, 0], [640, 800, 1.12, 0], [680, 660, 1.06, 0], [800, 700, 1.1, 0],
+    [830, 900, 1.16, 0], [790, 1080, 1.22, 0], [640, 1200, 1.3, 0], [433, 1236, 1.36, 0], [230, 1190, 1.3, 0],
+    [110, 1030, 1.2, 0], [90, 820, 1.1, 0], [150, 620, 1.0, 0], [300, 560, 0.92, 1], [480, 590, 0.86, 1],
+    [600, 700, 0.84, 1], [620, 880, 0.88, 1], [520, 1010, 0.95, 1], [330, 1000, 1.0, 1], [240, 880, 1.05, 0],
+    [300, 700, 1.35, 0], [433, 560, 2.1, 0], [520, 380, 3.2, 0],
   ];
-  DRAG.forEach((d) => { d.lag = LAG; d.v0 = d.sp.len / (LAG * (NPTS - 1)); const a = d.sp.pts[0]; d.anchor = { x: a[0], y: a[1] }; });
-  DRAG[0].theta0 = Math.atan2(DRAG[0].anchor.y - RING.y, DRAG[0].anchor.x - RING.x) + 0.2;
-  DRAG[1].theta0 = DRAG[0].theta0 + Math.PI;            // always on the opposite side of the gate
+  const WP_R = [[700, 515, 1, 0], ...WP_L.slice(1).map(([x, y, s, b]) => [866 - x, y, s, b])];
+  // Catmull-Rom → dense polyline with arc length, depth and behind-flag
+  function mkTrack(wp) {
+    const pts = [];
+    for (let i = 0; i < wp.length - 1; i++) {
+      const p0 = wp[Math.max(0, i - 1)], p1 = wp[i], p2 = wp[i + 1], p3 = wp[Math.min(wp.length - 1, i + 2)];
+      for (let k = 0; k < 24; k++) {
+        const t = k / 24, t2 = t * t, t3 = t2 * t;
+        const c = (a, b, cc, d) => 0.5 * (2 * b + (-a + cc) * t + (2 * a - 5 * b + 4 * cc - d) * t2 + (-a + 3 * b - 3 * cc + d) * t3);
+        pts.push({ x: c(p0[0], p1[0], p2[0], p3[0]), y: c(p0[1], p1[1], p2[1], p3[1]), s: p1[2] + (p2[2] - p1[2]) * t, b: p1[3] + (p2[3] - p1[3]) * t });
+      }
+    }
+    const l = wp[wp.length - 1]; pts.push({ x: l[0], y: l[1], s: l[2], b: l[3] });
+    const L = [0]; for (let i = 1; i < pts.length; i++) L.push(L[i - 1] + Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y));
+    return { pts, L, len: L[L.length - 1] };
+  }
+  function onTrack(tr, a) {
+    const { pts, L } = tr;
+    if (a <= 0) return pts[0];
+    if (a >= tr.len) { const p = pts[pts.length - 1], q = pts[pts.length - 2], l = Math.hypot(p.x - q.x, p.y - q.y) || 1, k = (a - tr.len) / l; return { x: p.x + (p.x - q.x) * k, y: p.y + (p.y - q.y) * k, s: p.s * (1 + k * 0.02), b: p.b }; }
+    let lo = 0, hi = L.length - 1; while (hi - lo > 1) { const m = (lo + hi) >> 1; if (L[m] < a) lo = m; else hi = m; }
+    const f = (a - L[lo]) / (L[hi] - L[lo] || 1), p = pts[lo], q = pts[hi];
+    return { x: p.x + (q.x - p.x) * f, y: p.y + (q.y - p.y) * f, s: p.s + (q.s - p.s) * f, b: p.b + (q.b - p.b) * f };
+  }
+  const VMAX = 520;
+  const DRAG = [
+    { sp: mkSpine([[205, 440], [165, 450], [125, 480], [100, 520], [110, 560], [150, 585], [200, 600], [235, 625], [245, 660]]), tr: mkTrack(WP_L), R0: 21, flip: false, delay: 0, lead: true },
+    { sp: mkSpine([[700, 515], [735, 495], [780, 470], [830, 480], [855, 530], [835, 585], [790, 610], [740, 600]]), tr: mkTrack(WP_R), R0: 19, flip: true, delay: 0.9 },
+  ];
+  // distance travelled: starts at the speed that matches the painted pose, eases up to VMAX
+  DRAG.forEach((d) => {
+    d.v0 = d.sp.len / (LAG * (NPTS - 1)); d.anchor = { x: d.sp.pts[0][0], y: d.sp.pts[0][1] };
+    d.D = [0]; let s = 0; for (let k = 1; k <= 2000; k++) { const u = k * 0.01; s += (d.v0 + (VMAX - d.v0) * smooth(u / 1.6)) * 0.01; d.D.push(s); }
+  });
+  const dist = (d, u) => { const k = u / 0.01, i = Math.min(1999, Math.floor(k)); return d.D[i] + (d.D[i + 1] - d.D[i]) * (k - i); };
   function path(d, u) {
     if (u <= 0) { const q = poseAt(d.sp, -u * d.v0); return { x: q.x, y: q.y, s: 1, back: false, fly: 0 }; }
-    const dist = d.v0 * u + 0.5 * ACC * u * u;
-    const lin = { x: d.anchor.x + d.fwd.x * dist, y: d.anchor.y + d.fwd.y * dist };
-    const th = d.theta0 + OMEGA * u;
-    // the track itself snakes in and out of the circle, so the body (which follows the track) forms S-curves
-    const rr = ORB + 52 * Math.sin(th * 5 + d.theta0 * 3) + 14 * Math.sin(th * 2 + d.theta0);
-    const orb = { x: RING.x + Math.cos(th) * rr, y: RING.y + Math.sin(th) * rr * 0.96 + Math.sin(u * 1.7 + d.theta0) * 10 };
-    const b = smooth(u / 1.6);
-    // blend in polar coordinates around the gate, so the dragons swing round it instead of cutting across the couple
-    const lr = Math.hypot(lin.x - RING.x, (lin.y - RING.y) / 0.96), la = Math.atan2((lin.y - RING.y) / 0.96, lin.x - RING.x);
-    let da = th - la; while (da > Math.PI) da -= Math.PI * 2; while (da < -Math.PI) da += Math.PI * 2;
-    const ang = la + da * b, rad = Math.max(lr + (rr - lr) * b, Math.min(lr, rr));
-    let x = RING.x + Math.cos(ang) * rad, y = RING.y + Math.sin(ang) * rad * 0.96;
-    let s = 1 + 0.22 * Math.sin(th) * b + 0.06 * Math.sin(th * 5 + d.theta0 * 3) * b;
-    let back = b > 0.55 && Math.sin(th) < -0.12;
-    const e = smooth((u - ORBIT_END) / 0.8);
-    if (e > 0) {
-      const eu = u - ORBIT_END;
-      x += (orb.x + (d.exit.x - RING.x) * eu * 1.3 - x) * e;
-      y += (orb.y + (d.exit.y - RING.y) * eu * 1.3 - y) * e;
-      s += (d.exitScale - s) * e;
-      if (e > 0.3) back = false;
-    }
-    return { x, y, s, back, fly: smooth(u / 0.8) };
+    const q = onTrack(d.tr, dist(d, u));
+    return { x: q.x, y: q.y, s: q.s, back: q.b > 0.5, fly: smooth(u / 0.7) };
   }
   function bodyAt(d, u) {
     const P = [], R = [], B = [];
-    for (let i = 0; i < NPTS; i++) { const q = path(d, u - i * d.lag); P.push(q); B.push(q.back); R.push(d.R0 * q.s * profile(i / (NPTS - 1))); }
-    // a slow serpentine sway once airborne
+    for (let i = 0; i < NPTS; i++) { const q = path(d, u - i * LAG); P.push(q); B.push(q.back); R.push(d.R0 * q.s * profile(i / (NPTS - 1))); }
+    // slither: a gentle wave runs from the head to the tail on top of the track
     for (let i = 1; i < NPTS - 1; i++) {
       const f = P[i].fly; if (!f) continue;
       const a = P[i - 1], b = P[i + 1]; const tx = a.x - b.x, ty = a.y - b.y, l = Math.hypot(tx, ty) || 1;
-      const fi = i / (NPTS - 1);   // travelling wave: calm at the head, swinging more toward the tail
-      // slither: a wave runs from the head to the tail (2½ bends along the body), growing toward the tail
-      const off = (Math.sin(i * 0.25 - u * 5.2) * (0.5 + 1.6 * fi) + Math.sin(i * 0.11 - u * 2.3 + 1) * 0.6 * fi) * d.R0 * f * Math.min(1, i / 6);
+      const fi = i / (NPTS - 1);
+      const off = Math.sin(i * 0.22 - u * 4.6) * d.R0 * P[i].s * (0.25 + 0.9 * fi) * f * Math.min(1, i / 6);
       P[i] = { ...P[i], x: P[i].x - (ty / l) * off, y: P[i].y + (tx / l) * off };
     }
     return { P, R, B };
   }
 
-  // cloud puffs (design units) and screen-space puffs
-  const puffs = [], puffsS = [];
+  // cloud puffs (artwork units), screen-space puffs and golden haze
+  const puffs = [], puffsS = [], haze = [];
+  // cloud puffs use the same painted cloud sprites as the sky, so they read as real cloud
   function drawPuffs(g, dt, list) {
     for (let i = list.length - 1; i >= 0; i--) {
       const p = list[i]; p.age += dt;
       if (p.age > p.life) { list.splice(i, 1); continue; }
       const kk = p.age / p.life; p.x += p.vx * dt; p.y += p.vy * dt;
-      const r = p.r * (0.6 + kk * 0.9), a = (1 - kk) * (kk < 0.15 ? kk / 0.15 : 1) * 0.85;
+      if (p.spr == null) { p.spr = (Math.random() * sprites.length) | 0; p.fl = Math.random() < 0.5; }
+      const w = p.r * 2.6 * (0.7 + kk * 0.6), h = w * 0.5;
+      g.globalAlpha = Math.sin(Math.PI * Math.min(1, kk * 1.15)) * 0.75;
+      g.save(); g.translate(p.x, p.y); if (p.fl) g.scale(-1, 1); g.drawImage(sprites[p.spr], -w / 2, -h * 0.65, w, h); g.restore();
+    }
+    g.globalAlpha = 1;
+  }
+  // the warm golden smoke that trails the body in the clip
+  function drawHaze(g, dt) {
+    g.globalCompositeOperation = "lighter";
+    for (let i = haze.length - 1; i >= 0; i--) {
+      const p = haze[i]; p.age += dt;
+      if (p.age > p.life) { haze.splice(i, 1); continue; }
+      const k = p.age / p.life; p.x += p.vx * dt; p.y += p.vy * dt;
+      const r = p.r * (0.5 + k * 1.2), a = Math.sin(Math.PI * k) * 0.22;
       const rg = g.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
-      rg.addColorStop(0, `rgba(255,250,240,${a})`); rg.addColorStop(0.6, `rgba(255,240,222,${a * 0.5})`); rg.addColorStop(1, "rgba(255,240,222,0)");
+      rg.addColorStop(0, `rgba(255,205,90,${a})`); rg.addColorStop(0.5, `rgba(240,160,40,${a * 0.45})`); rg.addColorStop(1, "rgba(220,140,30,0)");
       g.fillStyle = rg; g.beginPath(); g.arc(p.x, p.y, r, 0, Math.PI * 2); g.fill();
     }
+    g.globalCompositeOperation = "source-over";
   }
   function flash(g, x, y, r, a) {
     const rg = g.createRadialGradient(x, y, 0, x, y, r);
@@ -303,14 +336,70 @@
     g.globalCompositeOperation = "lighter"; g.fillStyle = rg; g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill(); g.globalCompositeOperation = "source-over";
   }
 
-  /* ---------- the transition ---------- */
-  const AWAKE = 0.65;               // the painted dragons glow before they move
-  let flying = false, tFly = 0, giant = null, swapped = false, loosed = false;
+  /* ---------- the transition ----------
+     1. each painted dragon glows, trembles and slithers out of the picture,
+        diving down into the sea of clouds (drawn from the painted dragon itself)
+     2. at that very spot the real 3D dragon (img/dragon.mp4, keyed: black → transparent)
+        rises back out of the clouds and coils round the moon gate exactly as in the clip
+     3. its body sweeps past the camera → page 2 */
+  const AWAKE = 0.7, RATE = 1.1;
+  const V0 = 0.75, V_SWAP = 9.35, V_END = 10.45, V_RFADE = 8.2;   // times inside the clip
+  const EMERGE = { fx: 0.47, fy: 0.95 };    // where the clip's dragon rises from (fraction of its frame)
+  const KW = 640, KH = 360;
+  const mkV = () => { const v = document.createElement("video"); v.src = "img/dragon.mp4"; v.muted = true; v.playsInline = true; v.setAttribute("playsinline", ""); v.preload = "auto"; v.playbackRate = RATE; return v; };
+  DRAG[0].delay = 0; DRAG[0].cx = 0.35; DRAG[0].mirror = false;
+  DRAG[1].delay = 0.75; DRAG[1].cx = 0.65; DRAG[1].mirror = true;
+  DRAG.forEach((d) => { d.v = mkV(); d.c = document.createElement("canvas"); d.c.width = KW; d.c.height = KH; d.g = d.c.getContext("2d", { willReadFrequently: true }); d.v.load(); });
+  const EDGE = new Float32Array(KW * KH);
+  for (let y = 0; y < KH; y++) for (let x = 0; x < KW; x++) {
+    const ex = Math.min(x, KW - 1 - x) / (KW * 0.09), ey = Math.min(y, KH - 1 - y) / (KH * 0.14);
+    EDGE[y * KW + x] = smooth(Math.min(ex, ey));
+  }
+  let rawMode = false;
+  function keyFrame(d) {
+    const g = d.g; g.drawImage(d.v, 0, 0, KW, KH);
+    const id = g.getImageData(0, 0, KW, KH), p = id.data;
+    for (let i = 0, q = 0; i < p.length; i += 4, q++) {
+      const r = p[i], gg = p[i + 1], b = p[i + 2], m = r > gg ? (r > b ? r : b) : (gg > b ? gg : b);
+      let a = (m - 22) / 95; a = a < 0 ? 0 : a > 1 ? 1 : a; a = a * a * (3 - 2 * a);
+      const k = 1 / (a > 0.55 ? a : 0.55);
+      const R = r * k * 1.12, G = gg * k * 0.94, B = b * k * 0.8;
+      p[i] = R > 255 ? 255 : R; p[i + 1] = G > 255 ? 255 : G; p[i + 2] = B > 255 ? 255 : B; p[i + 3] = a * EDGE[q] * 255;
+    }
+    g.putImageData(id, 0, 0);
+  }
+  // the clip's frame on screen for dragon d
+  function clipBox(d) {
+    const SW = innerWidth, SH = innerHeight;
+    const bw = Math.max(SW * 1.75, SH * 1.12), bh = (bw * 9) / 16;
+    return { cx: SW * d.cx, cy: SR.top + (RING.y / DH) * SR.height, bw, bh };
+  }
+  // build each dive: painted pose → down the outside of the gate → into the clouds where the clip's dragon rises
+  function buildDives() {
+    DRAG.forEach((d) => {
+      const b = clipBox(d);
+      const sx = b.cx + (d.mirror ? -1 : 1) * (EMERGE.fx - 0.5) * b.bw, sy = b.cy + (EMERGE.fy - 0.5) * b.bh;
+      const ex = (sx - SR.left) / K, ey = (sy - SR.top) / K;            // screen → artwork units
+      const side = d.mirror ? 1 : -1, a = d.anchor;
+      const wp = d.mirror
+        ? [[a.x, a.y, 1, 0], [a.x - 70, a.y + 40, 1.04, 0], [a.x - 40, a.y + 170, 1.08, 0], [RING.x + 345, RING.y - 40, 1.12, 0], [(RING.x + 345 + ex) / 2 + 30, (RING.y + ey) / 2 + 120, 1.15, 0], [ex, ey, 1.1, 0], [ex, ey + 300, 1.0, 0]]
+        : [[a.x, a.y, 1, 0], [a.x + 70, a.y + 30, 1.04, 0], [a.x + 40, a.y + 170, 1.08, 0], [RING.x - 345, RING.y - 40, 1.12, 0], [(RING.x - 345 + ex) / 2 - 30, (RING.y + ey) / 2 + 120, 1.15, 0], [ex, ey, 1.1, 0], [ex, ey + 300, 1.0, 0]];
+      void side;
+      d.tr = mkTrack(wp);
+      d.diveLen = d.tr.len - 300 * 0.98;                                  // distance at which the head enters the clouds
+      d.diveT = 0; while (d.diveT < 19 && dist(d, d.diveT) < d.diveLen) d.diveT += 0.01;
+      d.ex = ex; d.ey = ey;
+    });
+  }
+
+  let flying = false, tFly = 0, swapped = false, loosed = false;
   function startFlight() {
     if (flying) return;
-    flying = true; tFly = 0; swapped = false; giant = null; loosed = false;
-    resize();
+    flying = true; tFly = 0; swapped = false; loosed = false; haze.length = 0; puffs.length = 0;
+    resize(); buildDives();
     p1.classList.add("awaken");
+    // start (and pause) both clips inside the tap, so phones allow playback later
+    DRAG.forEach((d) => { d.out = false; d.vOn = false; d.done = false; try { d.v.currentTime = V0; } catch (e) {} const pr = d.v.play(); if (pr) pr.then(() => { if (!d.vOn) d.v.pause(); }).catch(() => {}); });
     startMusic();
     if (navigator.vibrate) navigator.vibrate([20, 60, 30]);
   }
@@ -321,63 +410,64 @@
     gDF.setTransform(1, 0, 0, 1, 0, 0); gDF.clearRect(0, 0, cvDF.width, cvDF.height);
     const toArt = (g) => g.setTransform(DPR * K, 0, 0, DPR * K, DPR * SR.left, DPR * SR.top);
     const exp = 0.7 / (K * DPR);
+    if (u >= 0 && !loosed) { loosed = true; p1.classList.add("loose", "flying"); windTarget = 3; }
+    if (u < 0) return;
+    let alive = false;
 
-    if (u >= 0 && !loosed) {
-      loosed = true;
-      p1.classList.remove("awaken"); p1.classList.add("loose", "flying");
-      windTarget = 4;
-      DRAG.forEach((d) => { for (let kk = 0; kk < 10; kk++) puffs.push({ x: d.anchor.x + rnd(-120, 120), y: d.anchor.y + rnd(-60, 160), r: rnd(60, 140), vx: rnd(-80, 80), vy: rnd(-50, 50), life: rnd(1.1, 1.8), age: 0 }); });
-    }
-    // ---- phase 1: out of the picture, slowly round the moon gate ----
-    if (u >= 0 && u < ORBIT_END + 1.4) {
-      DRAG.forEach((d) => {
-        const alpha = d.fade ? 1 - smooth((u - ORBIT_END - 0.2) / 0.6) : 1;
-        if (alpha <= 0.01) return;
-        const { P, R, B } = bodyAt(d, u);
-        gDB.setTransform(DPR * K, 0, 0, DPR * K, 0, 0);
-        drawKit(gDB, P, R, { alpha, keep: (i) => B[i], exp, t: u });
+    // ---- 1. the painted dragons dive into the clouds ----
+    toArt(gDF); drawHaze(gDF, dt);
+    DRAG.forEach((d) => {
+      const ud = u - d.delay;
+      if (ud < 0) { alive = true; return; }
+      if (!d.out) {
+        d.out = true; p1.classList.add(d.mirror ? "looseR" : "looseL");
+        for (let k = 0; k < 10; k++) puffs.push({ x: d.anchor.x + rnd(-110, 110), y: d.anchor.y + rnd(-40, 150), r: rnd(50, 120), vx: rnd(-70, 70), vy: rnd(-50, 50), life: rnd(1.1, 1.8), age: 0 });
+      }
+      const fade = 1 - smooth((ud - (d.diveT - 0.4)) / 0.5);   // dissolves into golden smoke as the real dragon rises
+      if (fade > 0.01) {
+        alive = true;
+        const { P, R } = bodyAt(d, ud);
         toArt(gDF);
-        drawKit(gDF, P, R, { alpha, keep: (i) => !B[i], exp, t: u });
-        if (d.fade && u > ORBIT_END && u < ORBIT_END + 0.8 && Math.random() < 0.5) puffs.push({ x: P[0].x, y: P[0].y, r: rnd(80, 160), vx: rnd(-60, 60), vy: rnd(-60, 60), life: 1.2, age: 0 });
-      });
-      toArt(gDF);
-      if (u < 0.5) DRAG.forEach((d) => flash(gDF, d.anchor.x + 40, d.anchor.y + 80, 260, 0.9 * (1 - u / 0.5)));
-      drawPuffs(gDF, dt, puffs);
-    }
+        drawKit(gDF, P, R, { alpha: fade, exp, t: ud, flip: d.mirror });
+        const nH = fade < 0.95 ? 6 : 2;
+        for (let k = 0; k < nH; k++) { const i = ((Math.random() * NPTS) | 0), q = P[i]; haze.push({ x: q.x, y: q.y, r: R[i] * rnd(2.2, 3.4), vx: rnd(-20, 20), vy: rnd(-24, 6), life: rnd(1.1, 1.8), age: 0 }); }
+        // the cloud sea swallows it
+        if (ud > d.diveT - 0.35 && ud < d.diveT + 0.4) for (let k = 0; k < 2; k++) puffs.push({ x: d.ex + rnd(-80, 80), y: d.ey + rnd(0, 80), r: rnd(55, 110), vx: rnd(-40, 40), vy: rnd(-40, -5), life: rnd(1.2, 1.9), age: 0 });
+      }
+      if (ud < 0.5) flash(gDF, d.anchor.x, d.anchor.y + 60, 220, 0.9 * (1 - ud / 0.5));
+    });
+    toArt(gDF); drawPuffs(gDF, dt, puffs);
 
-    // ---- phase 2: the dragon sweeps right → left right in front of the camera ----
-    const SW = innerWidth, SH = innerHeight;
-    if (u > ORBIT_END + 0.6 && !giant) giant = { x0: SW * 1.15 + SH * 0.25, v: (SW * 1.5) / 0.6, L: SW * 2.2 + SH * 0.5, t0: t, n: 70 };
-    if (giant) {
-      const gt = t - giant.t0, head = giant.x0 - giant.v * gt;
-      const Rg = Math.min(SH * 0.085, SW * 0.17), mid = SH * 0.5, A = SH * 0.11, lam = Math.max(SW * 1.5, Math.PI * 2 * Math.sqrt(2 * Rg * A));
-      const P = [], R = [];
-      for (let i = 0; i < giant.n; i++) {
-        const f = i / (giant.n - 1), xr = f * giant.L;
-        P.push({ x: head + xr, y: mid + Math.sin((xr / lam) * Math.PI * 2 - gt * 2.6) * A * Math.min(1, f * 8) });
-        R.push(Rg * profile(f));
-      }
-      gDF.setTransform(DPR, 0, 0, DPR, 0, 0);
-      const fog = gt < 0.6 ? smooth(gt / 0.6) : 1 - smooth((gt - 0.7) / 0.9);
-      if (fog > 0.003) {
-        const fg = gDF.createLinearGradient(0, 0, 0, SH);
-        fg.addColorStop(0, `rgba(255,244,228,${fog * 0.96})`); fg.addColorStop(0.5, `rgba(255,250,240,${fog})`); fg.addColorStop(1, `rgba(250,232,210,${fog * 0.96})`);
-        gDF.fillStyle = fg; gDF.fillRect(0, 0, SW, SH);
-      }
-      for (let kk = 0; kk < 3; kk++) {
-        const i = (Math.random() * giant.n) | 0, q = P[i];
-        if (q.x < -200 || q.x > SW + 200) continue;
-        const side = Math.random() < 0.5 ? -1 : 1;
-        puffsS.push({ x: q.x + rnd(-60, 60), y: q.y + side * R[i] * rnd(1, 2), r: SH * rnd(0.1, 0.2), vx: -rnd(60, 220), vy: side * rnd(20, 80), life: rnd(1, 1.6), age: 0 });
-      }
-      drawPuffs(gDF, dt, puffsS);
-      drawKit(gDF, P, R, { flip: true, exp: 0.7 / DPR, headK: 0.85, t: gt });
-      if (!swapped && gt > 0.6) { swapped = true; showPage2(); }
-      if (head + giant.L < -SW * 0.1 && gt > 1.7) { puffsS.length = 0; endFlight(); }
-    }
+    // ---- 2. the real dragon rises from that same spot and coils round the gate ----
+    gDF.setTransform(DPR, 0, 0, DPR, 0, 0);
+    DRAG.forEach((d) => {
+      const ud = u - d.delay;
+      if (d.done || ud < d.diveT - 0.25) return;
+      alive = true;
+      if (!d.vOn) { d.vOn = true; try { d.v.currentTime = V0; } catch (e) {} d.v.play().catch(() => {}); }
+      const vt = d.v.currentTime;
+      if (vt >= V_END || d.v.ended || (d.mirror && vt >= V_RFADE + 0.7)) { d.done = true; d.v.pause(); return; }
+      if (d.v.readyState < 2) return;
+      let src = d.c;
+      if (!rawMode) { try { keyFrame(d); } catch (e) { rawMode = true; cvDF.style.mixBlendMode = "screen"; } }
+      if (rawMode) src = d.v;
+      let a = smooth((vt - V0) / 0.35);
+      if (d.mirror) a *= 1 - smooth((vt - V_RFADE) / 0.7);
+      else a *= 1 - smooth((vt - (V_END - 0.45)) / 0.45);
+      const b = clipBox(d), grow = d.mirror ? 1 : 1 + 0.5 * smooth((vt - 8.6) / 0.8);
+      const bw = b.bw * grow, bh = b.bh * grow;
+      gDF.save(); gDF.globalAlpha = a; gDF.translate(b.cx, b.cy);
+      if (d.mirror) gDF.scale(-1, 1);
+      gDF.drawImage(src, -bw / 2, -bh / 2, bw, bh);
+      gDF.restore();
+      if (!d.mirror && !swapped && vt >= V_SWAP) { swapped = true; showPage2(); }
+    });
+    if (!alive) endFlight();
   }
   function endFlight() {
-    flying = false; giant = null; puffs.length = 0;
+    flying = false; puffs.length = 0; haze.length = 0;
+    DRAG.forEach((d) => d.v.pause());
+    if (!swapped) { swapped = true; showPage2(); }
     gDF.setTransform(1, 0, 0, 1, 0, 0); gDF.clearRect(0, 0, cvDF.width, cvDF.height);
     gDB.setTransform(1, 0, 0, 1, 0, 0); gDB.clearRect(0, 0, cvDB.width, cvDB.height);
   }
@@ -393,7 +483,7 @@
   }
   function showPage1() {
     p2.classList.remove("on", "in"); p2.setAttribute("aria-hidden", "true");
-    p1.classList.remove("loose", "flying", "awaken", "in");
+    p1.classList.remove("loose", "flying", "awaken", "in", "looseL", "looseR");
     p1.classList.add("on"); p1.removeAttribute("aria-hidden");
     void p1.offsetWidth; p1.classList.add("in");
     setTimeout(resize, 1700);
@@ -420,7 +510,7 @@
   function loop(now) {
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
     if (p1.classList.contains("on")) { drawSky(dt, now); drawPetals(dt, now); }
-    if (flying) flightFrame(dt);
+    if (flying) { try { flightFrame(dt); } catch (e) { console.error(e); endFlight(); } }
     if (p2.classList.contains("on")) drawDust(now);
     requestAnimationFrame(loop);
   }
