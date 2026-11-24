@@ -530,7 +530,7 @@
   }
   $("#enterBtn").addEventListener("click", () => { unlockMusic(); if (reduce) { showPage2(); return; } startFlight(); });
   $("#backBtn").addEventListener("click", () => (history.state && history.state.p === 2 ? history.back() : showPage1()));
-  addEventListener("popstate", () => { if (p6.classList.contains("on")) { closePage6(); return; } if (p5.classList.contains("on")) { closePage5(); return; } if (p4.classList.contains("on")) { closePage4(); return; } if (p3.classList.contains("on")) { closePage3(); return; } if (p2.classList.contains("on") && !flying) showPage1(); });
+  addEventListener("popstate", () => { if (p7.classList.contains("on")) { closePage7(); return; } if (p6.classList.contains("on")) { closePage6(); return; } if (p5.classList.contains("on")) { closePage5(); return; } if (p4.classList.contains("on")) { closePage4(); return; } if (p3.classList.contains("on")) { closePage3(); return; } if (p2.classList.contains("on") && !flying) showPage1(); });
 
   /* =========================================================
      PAGE 2 — the hanging scroll. The top roller stays where it is;
@@ -989,6 +989,51 @@
     g6.globalAlpha = 1;
   }
 
+  /* =========================================================
+     PAGE 7 — Thank You
+  ========================================================= */
+  const p7 = $("#p7"), st7 = $("#st7");
+  function fitThanks() {
+    const W = p7.clientWidth || innerWidth, H = p7.clientHeight || innerHeight, r = 1086 / 1448;
+    // full height on phones (the sides are decoration), whole picture on wide screens
+    const w = Math.max(H * r * (W / H < 0.75 ? 1 : 0), Math.min(W, H * r)) || H * r;
+    st7.style.width = `${w}px`; st7.style.height = `${w / r}px`;
+  }
+  addEventListener("resize", () => { if (p7.classList.contains("on")) fitThanks(); });
+  function showPage7(push = true) {
+    p2.classList.remove("on", "in"); p2.setAttribute("aria-hidden", "true");
+    p7.classList.add("on"); p7.removeAttribute("aria-hidden");
+    fitThanks();
+    p7.classList.remove("in"); void p7.offsetWidth; p7.classList.add("in");
+    if (push) history.pushState({ p: 7 }, "", "#thanks");
+  }
+  function closePage7() {
+    p7.classList.remove("on", "in"); p7.setAttribute("aria-hidden", "true");
+    p2.classList.add("on"); p2.removeAttribute("aria-hidden");
+    p2.classList.remove("in"); void p2.offsetWidth; p2.classList.add("in");
+  }
+  $("#tyBtn").addEventListener("click", () => showPage7());
+  $("#back7").addEventListener("click", () => (history.state && history.state.p === 7 ? history.back() : closePage7()));
+  const cv7 = $("#p7Petals"), g7 = cv7.getContext("2d"), pet7 = [];
+  const mkP7 = (top) => ({ x: top ? rnd(-0.2, 0.9) : Math.random(), y: top ? -0.03 : Math.random(), s: rnd(6, 12), vx: rnd(0.03, 0.08), vy: rnd(0.05, 0.11), r: rnd(0, 6.28), vr: rnd(-4, 4), ph: rnd(0, 6.28) });
+  for (let i = 0; i < 20; i++) pet7.push(mkP7(false));
+  let last7 = performance.now();
+  function drawP7(t) {
+    const r = st7.getBoundingClientRect(), W = r.width, H = r.height, dt = Math.min(0.05, (t - last7) / 1000); last7 = t;
+    fit(cv7, W, H); g7.setTransform(DPR, 0, 0, DPR, 0, 0); g7.clearRect(0, 0, W, H);
+    if (pet7.length < 28 && Math.random() < 0.14) pet7.push(mkP7(true));
+    for (let i = pet7.length - 1; i >= 0; i--) {
+      const p = pet7[i]; p.x += (p.vx + Math.sin(t * 0.002 + p.ph) * 0.04) * dt; p.y += p.vy * dt; p.r += p.vr * dt;
+      if (p.y > 1.03 || p.x > 1.08) { pet7.splice(i, 1); continue; }
+      g7.save(); g7.translate(p.x * W, p.y * H); g7.rotate(p.r); g7.scale(1, 0.4 + Math.abs(Math.sin(t * 0.005 + p.ph)) * 0.6);
+      const gr = g7.createLinearGradient(0, -p.s, 0, p.s); gr.addColorStop(0, "#ffd3dc"); gr.addColorStop(1, "#ef6f86");
+      g7.fillStyle = gr; g7.globalAlpha = 0.9;
+      g7.beginPath(); g7.moveTo(0, -p.s); g7.bezierCurveTo(p.s * 0.9, -p.s * 0.5, p.s * 0.55, p.s * 0.8, 0, p.s * 0.75); g7.bezierCurveTo(-p.s * 0.55, p.s * 0.8, -p.s * 0.9, -p.s * 0.5, 0, -p.s); g7.fill();
+      g7.restore();
+    }
+    g7.globalAlpha = 1;
+  }
+
   /* ---------- main loop ---------- */
   let last = performance.now();
   function loop(now) {
@@ -1000,6 +1045,7 @@
     if (p4.classList.contains("on")) drawP4(now);
     if (p5.classList.contains("on")) drawP5(now);
     if (p6.classList.contains("on")) drawP6(now);
+    if (p7.classList.contains("on")) drawP7(now);
     requestAnimationFrame(loop);
   }
   requestAnimationFrame(loop);
@@ -1036,6 +1082,7 @@
 
   // preview shortcuts:  ?fly  (play the dragons right away)   ?p2  (open page 2)
   if (/[?&]p2\b/.test(location.search)) showPage2(false);
+  if (/[?&]thanks/.test(location.search)) { showPage2(false); showPage7(false); }
   if (/[?&]fortune/.test(location.search)) { showPage2(false); showPage6(false); }
   if (/[?&]gallery/.test(location.search)) { showPage2(false); showPage5(false); }
   if (/[?&]place/.test(location.search)) { showPage2(false); showPage4(false); }

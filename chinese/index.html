@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+Myanmar:wght@500;700&family=Noto+Serif+SC:wght@500;700&family=Cinzel:wght@500;600;700&family=Pinyon+Script&display=swap" rel="stylesheet">
   <link rel="preload" as="image" href="img/cn-bg.jpg">
-  <link rel="stylesheet" href="style.css?v=56">
+  <link rel="stylesheet" href="style.css?v=58">
 </head>
 <body>
 
@@ -121,6 +121,7 @@
         <div class="l3 knotB" id="knotB" data-k="knotB" aria-hidden="true"><img src="img/p2-knotB.png" alt=""></div>
         <button class="pull-zone" id="pullZone" type="button" aria-label="向下拉开画轴 · Pull the scroll down"></button>
         <p class="pull-hint" id="pullHint" aria-hidden="true"><i></i><i></i></p>
+        <button class="ty-btn" id="tyBtn" type="button"><i class="ty-sh" aria-hidden="true"></i><span class="cn">感谢函</span><span class="mm">ကျေးဇူးတင်လွှာ</span></button>
         <button class="b3" style="--x:117" type="button" data-b="story" aria-label="我们的故事"><span class="b3-mm">အချစ်ဇာတ်လမ်း</span></button>
         <button class="b3" style="--x:322" type="button" data-b="place" aria-label="地点 · Place"><span class="b3-mm">နေရာ</span></button>
         <button class="b3" style="--x:530" type="button" data-b="gallery" aria-label="婚纱相册"><span class="b3-mm">ဓာတ်ပုံများ</span></button>
@@ -228,14 +229,33 @@
     </div>
   </main>
 
+  <!-- ================= PAGE 7 : Thank You ================= -->
+  <main class="page p7" id="p7" aria-label="衷心感谢 · Thank You" aria-hidden="true">
+    <div class="backdrop7" aria-hidden="true"></div>
+    <div class="stage s9" id="st7">
+      <img class="bg" src="img/ty-bg.jpg" alt="Thank You · 衷心感谢" draggable="false">
+      <i class="g9 l9a" aria-hidden="true"></i><i class="g9 l9b" aria-hidden="true"></i><i class="g9 m9" aria-hidden="true"></i><i class="xi9" aria-hidden="true"></i>
+      <i class="ty-shine" aria-hidden="true"></i>
+      <div class="ty-text">
+        <p class="cn">感谢您的光临与祝福，<br>让我们的特别之日更加圆满。</p>
+        <p class="mm">ကျွန်ုပ်တို့၏ မင်္ဂလာနေ့ကို ကြွရောက်ချီးမြှင့်၍<br>ဆုမွန်ကောင်းများ ပေးခဲ့ကြသည့်အတွက်<br>လှိုက်လှဲစွာ ကျေးဇူးတင်ပါသည်။</p>
+        <p class="nm">Wai Hlyan Soe <em>&amp;</em> Jue Mi Mi Aw</p>
+      </div>
+      <canvas class="layer" id="p7Petals" aria-hidden="true"></canvas>
+    </div>
+  
+      <button class="back6 bk7" id="back7" type="button" aria-label="返回 · Back"><svg viewBox="0 0 24 24"><path d="M14.5 6 8.5 12l6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <p class="sig5 sig7"><i class="sig-line" aria-hidden="true"></i><span class="sig-pre">love story crafted by</span><span class="sig-name">Zin Min Myat</span><i class="sig-line r" aria-hidden="true"></i></p>
+  </main>
+
   <!-- the dragons fly over everything during the page change -->
   <canvas class="dragon-front" id="dragonFront" aria-hidden="true"></canvas>
   <link rel="preload" as="video" href="img/dragon.mp4">
 
   <audio id="bgm" loop preload="auto"></audio>
 
-  <script src="config.js?v=56"></script>
+  <script src="config.js?v=58"></script>
   <script src="fortune.js?v=1"></script>
-  <script src="app.js?v=56"></script>
+  <script src="app.js?v=58"></script>
 </body>
 </html>
