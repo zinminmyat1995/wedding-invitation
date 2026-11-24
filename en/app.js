@@ -89,7 +89,7 @@
     audio.src = C.music; audio.volume = 0;
     audio.play().then(() => {
       const t0 = performance.now();
-      const step = (t) => { audio.volume = Math.min(0.7, (t - t0) / 2500 * 0.7); if (audio.volume < 0.7) requestAnimationFrame(step); };
+      const step = (t) => { audio.volume = Math.max(0, Math.min(0.7, (t - t0) / 2500 * 0.7)); if (audio.volume < 0.7) requestAnimationFrame(step); };
       requestAnimationFrame(step);
     }).catch(() => { started = false; });
   }
@@ -832,6 +832,14 @@
   })();
 
   // preview helper: en/?garden  ·  en/?gallery
+  // signature line: visible once the guest is inside (hidden on the opening card and the Thank-You page)
+  {
+    const sig = $("#sig");
+    const upd = () => sig.classList.toggle("show", hero.classList.contains("leaving") && !ty.classList.contains("on") && !garden.classList.contains("walkin"));
+    const mo = new MutationObserver(upd);
+    [hero, ty, garden].forEach((el) => mo.observe(el, { attributes: true, attributeFilter: ["class"] }));
+    setTimeout(upd, 0);
+  }
   if (/[?&]garden\b/.test(location.search)) { hero.classList.add("leaving", "away"); garden.classList.add("on", "in"); garden.removeAttribute("aria-hidden"); where = "garden"; }
   if (/[?&]gallery/.test(location.search)) { hero.classList.add("leaving", "away"); gal.classList.add("on", "in"); gal.removeAttribute("aria-hidden"); where = "gallery"; layout(); }
   if (/[?&]bigday/.test(location.search)) { hero.classList.add("leaving", "away"); bd.classList.add("on", "in"); bd.removeAttribute("aria-hidden"); where = "bigday"; }

@@ -379,6 +379,7 @@
 
   function showApp() {
     app.removeAttribute("aria-hidden");
+    document.body.classList.add("app-open");
     homePage.classList.add("home-in");
     if (!flies.home) flies.home = createButterflies($("#homeStage"), 4);
   }
@@ -430,6 +431,7 @@
   }
   function settle(name) {
     current = name;
+    document.body.dataset.page = name;
     if (name !== "p6" && typeof autoplay === "function") autoplay(false);
     if (name !== "p8") musicFadeIn();
     busy = false;
@@ -448,7 +450,7 @@
     if (name === "p2") setTimeout(() => sparkleAt(".p2-rings"), (delay + 1.9) * 1000);
     if (name === "p3") setTimeout(() => sparkleAt(".p3-heart"), (delay + 1.8) * 1000);
     if (name === "p5") { window.__loadVenueMap && window.__loadVenueMap(); setTimeout(() => sparkleAt(".p5-map"), (delay + 2.2) * 1000); }
-    if (name === "p6") { autoplay(false); setTimeout(() => current === "p6" && autoplay(true), (delay + 3) * 1000); }
+    if (name === "p6") { mgLayout(); autoplay(false); setTimeout(() => current === "p6" && autoplay(true), (delay + 3) * 1000); }
     if (name === "p8") {
       const st = p.querySelector(".art-stage");
       // the thank-you letter we just left is shown inside the open doorway,
@@ -476,6 +478,10 @@
         burst(s.left + s.width / 2, s.top + s.height * 0.4, 30);
       }, (delay + 3.65) * 1000);
       setTimeout(() => sparkleAt(".p8-plaque"), (delay + 4.5) * 1000);
+      // once the camera has finished pulling back, drop the zoom animation so the
+      // browser re-draws the text at its real size (phones kept the blurry zoomed copy)
+      p.classList.remove("p8-settled");
+      setTimeout(() => current === "p8" && p.classList.add("p8-settled"), (delay + 2.75) * 1000);
     }
   }
   function sparkleAt(sel, fx = 0.5, fy = 0.5) {
@@ -567,7 +573,7 @@
     setTimeout(() => p8.classList.add("walk"), 500);
     setTimeout(() => { fx.className = "fx"; void fx.offsetWidth; fx.className = "fx white"; }, 1250);
     setTimeout(() => {
-      p8.classList.remove("active", "reopen", "walk", "p8-in");
+      p8.classList.remove("active", "reopen", "walk", "p8-in", "p8-settled");
       home.classList.add("active");
       home.classList.remove("home-in"); void home.offsetWidth; home.classList.add("home-in");
       burst(innerWidth / 2, innerHeight * 0.45, 60);
@@ -580,6 +586,7 @@
   function navigate(toName, fromEl, { push = true } = {}) {
     if (busy || !pages[toName] || toName === current) return;
     busy = true;
+    document.body.dataset.page = toName;   // hides the credit line on the closing page
     if (navigator.vibrate) navigator.vibrate(12);
     const fromName = current;
     const tabHop = inTabs(fromName) && inTabs(toName);
@@ -645,7 +652,7 @@
   // swipe left / right on the tab pages
   $$(".tabpage").forEach((p) => {
     let sx = null, sy = 0;
-    p.addEventListener("touchstart", (e) => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+    p.addEventListener("touchstart", (e) => { if (e.target.closest(".mg, .mg-nav, .mg-dots")) { sx = null; return; } sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
     p.addEventListener("touchend", (e) => {
       if (sx === null) return;
       const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
@@ -658,68 +665,135 @@
   });
 
   /* ============================================================
-     6b. PAGE 6 — GALLERY (main photo, thumbnails, swipe, autoplay)
+     6b. PAGE 6 — GALLERY (3D coverflow in a gilded Myanmar frame)
+         big photo in the middle, the rest peek from both sides,
+         swipe / arrows / dots, tap the middle photo for full screen
   ============================================================ */
-  const photos = (P6.photos || []).filter(Boolean);
-  const gv = $("#gv"), gvCur = $("#gv .cur"), gvNxt = $("#gv .nxt"), gvDots = $("#gvDots"), gvThumbs = $("#gvThumbs");
-  const PER = 6;
-  let gi = 0, gvBusy = false, gvTimer = null, gvPage = -1;
-  photos.forEach((src) => { const im = new Image(); im.src = src; });   // preload
+  const photos = (P6.photos || []).filter(Boolean).map((p) => (typeof p === "string" ? { src: p, thumb: p, w: 3, h: 2 } : p));
+  const mg = $("#mg"), mgFlow = $("#mgFlow"), mgDots = $("#mgDots"), mgCount = $("#mgCount");
+  const MMD = (n) => String(n).replace(/\d/g, (d) => "၀၁၂၃၄၅၆၇၈၉"[d]);
+  let gi = 0, gvTimer = null;
+  const mgCards = photos.map((p, i) => {
+    const el = document.createElement("div");
+    el.className = "mg-card"; el.dataset.i = i;
+    el.innerHTML = `<div class="mg-pic"><img src="${p.thumb}" alt="ဓာတ်ပုံ ${i + 1}" loading="lazy" decoding="async" draggable="false"><span class="mg-shine"></span></div>
+      <svg class="mg-c tl" aria-hidden="true"><use href="#mgCorner"/></svg><svg class="mg-c tr" aria-hidden="true"><use href="#mgCorner"/></svg>
+      <svg class="mg-c bl" aria-hidden="true"><use href="#mgCorner"/></svg><svg class="mg-c br" aria-hidden="true"><use href="#mgCorner"/></svg>
+      <svg class="mg-crest" viewBox="0 0 120 60" aria-hidden="true"><use href="#lotus"/></svg>`;
+    mgFlow.appendChild(el);
+    return el;
+  });
+  mgDots.innerHTML = photos.map((_, i) => `<button type="button" aria-label="ဓာတ်ပုံ ${i + 1}" data-i="${i}"></button>`).join("");
+  const mgDotEls = [...mgDots.children];
 
-  function renderThumbs(force) {
-    const page = Math.floor(gi / PER), pages = Math.ceil(photos.length / PER);
-    if (page !== gvPage || force) {
-      gvPage = page;
-      gvThumbs.innerHTML = Array.from({ length: PER }, (_, k) => {
-        const i = page * PER + k;
-        return i < photos.length
-          ? `<button class="gv-th" type="button" data-gi="${i}" aria-label="ဓာတ်ပုံ ${i + 1}"><img src="${photos[i]}" alt=""></button>`
-          : `<span class="gv-th empty"></span>`;
-      }).join("");
-      gvThumbs.classList.remove("flip"); void gvThumbs.offsetWidth; gvThumbs.classList.add("flip");
-      gvDots.innerHTML = pages > 1
-        ? Array.from({ length: pages }, (_, p) => `<button type="button" data-gp="${p}" class="${p === page ? "on" : ""}" aria-label="ဓာတ်ပုံ အုပ်စု ${p + 1}"></button>`).join("")
-        : "";
-    }
-    $$(".gv-th", gvThumbs).forEach((t) => t.classList.toggle("on", +t.dataset.gi === gi));
+  function mgLayout() {
+    if (!photos.length) return;
+    const fw = mgFlow.clientWidth, fh = mgFlow.clientHeight;
+    if (!fw || !fh) return;
+    const n = photos.length;
+    const side = { h: fh * .58 }; side.w = side.h * .7;
+    const c = photos[gi], r = c.w / c.h;
+    let ch = fh * .9, cw = ch * r;
+    const maxW = fw * (r > 1 ? .82 : .72);
+    if (cw > maxW) { cw = maxW; ch = cw / r; }
+    mgCards.forEach((el, i) => {
+      let d = i - gi; if (d > n / 2) d -= n; if (d < -n / 2) d += n;     // wrap so both sides are always filled
+      const a = Math.abs(d), s = el.style;
+      el.classList.toggle("center", d === 0);
+      el.classList.toggle("hide", a > 4);
+      if (d === 0) {
+        s.setProperty("--w", `${cw}px`); s.setProperty("--h", `${ch}px`);
+        s.setProperty("--x", "0px"); s.setProperty("--z", "40px"); s.setProperty("--ry", "0deg");
+        s.setProperty("--o", 1); s.setProperty("--b", 1); s.setProperty("--zi", 100);
+        const im = el.querySelector("img");
+        if (!im.dataset.full) { im.dataset.full = 1; const big = new Image(); big.onload = () => { im.src = c.src; }; big.src = c.src; }
+        const sh = el.querySelector(".mg-shine"); sh.style.animation = "none"; void sh.offsetWidth; sh.style.animation = "";
+        el.setAttribute("aria-current", "true");
+      } else {
+        const sg = Math.sign(d);
+        const x = sg * (cw / 2 + side.w * .12 + (a - 1) * side.w * .34);
+        s.setProperty("--w", `${side.w}px`); s.setProperty("--h", `${side.h}px`);
+        s.setProperty("--x", `${x}px`); s.setProperty("--z", `${-120 - a * 60}px`); s.setProperty("--ry", `${-sg * 40}deg`);
+        s.setProperty("--o", a > 3 ? 0 : 1 - a * .12); s.setProperty("--b", .9 - a * .1); s.setProperty("--zi", 100 - a);
+        el.removeAttribute("aria-current");
+      }
+    });
+    mgDotEls.forEach((b, i) => b.classList.toggle("on", i === gi));
+    mgCount.textContent = `${MMD(String(gi + 1).padStart(2, "0"))} / ${MMD(String(n).padStart(2, "0"))}`;
   }
-  function showPhoto(i, dir) {
-    if (!photos.length || gvBusy) return;
-    i = (i + photos.length) % photos.length;
-    if (i === gi) return;
-    gvBusy = true;
-    const d = dir || (i > gi ? 1 : -1);
-    gi = i;
-    gvNxt.src = photos[gi];
-    gvNxt.className = `gv-img nxt ${d > 0 ? "go-r" : "go-l"}`;
-    const r = gv.getBoundingClientRect();
-    burst(d > 0 ? r.right - 20 : r.left + 20, r.top + r.height / 2, 16);
-    renderThumbs();
-    setTimeout(() => {
-      gvCur.src = photos[gi];
-      gvNxt.className = "gv-img nxt";
-      gvBusy = false;
-    }, reduceMotion ? 30 : 1000);
+  function showPhoto(i) {
+    if (!photos.length) return;
+    const ni = (i + photos.length) % photos.length;
+    if (ni === gi) return;
+    const d = i > gi ? 1 : -1;
+    gi = ni; mgLayout();
+    const r = mg.getBoundingClientRect();
+    burst(d > 0 ? r.right - 30 : r.left + 30, r.top + r.height / 2, 12);
   }
   function autoplay(on) {
     clearInterval(gvTimer);
-    if (on && photos.length > 1 && !reduceMotion) gvTimer = setInterval(() => showPhoto(gi + 1, 1), 4800);
+    if (on && photos.length > 1 && !reduceMotion) gvTimer = setInterval(() => showPhoto(gi + 1), 5200);
   }
-  function userNav(fn) { fn(); autoplay(false); clearTimeout(userNav.t); userNav.t = setTimeout(() => current === "p6" && autoplay(true), 9000); }
-  if (photos.length) { gvCur.src = photos[0]; renderThumbs(true); }
-  $(".gv-prev").addEventListener("click", () => userNav(() => showPhoto(gi - 1, -1)));
-  $(".gv-next").addEventListener("click", () => userNav(() => showPhoto(gi + 1, 1)));
-  gvDots.addEventListener("click", (e) => { const d = e.target.closest("[data-gp]"); if (d) userNav(() => showPhoto(+d.dataset.gp * PER, +d.dataset.gp * PER > gi ? 1 : -1)); });
-  gvThumbs.addEventListener("click", (e) => { const t = e.target.closest("[data-gi]"); if (t) userNav(() => showPhoto(+t.dataset.gi)); });
+  function userNav(fn) { fn(); autoplay(false); clearTimeout(userNav.t); userNav.t = setTimeout(() => current === "p6" && autoplay(true), 10000); }
+  // arrows react on touch-end straight away (no 300 ms delay / ghost click)
+  function tapBtn(el, fn) {
+    let touched = false;
+    el.addEventListener("touchend", (e) => { e.preventDefault(); touched = true; fn(); }, { passive: false });
+    el.addEventListener("click", () => { if (touched) { touched = false; return; } fn(); });
+  }
+  tapBtn($(".mg-prev"), () => userNav(() => showPhoto(gi - 1)));
+  tapBtn($(".mg-next"), () => userNav(() => showPhoto(gi + 1)));
+  mgDots.addEventListener("click", (e) => { const b = e.target.closest("[data-i]"); if (b) userNav(() => showPhoto(+b.dataset.i)); });
+  addEventListener("resize", () => mgLayout());
+  if ("ResizeObserver" in window) new ResizeObserver(() => mgLayout()).observe(mgFlow);
+  mgLayout();
+
+  // swipe / drag — the photos follow the finger
   {
-    let sx = null;
-    gv.addEventListener("touchstart", (e) => { sx = e.touches[0].clientX; }, { passive: true });
-    gv.addEventListener("touchend", (e) => {
+    let sx = null, sy = 0, dxNow = 0, moved = false, horiz = null, t0 = 0;
+    const start = (x, y) => { sx = x; sy = y; dxNow = 0; moved = false; horiz = null; t0 = performance.now(); };
+    const move = (x, y, e) => {
       if (sx === null) return;
-      const dx = e.changedTouches[0].clientX - sx; sx = null;
-      if (Math.abs(dx) > 45) userNav(() => showPhoto(gi + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1));
-    });
+      const dx = x - sx, dy = y - sy;
+      if (horiz === null && (Math.abs(dx) > 6 || Math.abs(dy) > 6)) horiz = Math.abs(dx) > Math.abs(dy);
+      if (!horiz) return;
+      if (e && e.cancelable) e.preventDefault();
+      moved = Math.abs(dx) > 8; dxNow = dx;
+      mgFlow.style.transform = `translateX(${dx * .4}px)`;
+    };
+    const end = (target) => {
+      if (sx === null) return;
+      const dx = dxNow, fast = Math.abs(dx) / Math.max(1, performance.now() - t0) > .5;
+      sx = null;
+      mgFlow.style.transition = "transform .45s cubic-bezier(.2,.8,.2,1)"; mgFlow.style.transform = "";
+      setTimeout(() => { mgFlow.style.transition = ""; }, 460);
+      if (horiz && (Math.abs(dx) > 40 || (fast && Math.abs(dx) > 15))) { userNav(() => showPhoto(gi + (dx < 0 ? 1 : -1))); return; }
+      if (moved) return;
+      const card = target && target.closest && target.closest(".mg-card");
+      if (!card) return;
+      if (+card.dataset.i === gi) openMgViewer(gi); else userNav(() => showPhoto(+card.dataset.i));
+    };
+    mg.addEventListener("touchstart", (e) => { const t = e.touches[0]; start(t.clientX, t.clientY); }, { passive: true });
+    mg.addEventListener("touchmove", (e) => { const t = e.touches[0]; move(t.clientX, t.clientY, e); }, { passive: false });
+    mg.addEventListener("touchend", (e) => { const t = e.changedTouches[0]; if (e.cancelable) e.preventDefault(); end(document.elementFromPoint(t.clientX, t.clientY)); }, { passive: false });
+    mg.addEventListener("touchcancel", () => end(null));
+    mg.addEventListener("mousedown", (e) => { e.preventDefault(); start(e.clientX, e.clientY); });
+    addEventListener("mousemove", (e) => { if (sx !== null) move(e.clientX, e.clientY, null); });
+    addEventListener("mouseup", (e) => { if (sx !== null) end(e.target); });
   }
+
+  // full-screen photo
+  const mgViewer = $("#mgViewer"), mgViewerImg = $("#mgViewerImg");
+  function openMgViewer(i) { autoplay(false); mgViewerImg.src = photos[i].src; mgViewer.classList.add("open"); mgViewer.setAttribute("aria-hidden", "false"); }
+  function closeMgViewer() { mgViewer.classList.remove("open"); mgViewer.setAttribute("aria-hidden", "true"); if (current === "p6") autoplay(true); }
+  $("#mgViewerClose").addEventListener("click", closeMgViewer);
+  mgViewer.addEventListener("click", (e) => { if (e.target === mgViewer || e.target.classList.contains("mgv-frame")) closeMgViewer(); });
+  addEventListener("keydown", (e) => {
+    if (mgViewer.classList.contains("open")) { if (e.key === "Escape") closeMgViewer(); return; }
+    if (current !== "p6") return;
+    if (e.key === "ArrowLeft") userNav(() => showPhoto(gi - 1));
+    if (e.key === "ArrowRight") userNav(() => showPhoto(gi + 1));
+  });
 
   /* ============================================================
      6c. VENUE — real map + "wedding boarding pass" guide
@@ -747,6 +821,8 @@
     const mm = (n) => String(n).replace(/\d/g, (d) => "၀၁၂၃၄၅၆၇၈၉"[d]);
     setText("gdTitle", P5.name);
     setText("gdToName", P5.name);
+    setText("gdCode", P5.code || "");
+    if (P5.photo) { $("#gdHeroImg").src = P5.photo; $("#p5PhotoImg").src = P5.photo; }
     setText("gdDate", (W.page4 && W.page4.items && W.page4.items[0] && W.page4.items[0].title) || "");
     setText("gdTime", (W.home && W.home.cardTime) ? `${W.home.cardTime} ${W.home.cardTimeSub || ""}`.trim() : "");
     setText("gdHall", P5.hall || "");

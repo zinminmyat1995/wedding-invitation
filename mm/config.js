@@ -1,43 +1,44 @@
 /* =========================================================
    ဖိတ်စာ အချက်အလက်များ — ဒီဖိုင်ကိုပဲ ပြင်ရင် ရပါပြီ
-   (ဖိတ်စာအစစ်မှ ယူထားသည် — ၂၉-၁၁-၂၀၂၆၊ Royal Myeik Ballroom)
+   (ဖိတ်စာအစစ်မှ ယူထားသည် — မင်္ဂလာဦးဆွမ်းကျွေး၊ ၂၈-၁၁-၂၀၂၆ (စနေ)၊
+    နံနက် ၅ နာရီ မှ ၈ နာရီ၊ ဘုရားငါးဆူ စာသင်တိုက်၊ ကန်ဖျားရပ်၊ မြိတ်မြို့)
    စာကြောင်း ခွဲချင်ရင် \n ထည့်ပါ
    ========================================================= */
 window.WEDDING = {
-  groom: { short: "ဝေလျှံစိုး", full: "မောင်ဝေလျှံစိုး B.Sc (Geology)" },
-  bride: { short: "ဂျူးမီမီအော်", full: "မဂျူးမီမီအော် (B.C.Sc)" },
+  groom: { short: "ဝေလျှံစိုး", full: "မောင်ဝေလျှံစိုး" },
+  bride: { short: "ဂျူးမီမီအော်", full: "မဂျူးမီမီအော်" },
 
   // ① ဝင်ပေါက် (တံခါး)
   intro: {
-    title: "မင်္ဂလာ ဖိတ်စာ",
-    kicker: "ထိမ်းမြားမင်္ဂလာ ဖိတ်ကြားလွှာ",
+    title: "မင်္ဂလာဦးဆွမ်းကျွေး",
+    kicker: "မင်္ဂလာဦးဆွမ်းကျွေး ဖိတ်ကြားလွှာ",
     button: "ဖိတ်စာ ဖွင့်ကြည့်ရန်",
   },
 
   // ② Page 1 (ဘုရားနောက်ခံ)
   home: {
-    title: "မင်္ဂလာ ဖိတ်စာ",
-    message: "ထိမ်းမြားမင်္ဂလာပွဲသို့\nခင်မင်ရင်းနှီးစွာဖြင့် ဖိတ်ကြားအပ်ပါသည်။",
+    title: "မင်္ဂလာဦးဆွမ်းကျွေး",
+    message: "မင်္ဂလာဦးဆွမ်းကျွေးသို့\nခင်မင်ရင်းနှီးစွာဖြင့် ဖိတ်ကြားအပ်ပါသည်။",
     button: "ဖိတ်စာ ကြည့်ရန်",
-    cardDay: "တနင်္ဂနွေနေ့",
-    cardDate: "၂၉-၁၁-၂၀၂၆",
-    cardTime: "နေ့လယ် ၁၂ နာရီ",
-    cardTimeSub: "မှ ညနေ ၃ နာရီ",
-    cardVenue: "Royal Myeik",
-    cardCity: "(မြိတ်မြို့)",
+    cardDay: "စနေနေ့",
+    cardDate: "၂၈-၁၁-၂၀၂၆",
+    cardTime: "နံနက် ၅ နာရီ",
+    cardTimeSub: "မှ ၈ နာရီအထိ",
+    cardVenue: "ဘုရားငါးဆူ",
+    cardCity: "စာသင်တိုက်",
   },
 
   // ③ Page 2 (စုံတွဲ silhouette)
   page2: {
-    title: "မင်္ဂလာ ဖိတ်စာ",
-    message: "ထိမ်းမြားမင်္ဂလာပွဲသို့\nခင်မင်ရင်းနှီးစွာဖြင့် ဖိတ်ကြားအပ်ပါသည်။",
-    date: "တနင်္ဂနွေ\n၂၉-၁၁-၂၀၂၆",
-    time: "နေ့လယ် ၁၂ နာရီ\nမှ ညနေ ၃ နာရီ",
-    venue: "Royal Myeik\n(မြိတ်မြို့)",
+    title: "မင်္ဂလာဦးဆွမ်းကျွေး",
+    message: "မင်္ဂလာဦးဆွမ်းကျွေးသို့\nခင်မင်ရင်းနှီးစွာဖြင့် ဖိတ်ကြားအပ်ပါသည်။",
+    date: "စနေ\n၂၈-၁၁-၂၀၂၆",
+    time: "နံနက် ၅ နာရီ\nမှ ၈ နာရီအထိ",
+    venue: "ဘုရားငါးဆူ\nစာသင်တိုက်",
     // အောက်က ခလုတ် ၄ ခု — page: နောက်ထပ်လုပ်မယ့် page ရဲ့ နာမည်
     // p3 ဖိတ်စာ · p4 အစီအစဉ် · p5 နေရာ · p6 ဓာတ်ပုံ · p7 ကျေးဇူးတင်လွှာ · p8 တံခါးပိတ်
     buttons: [
-      { label: "မင်္ဂလာ အစီအစဉ်", page: "p4" },
+      { label: "အစီအစဉ်", page: "p4" },
       { label: "နေရာ ကြည့်ရန်", page: "p5" },
       { label: "ဓာတ်ပုံများ", page: "p6" },
     ],
@@ -45,7 +46,7 @@ window.WEDDING = {
 
   // ④ Page 3–5 အပေါ်က ခေါင်းစဉ်နဲ့ tab ၄ ခု (တူတူသုံး)
   tabs: {
-    title: "မင်္ဂလာ ဖိတ်စာ",
+    title: "မင်္ဂလာဦးဆွမ်းကျွေး",
     items: [
       { label: "ဖိတ်စာ", page: "p2" },
       { label: "အစီအစဉ်", page: "p4" },
@@ -56,37 +57,39 @@ window.WEDDING = {
 
   // ⑤ Page 3 — ဖိတ်ကြားလွှာ
   page3: {
-    title: "မင်္ဂလာ ဖိတ်စာ",
-    message: "“ထိမ်းမြားမင်္ဂလာပွဲ” သို့\nကြွရောက်ချီးမြှင့်ပေးပါရန်\nခင်မင်ရင်းနှီးစွာဖြင့် ဖိတ်ကြားအပ်ပါသည်။",
-    date: "တနင်္ဂနွေ\n၂၉-၁၁-၂၀၂၆",
-    time: "နေ့လယ် ၁၂ နာရီ\nမှ ညနေ ၃ နာရီ",
-    venue: "Royal Myeik\n(မြိတ်မြို့)",
+    title: "မင်္ဂလာဦးဆွမ်းကျွေး",
+    message: "“မင်္ဂလာဦးဆွမ်းကျွေး” သို့\nကြွရောက်ပေးပါရန်\nခင်မင်ရင်းနှီးစွာဖြင့် ဖိတ်ကြားအပ်ပါသည်။",
+    date: "စနေ\n၂၈-၁၁-၂၀၂၆",
+    time: "နံနက် ၅ နာရီ\nမှ ၈ နာရီအထိ",
+    venue: "ဘုရားငါးဆူ\nစာသင်တိုက်",
     button: "နေရာ ကြည့်ရန်",
   },
 
-  // ⑥ Page 4 — မင်္ဂလာ အစီအစဉ် (၅ ခု)
+  // ⑥ Page 4 — အစီအစဉ် (၅ ခု)
   page4: {
-    title: "မင်္ဂလာ အစီအစဉ်",
+    title: "ဆွမ်းကျွေး အစီအစဉ်",
     items: [
-      { time: "မင်္ဂလာ ရက်", title: "၂၉-၁၁-၂၀၂၆ (တနင်္ဂနွေ)" },
-      { time: "၁၃၈၈ ခုနှစ်", title: "တန်ဆောင်မုန်းလပြည့်ကျော် ၅ ရက်" },
-      { time: "အချိန်", title: "နေ့လယ် ၁၂ နာရီ – ညနေ ၃ နာရီ" },
-      { time: "နေရာ", title: "Royal Myeik Ballroom" },
-      { time: "လိပ်စာ", title: "ကြံတောရပ်၊ မြိတ်မြို့" },
+      { time: "ရက်စွဲ", title: "၂၈-၁၁-၂၀၂၆ (စနေနေ့)" },
+      { time: "၁၃၈၈ ခုနှစ်", title: "တန်ဆောင်မုန်းလပြည့်ကျော် (၄) ရက်" },
+      { time: "အချိန်", title: "နံနက် (၅:၀၀) မှ (၈:၀၀) နာရီအထိ" },
+      { time: "အစီအစဉ်", title: "ဆွမ်းကျွေး · တရားတော်နာ" },
+      { time: "နေရာ", title: "ဘုရားငါးဆူ စာသင်တိုက်" },
     ],
   },
 
   // ⑦ Page 5 — ကျင်းပမည့် နေရာ
   page5: {
-    title: "မင်္ဂလာ နေရာ",   // အပေါ်ဆုံး ခေါင်းစဉ်
-    name: "Royal Myeik Hotel",
-    hall: "Ballroom",
-    address: "Royal Myeik Hotel (Ballroom)\nအမှတ် ၁၄၄/(က)၊ ကြံတောလမ်း၊\nကန်ဖျားရပ်၊ မြိတ်မြို့။",   // \n = စာကြောင်းခွဲ
-    mapQuery: "Royal Myeik Hotel, Myeik",   // Google Maps မှာ ရှာမယ့်စာ
-    // ဟိုတယ်ရဲ့ တည်နေရာ — Google Maps မှာ ဟိုတယ်ကို ဖိထားရင် ပေါ်လာတဲ့ ဂဏန်း ၂ ခု (ဥပမာ 12.44, 98.60)
-    // ထည့်ထားရင် လမ်းညွှန်လက်မှတ်မှာ အကွာအဝေးနဲ့ သံလိုက်အိမ်မြှောင် အလုပ်လုပ်မယ်
+    title: "ဆွမ်းကျွေး နေရာ",   // အပေါ်ဆုံး ခေါင်းစဉ်
+    name: "ဘုရားငါးဆူ စာသင်တိုက်",
+    hall: "ကန်ဖျားရပ်",
+    address: "ဘုရားငါးဆူ စာသင်တိုက်\nကန်ဖျားရပ်၊\nမြိတ်မြို့။",   // \n = စာကြောင်းခွဲ
+    mapQuery: "ဘုရားငါးဆူ စာသင်တိုက်, ကန်ဖျားရပ်, မြိတ်",   // Google Maps မှာ ရှာမယ့်စာ
+    // ⚠️ စာသင်တိုက်ရဲ့ တည်နေရာ — Google Maps မှာ စာသင်တိုက်ကို ဖိထားရင် ပေါ်လာတဲ့ ဂဏန်း ၂ ခု (ဥပမာ 12.44, 98.60)
+    // ထည့်ထားရင် မြေပုံက နေရာအတိအကျ ပြပြီး လမ်းညွှန်လက်မှတ်မှာ အကွာအဝေးနဲ့ သံလိုက်အိမ်မြှောင် အလုပ်လုပ်မယ်
     lat: null,
     lng: null,
+    photo: "../assets/img/gallery/g-n-pagoda.jpg",   // နေရာပုံ (စာသင်တိုက် ပုံအစစ်ရှိရင် ဒီမှာ ပြောင်းပါ)
+    code: "ငါးဆူ",                                    // လမ်းညွှန်လက်မှတ်ပေါ်က တိုတို နာမည်
     phones: ["09881166595", "09684440736"],
     dirLabel: "နေရာသို့ လမ်းညွှန်",
     mapLabel: "Google Map ဖြင့် ကြည့်ရန်",
@@ -96,25 +99,27 @@ window.WEDDING = {
   page6: {
     title: "မင်္ဂလာ အမှတ်တရများ",
     next: "ကျေးဇူးတင်လွှာ",
+    // mm/image ထဲက ပုံအစစ်များ (web အရွယ် — assets/img/gallery-mm)
     photos: [
-      "../assets/img/gallery/g-n-main.jpg",
-      "../assets/img/gallery/g-n-hands.jpg",
-      "../assets/img/gallery/g-n-bouquet.jpg",
-      "../assets/img/gallery/g-n-bowl.jpg",
-      "../assets/img/gallery/g-n-lotus.jpg",
-      "../assets/img/gallery/g-n-pagoda.jpg",
-      "../assets/img/gallery/g-n-parasol.jpg",
-      "../assets/img/gallery/g-couple.jpg",
-      "../assets/img/gallery/g-venue.jpg",
-      "../assets/img/gallery/g-moon.jpg",
+      { src: "../assets/img/gallery-mm/g1.jpg", thumb: "../assets/img/gallery-mm/t1.jpg", w: 2, h: 3 },
+      { src: "../assets/img/gallery-mm/g2.jpg", thumb: "../assets/img/gallery-mm/t2.jpg", w: 2, h: 3 },
+      { src: "../assets/img/gallery-mm/g3.jpg", thumb: "../assets/img/gallery-mm/t3.jpg", w: 3, h: 2 },
+      { src: "../assets/img/gallery-mm/g4.jpg", thumb: "../assets/img/gallery-mm/t4.jpg", w: 2, h: 3 },
+      { src: "../assets/img/gallery-mm/g5.jpg", thumb: "../assets/img/gallery-mm/t5.jpg", w: 3, h: 2 },
+      { src: "../assets/img/gallery-mm/g6.jpg", thumb: "../assets/img/gallery-mm/t6.jpg", w: 3, h: 2 },
+      { src: "../assets/img/gallery-mm/g7.jpg", thumb: "../assets/img/gallery-mm/t7.jpg", w: 3, h: 2 },
+      { src: "../assets/img/gallery-mm/g8.jpg", thumb: "../assets/img/gallery-mm/t8.jpg", w: 3, h: 2 },
+      { src: "../assets/img/gallery-mm/g9.jpg", thumb: "../assets/img/gallery-mm/t9.jpg", w: 3, h: 2 },
+      { src: "../assets/img/gallery-mm/g10.jpg", thumb: "../assets/img/gallery-mm/t10.jpg", w: 2, h: 3 },
+      { src: "../assets/img/gallery-mm/g11.jpg", thumb: "../assets/img/gallery-mm/t11.jpg", w: 3, h: 2 },
     ],
   },
 
   // ⑨ Page 7 — ကျေးဇူးတင်လွှာ
   page7: {
-    head: "မင်္ဂလာ ဖိတ်စာ",
+    head: "မင်္ဂလာဦးဆွမ်းကျွေး",
     title: "ကျေးဇူးတင်လွှာ",
-    message: "ကျွန်ုပ်တို့၏ မင်္ဂလာပွဲသို့\nဖိတ်ကြားချက်ကို လေးစားစွာ လက်ခံ၍\nတက်ရောက်ပေးကြသော ချစ်ခင်ရသူများအား\nအထူး ကျေးဇူးတင်ရှိပါသည်။",
+    message: "ကျွန်ုပ်တို့၏ မင်္ဂလာဦးဆွမ်းကျွေးသို့\nဖိတ်ကြားချက်ကို လေးစားစွာ လက်ခံ၍\nကြွရောက်ပေးကြသော ချစ်ခင်ရသူများအား\nအထူး ကျေးဇူးတင်ရှိပါသည်။",
     next: "ဖိတ်စာ ပိတ်မည်",
   },
 

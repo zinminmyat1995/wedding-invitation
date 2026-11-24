@@ -4,16 +4,17 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#3a0d0d">
-  <title>မင်္ဂလာ ဖိတ်ကြားလွှာ</title>
-  <meta name="description" content="မင်္ဂလာအခမ်းအနားသို့ ဖိတ်ကြားအပ်ပါသည်">
-  <meta property="og:title" content="မင်္ဂလာ ဖိတ်ကြားလွှာ">
-  <meta property="og:description" content="မင်္ဂလာအခမ်းအနားသို့ ကြွရောက်ချီးမြှင့်ပေးပါရန် ဖိတ်ကြားအပ်ပါသည်">
+  <title>မင်္ဂလာဦးဆွမ်းကျွေး ဖိတ်ကြားလွှာ</title>
+  <meta name="description" content="မင်္ဂလာဦးဆွမ်းကျွေးသို့ ဖိတ်ကြားအပ်ပါသည် — ၂၈-၁၁-၂၀၂၆ (စနေ)၊ ဘုရားငါးဆူ စာသင်တိုက်၊ မြိတ်">
+  <meta property="og:title" content="မင်္ဂလာဦးဆွမ်းကျွေး ဖိတ်ကြားလွှာ">
+  <meta property="og:description" content="မင်္ဂလာဦးဆွမ်းကျွေးသို့ ကြွရောက်ပေးပါရန် ဖိတ်ကြားအပ်ပါသည်">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💛</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Myanmar:wght@400;600;700;800&family=Cinzel+Decorative:wght@400;700&family=Great+Vibes&display=swap" rel="stylesheet">
-  <link rel="preload" as="image" href="../assets/img/mm-home-bg.jpg">
-  <link rel="stylesheet" href="style.css?v=202611201334">
+  <link rel="preload" as="image" href="../assets/img/mm-home-bg2.jpg">
+  <link rel="preload" as="image" href="../assets/img/gallery/g-n-pagoda.jpg">
+  <link rel="stylesheet" href="style.css?v=202611240010">
 </head>
 <body>
 
@@ -40,6 +41,14 @@
         <path d="M60 58 C40 50 30 36 34 18 C46 24 56 36 60 58 Z M60 58 C80 50 90 36 86 18 C74 24 64 36 60 58 Z" fill="url(#goldGrad)"/>
         <path d="M60 58 C50 40 52 20 60 4 C68 20 70 40 60 58 Z" fill="url(#goldGrad)"/>
         <path d="M60 58 C34 56 12 46 4 30 C22 30 44 40 60 58 Z M60 58 C86 56 108 46 116 30 C98 30 76 40 60 58 Z" fill="url(#goldGrad)" opacity=".8"/>
+      </symbol>
+      <!-- gilded corner scroll for the gallery frame (top-left; mirrored in CSS) -->
+      <symbol id="mgCorner" viewBox="0 0 64 64">
+        <path d="M5 60 V16 Q5 5 16 5 H60" fill="none" stroke="url(#goldGrad)" stroke-width="3.4"/>
+        <path d="M12 54 V21 Q12 12 21 12 H54" fill="none" stroke="url(#goldGrad)" stroke-width="1.4"/>
+        <path d="M16 16 C30 14 34 24 27 30 C21 35 13 28 19 23 C23 20 27 24 24 26" fill="none" stroke="url(#goldGrad)" stroke-width="2.4" stroke-linecap="round"/>
+        <path d="M34 5 C40 -1 48 -1 52 5 C46 9 40 9 34 5 Z M5 34 C-1 40 -1 48 5 52 C9 46 9 40 5 34 Z" fill="url(#goldGrad)"/>
+        <circle cx="5" cy="5" r="4.6" fill="url(#goldGrad)" stroke="#7a1e08" stroke-width="1"/>
       </symbol>
       <symbol id="butterfly" viewBox="-50 -40 100 80">
         <g class="wing wing-l">
@@ -77,7 +86,7 @@
         <p class="gt-main" id="introTitle">မင်္ဂလာ ဖိတ်စာ</p>
       </div>
       <div class="gate-floor">
-        <p class="gf-kicker" id="introKicker">မင်္ဂလာဆောင် ဖိတ်ကြားစာ</p>
+        <p class="gf-kicker" id="introKicker">မင်္ဂလာဦးဆွမ်းကျွေး ဖိတ်ကြားလွှာ</p>
         <svg class="gf-line" viewBox="0 0 300 16" aria-hidden="true"><path d="M2 8 H130 M170 8 H298" stroke="url(#goldGrad)" stroke-width="1.4"/><path d="M150 1 L157 8 L150 15 L143 8 Z" fill="url(#goldGrad)"/><circle cx="136" cy="8" r="2" fill="#f6d98b"/><circle cx="164" cy="8" r="2" fill="#f6d98b"/></svg>
         <p class="gf-names"><span id="introGroom"></span><em>နှင့်</em><span id="introBride"></span></p>
         <svg class="gf-swirl" viewBox="0 0 400 40" aria-hidden="true">
@@ -104,9 +113,9 @@
 
     <!-- ---------- PAGE 1 : HOME ---------- -->
     <section class="page page-home active" data-page="home" aria-label="ပင်မစာမျက်နှာ">
-      <div class="art-backdrop" style="--art:url('../assets/img/mm-home-bg.jpg')" aria-hidden="true"></div>
+      <div class="art-backdrop" style="--art:url('../assets/img/mm-home-bg2.jpg')" aria-hidden="true"></div>
       <div class="stage art-stage home-stage" id="homeStage">
-        <img class="stage-bg" src="../assets/img/mm-home-bg.jpg" alt="" draggable="false">
+        <img class="stage-bg" src="../assets/img/mm-home-bg2.jpg" alt="" draggable="false">
         <span class="h-sun" aria-hidden="true"></span>
 
 
@@ -216,7 +225,7 @@
         <div class="tp-chrome"></div>
         <p class="p5-title" id="p5Title"></p>
         <p class="p5-addr" id="p5Addr"></p>
-        <a class="p5-photo" id="p5Photo" target="_blank" rel="noopener" aria-label="Royal Myeik Hotel"><img src="../assets/img/venue-hotel.jpg" alt="Royal Myeik Hotel"></a>
+        <a class="p5-photo" id="p5Photo" target="_blank" rel="noopener" aria-label="ဆွမ်းကျွေး နေရာ"><img id="p5PhotoImg" src="../assets/img/gallery/g-n-pagoda.jpg" alt=""></a>
         <a class="p5-map" id="p5Map" target="_blank" rel="noopener" aria-label="မြေပုံ ဖွင့်ရန်"><span class="p5-map-frame"></span></a>
         <button class="p5-btn pb5-1" id="p5Dir" type="button"><span class="p5-btn-label" id="p5DirLabel"></span></button>
         <a class="p5-btn pb5-2" id="p5Gmap" target="_blank" rel="noopener"><span class="p5-btn-label" id="p5GmapLabel"></span></a>
@@ -227,20 +236,17 @@
 
     <!-- ---------- PAGE 6 : PHOTO GALLERY (tab 4) ---------- -->
     <section class="page tabpage tabnew page-p6" data-page="p6" data-tab="3" aria-label="ဓာတ်ပုံများ">
-      <div class="art-backdrop" style="--art:url('../assets/img/mm-p6-bg.jpg')" aria-hidden="true"></div>
+      <div class="art-backdrop" style="--art:url('../assets/img/mm-p6-bg2.jpg')" aria-hidden="true"></div>
       <div class="stage art-stage" id="p6Stage">
-        <img class="stage-bg" src="../assets/img/mm-p6-bg.jpg" alt="" draggable="false">
+        <img class="stage-bg" src="../assets/img/mm-p6-bg2.jpg" alt="" draggable="false">
         <div class="tp-chrome"></div>
         <p class="p6-title" id="p6Title"></p>
-        <div class="gv" id="gv" aria-live="polite">
-          <img class="gv-img cur" alt="">
-          <img class="gv-img nxt" alt="">
-          <span class="gv-shine" aria-hidden="true"></span>
-        </div>
-        <button class="gv-nav gv-prev" type="button" aria-label="ရှေ့ပုံ"></button>
-        <button class="gv-nav gv-next" type="button" aria-label="နောက်ပုံ"></button>
-        <div class="gv-thumbs" id="gvThumbs"></div>
-        <div class="gv-dots" id="gvDots"></div>
+        <!-- 3D coverflow: big photo in the middle, the others peek from both sides -->
+        <div class="mg" id="mg"><div class="mg-flow" id="mgFlow"></div></div>
+        <button class="mg-nav mg-prev" type="button" aria-label="ရှေ့ပုံ"><svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button class="mg-nav mg-next" type="button" aria-label="နောက်ပုံ"><svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="mg-dots" id="mgDots"></div>
+        <p class="mg-count" id="mgCount"></p>
         <button class="gold-pill p6-next" type="button" data-go="p7"><span id="p6NextLabel"></span></button>
         <div class="butterflies" aria-hidden="true"></div>
       </div>
@@ -249,9 +255,9 @@
 
     <!-- ---------- PAGE 7 : THANK-YOU LETTER ---------- -->
     <section class="page page-p7" data-page="p7" aria-label="ကျေးဇူးတင်လွှာ">
-      <div class="art-backdrop" style="--art:url('../assets/img/mm-p7-bg.jpg')" aria-hidden="true"></div>
+      <div class="art-backdrop" style="--art:url('../assets/img/mm-p7-bg2.jpg')" aria-hidden="true"></div>
       <div class="stage art-stage" id="p7Stage">
-        <img class="stage-bg" src="../assets/img/mm-p7-bg.jpg" alt="" draggable="false">
+        <img class="stage-bg" src="../assets/img/mm-p7-bg2.jpg" alt="" draggable="false">
         <span class="p7-sun" aria-hidden="true"></span>
         <span class="p7-flame" aria-hidden="true"></span>
         <button class="tp-round tp-back" type="button" data-back aria-label="နောက်သို့"></button>
@@ -291,6 +297,15 @@
     </section>
   </main>
 
+  <!-- credit line — shown on every inside page (not on the opening gate or the closing doors) -->
+  <p class="credit" aria-label="Created by Zin Min Myat">Created with <span aria-hidden="true">♥</span> by <b>Zin Min Myat</b></p>
+
+  <!-- full-screen photo (tap the middle photo in the gallery) -->
+  <div class="mg-viewer" id="mgViewer" aria-hidden="true">
+    <div class="mgv-frame"><img id="mgViewerImg" alt=""></div>
+    <button class="mgv-close" id="mgViewerClose" type="button" aria-label="ပိတ်ရန်">✕</button>
+  </div>
+
   <!-- ============ MENU ============ -->
   <nav class="menu" id="menu" aria-label="မီနူး" aria-hidden="true">
     <button class="menu-close" type="button" aria-label="ပိတ်ရန်">✕</button>
@@ -313,10 +328,9 @@
     <div class="gd-ticket" id="gdTicket">
       <button class="gd-close" type="button" data-gclose aria-label="ပိတ်ရန်">✕</button>
 
-      <!-- top: hotel photo + logo -->
+      <!-- top: venue photo -->
       <div class="gd-hero">
-        <img class="gd-hero-img" src="../assets/img/venue-hotel.jpg" alt="Royal Myeik Hotel">
-        <img class="gd-logo" src="../assets/img/venue-hotel-logo.jpg" alt="">
+        <img class="gd-hero-img" id="gdHeroImg" src="../assets/img/gallery/g-n-pagoda.jpg" alt="">
         <span class="gd-hero-shine" aria-hidden="true"></span>
       </div>
 
@@ -332,7 +346,7 @@
             <animateMotion dur="3.2s" repeatCount="indefinite" rotate="0" keyPoints="0;1" keyTimes="0;1" calcMode="spline" keySplines=".45 0 .55 1"><mpath href="#gdArc"/></animateMotion></g>
           <circle cx="8" cy="46" r="4" fill="#b8862b"/><circle cx="192" cy="46" r="5" fill="#8f1d1d"/>
         </svg>
-        <div class="gd-end gd-to"><span class="gd-code">RM</span><span class="gd-sub" id="gdToName"></span></div>
+        <div class="gd-end gd-to"><span class="gd-code" id="gdCode"></span><span class="gd-sub" id="gdToName"></span></div>
       </div>
 
       <div class="gd-fields">
@@ -387,7 +401,7 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="config.js?v=202611201334"></script>
-  <script src="app.js?v=202611201334"></script>
+  <script src="config.js?v=202611240010"></script>
+  <script src="app.js?v=202611240010"></script>
 </body>
 </html>

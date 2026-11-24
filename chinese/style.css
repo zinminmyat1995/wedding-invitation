@@ -1,0 +1,226 @@
+/* =========================================================
+   中文版 — the artwork itself, brought to life
+   artwork 1199 × 1312 · layers are placed in % of that
+   ========================================================= */
+:root {
+  --cal: "Ma Shan Zheng", "STKaiti", "KaiTi", serif;
+  --serif: "Noto Serif SC", "Songti SC", serif;
+  --latin: "Cinzel", Georgia, serif;
+  --script: "Pinyon Script", cursive;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-t: env(safe-area-inset-top, 0px);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; background: #e9c9a6; }
+body { font-family: var(--serif); color: #5a1a0c; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+
+.page { position: fixed; inset: 0; overflow: hidden; visibility: hidden; }
+.page.on { visibility: visible; }
+
+/* ---------- page 1 ---------- */
+.backdrop { position: absolute; inset: -60px; background: url("img/cn-bg.jpg") center / cover; filter: blur(22px) saturate(1.05); transform: scale(1.15); }
+.backdrop::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 50%, rgba(255, 244, 228, .25), rgba(255, 236, 214, .45)); }
+.sky { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+/* full-screen on phones: the artwork sits in a tall scene (1199 × 2400) that covers the screen;
+   on wide screens the scene is capped so the whole artwork stays visible */
+.p1 .stage {
+  position: absolute; left: 50%; top: 50%;
+  width: min(max(100vw, 100vh * 1199 / 2400), 100vh * 1199 / 1312);
+  width: min(max(100vw, 100dvh * 1199 / 2400), 100dvh * 1199 / 1312);
+  aspect-ratio: 1199 / 2400;
+  transform: translate(-50%, -50%);
+  container-type: inline-size;
+}
+.art { position: absolute; left: 0; top: 22.6667%; width: 100%; height: 54.6667%; container-type: inline-size; }
+.bg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
+.layer { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.lay { position: absolute; pointer-events: none; }
+.lay img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; -webkit-user-drag: none; }
+
+/* the two painted dragons breathe and shimmer */
+.drgL img { transform-origin: 45% 70%; animation: floatL 6.4s ease-in-out infinite, glint 5s ease-in-out infinite; }
+.drgR img { transform-origin: 60% 60%; animation: floatR 7.2s ease-in-out -2s infinite, glint 5.6s ease-in-out -2.5s infinite; }
+@keyframes floatL { 0%, 100% { transform: translate(0, 0) rotate(0); } 50% { transform: translate(.25%, -1.1%) rotate(-.7deg) scale(1.006); } }
+@keyframes floatR { 0%, 100% { transform: translate(0, 0) rotate(0); } 50% { transform: translate(-.4%, -1.4%) rotate(.8deg) scale(1.008); } }
+@keyframes glint { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.12) drop-shadow(0 0 .6cqw rgba(255, 210, 120, .55)); } }
+.drg { transition: opacity .25s ease; }
+.p1.awaken .drg img { animation: awaken .65s ease-in both; }
+@keyframes awaken {
+  0% { filter: brightness(1); transform: none; }
+  30% { transform: translate(.4%, -.3%) rotate(.6deg); }
+  55% { transform: translate(-.5%, .3%) rotate(-.8deg); }
+  100% { filter: brightness(1.9) drop-shadow(0 0 2cqw rgba(255, 220, 130, 1)); transform: scale(1.03); }
+}
+.p1.loose .drg { opacity: 0; }
+
+/* small glows */
+.glow { position: absolute; border-radius: 50%; pointer-events: none; transform: translate(-50%, -50%); mix-blend-mode: screen; }
+.eye { width: 3.2cqw; aspect-ratio: 1; background: radial-gradient(circle, rgba(255, 245, 200, .95), rgba(255, 170, 60, .55) 35%, rgba(255, 150, 40, 0) 70%); animation: eyeGlow 3.4s ease-in-out infinite; }
+.eyeL { left: 21.68%; top: 10.67%; }
+.eyeR { left: 76.9%; top: 19.6%; animation-delay: -1.7s; }
+@keyframes eyeGlow { 0%, 100% { opacity: .2; transform: translate(-50%, -50%) scale(.7); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); } }
+.p1.awaken .eye { animation: eyeFlash .65s ease-in both; }
+@keyframes eyeFlash { to { opacity: 1; transform: translate(-50%, -50%) scale(3.2); } }
+.p1.loose .eye { opacity: 0; transition: opacity .3s; }
+.lan { width: 20cqw; aspect-ratio: .8; background: radial-gradient(ellipse, rgba(255, 190, 100, .55), rgba(255, 110, 40, .2) 42%, rgba(255, 90, 30, 0) 70%); animation: flicker 2.7s ease-in-out infinite; }
+.lanL { left: 6%; top: 30.2%; }
+.lanR { left: 94.1%; top: 30.9%; animation-delay: -1.3s; animation-duration: 3.1s; }
+@keyframes flicker { 0%, 100% { opacity: .5; } 18% { opacity: .85; } 33% { opacity: .6; } 52% { opacity: 1; } 70% { opacity: .65; } 86% { opacity: .9; } }
+.xi { left: 50%; top: 7.62%; width: 13cqw; aspect-ratio: 1; background: radial-gradient(circle, rgba(255, 220, 140, .6), rgba(255, 200, 110, 0) 66%); animation: xiPulse 3.2s ease-in-out infinite; }
+@keyframes xiPulse { 0%, 100% { opacity: .3; transform: translate(-50%, -50%) scale(.9); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); } }
+
+/* lantern tassels sway in the breeze */
+.tas img { transform-origin: 50% 2%; }
+.tasL img { animation: sway 3.6s ease-in-out infinite; }
+.tasR img { animation: sway 4.3s ease-in-out -1.4s infinite; }
+@keyframes sway {
+  0%, 100% { transform: rotate(-2.2deg) skewX(1deg); }
+  22% { transform: rotate(2.8deg) skewX(-2.4deg); }
+  41% { transform: rotate(.6deg) skewX(-.6deg); }
+  63% { transform: rotate(3.4deg) skewX(-2.8deg); }
+  82% { transform: rotate(-.8deg) skewX(.8deg); }
+}
+.p1.flying .tas img { animation-duration: 1s; }
+
+/* the painted clouds drift and billow */
+.cl { transition: transform 1.8s cubic-bezier(.3, 0, .2, 1), opacity 1.8s ease; }
+.cl img { animation: drift 11s ease-in-out infinite alternate; transform-origin: 50% 70%; }
+.cl1 img { animation-duration: 9s; animation-delay: -3s; }
+.cl2 img { animation-duration: 13s; animation-delay: -6s; animation-name: drift2; }
+.cl3 img { animation-duration: 10s; animation-delay: -2s; }
+.cl4 img { animation-duration: 14s; animation-name: drift2; }
+.cl5 img { animation-duration: 12s; animation-delay: -7s; }
+.cl6 img { animation-duration: 8.5s; animation-delay: -4s; animation-name: drift2; }
+@keyframes drift { 0% { transform: translate(-2.6%, .4%) scale(1); opacity: .92; } 50% { opacity: 1; } 100% { transform: translate(3.2%, -1.2%) scale(1.035); opacity: .95; } }
+@keyframes drift2 { 0% { transform: translate(2.4%, -.6%) scale(1.03); opacity: 1; } 50% { opacity: .9; } 100% { transform: translate(-3%, .8%) scale(1); opacity: 1; } }
+/* the dragons' wind pushes the clouds away */
+.p1.flying .cl { transform: translate(var(--px, 0), var(--py, 0)) scale(1.15); opacity: .55; }
+
+/* enter button (the painted one) — a light sweeps across it */
+.enter { position: absolute; left: 27.5%; top: 76.2%; width: 45%; height: 10.7%; z-index: 5; }
+.en-shine { position: absolute; left: 14.8%; right: 14.8%; top: 7.5%; bottom: 25%; border-radius: 1.6cqw; overflow: hidden; pointer-events: none; mix-blend-mode: screen; transition: transform .2s; }
+.en-shine::before { content: ""; position: absolute; top: 0; bottom: 0; left: -40%; width: 26%; background: linear-gradient(100deg, transparent, rgba(255, 236, 190, .75), transparent); transform: skewX(-20deg); animation: btnShine 3.4s ease-in-out 1.4s infinite; }
+.en-shine::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: 0 0 2.4cqw rgba(255, 200, 110, .9), inset 0 0 1.4cqw rgba(255, 220, 150, .5); animation: btnGlow 2.8s ease-in-out infinite; }
+@keyframes btnShine { 0% { left: -40%; } 45%, 100% { left: 130%; } }
+@keyframes btnGlow { 0%, 100% { opacity: .2; } 50% { opacity: .85; } }
+.enter:active .en-shine { transform: scale(.97); }
+.enter:focus-visible { outline: 2px solid #fff3c4; outline-offset: -6px; border-radius: 2cqw; }
+.p1.flying .enter { pointer-events: none; }
+
+/* entrance */
+.p1.in .stage { animation: stageIn 1.6s cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes stageIn { from { opacity: 0; transform: translate(-50%, -50%) scale(1.06); filter: blur(6px); } }
+
+/* ---------- full-screen dragon layer ---------- */
+.dragon-front { position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100dvh; z-index: 50; pointer-events: none; }
+
+/* =========================================================
+   PAGE 2 (temporary)
+   ========================================================= */
+.p2-bg { position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 35%, rgba(255, 140, 80, .35), transparent 60%),
+    radial-gradient(ellipse at 50% 110%, rgba(255, 190, 90, .25), transparent 55%),
+    linear-gradient(180deg, #8e1014, #5a070a 60%, #3d0406); }
+.p2-dust { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.card { position: absolute; left: 8%; right: 8%; top: 12%; bottom: 14%; border-radius: 2cqw; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: linear-gradient(180deg, rgba(120, 12, 16, .6), rgba(70, 6, 8, .6));
+  box-shadow: inset 0 0 0 .4cqw #e9b24c, inset 0 0 0 1.2cqw rgba(90, 8, 10, .9), inset 0 0 0 1.45cqw rgba(233, 178, 76, .65), 0 2cqw 5cqw rgba(0, 0, 0, .45); color: #f7dfa6; }
+.cn-corner { position: absolute; width: 10cqw; height: 10cqw; border: .5cqw solid #e9b24c; }
+.cn-corner::after { content: ""; position: absolute; width: 4.5cqw; height: 4.5cqw; border: .45cqw solid #e9b24c; }
+.cn-corner.tl { left: -1.2cqw; top: -1.2cqw; border-right: 0; border-bottom: 0; }
+.cn-corner.tl::after { left: 1.4cqw; top: 1.4cqw; border-right: 0; border-bottom: 0; }
+.cn-corner.tr { right: -1.2cqw; top: -1.2cqw; border-left: 0; border-bottom: 0; }
+.cn-corner.tr::after { right: 1.4cqw; top: 1.4cqw; border-left: 0; border-bottom: 0; }
+.cn-corner.bl { left: -1.2cqw; bottom: -1.2cqw; border-right: 0; border-top: 0; }
+.cn-corner.bl::after { left: 1.4cqw; bottom: 1.4cqw; border-right: 0; border-top: 0; }
+.cn-corner.br { right: -1.2cqw; bottom: -1.2cqw; border-left: 0; border-top: 0; }
+.cn-corner.br::after { right: 1.4cqw; bottom: 1.4cqw; border-left: 0; border-top: 0; }
+.c-xi { font-family: var(--cal); font-size: 24cqw; line-height: 1; color: transparent; background: linear-gradient(180deg, #fff1c0, #e9b24c 50%, #a8701c); -webkit-background-clip: text; background-clip: text;
+  filter: drop-shadow(0 0 2.4cqw rgba(255, 190, 90, .7)); }
+.c-names { margin-top: 2cqw; font-family: var(--latin); font-weight: 700; font-size: 4.2cqw; letter-spacing: .06em; color: #ffe7b0; display: flex; flex-direction: column; gap: .6cqw; }
+.c-names em { font-family: var(--script); font-style: normal; font-weight: 400; font-size: 1.3em; color: #f3cd6e; line-height: .8; }
+.p2 .divider { width: 66%; }
+.c-kicker { font-weight: 700; font-size: 3.2cqw; letter-spacing: .5em; color: #e9c27a; }
+.c-date { margin-top: 1.6cqw; font-weight: 700; font-size: 5.2cqw; letter-spacing: .12em; color: #fff0c8; }
+.c-week { margin-top: .8cqw; font-size: 3.4cqw; letter-spacing: .3em; color: #f3cd6e; }
+.c-time { margin-top: 1.4cqw; font-size: 3.4cqw; letter-spacing: .14em; color: #ffe7b0; }
+.c-venue { margin-top: 3cqw; font-family: var(--latin); font-weight: 700; font-size: 3.6cqw; letter-spacing: .06em; color: #fff0c8; }
+.c-city { margin-top: .6cqw; font-size: 3cqw; letter-spacing: .3em; color: #e9c27a; }
+.c-close { margin-top: 3.6cqw; font-family: var(--cal); font-size: 7.4cqw; letter-spacing: .2em; color: #ffe3a0; text-shadow: 0 0 2cqw rgba(255, 180, 80, .7); }
+.p2.in .card { animation: cardIn 1.2s var(--ease) .2s both; }
+@keyframes cardIn { from { opacity: 0; transform: scale(.92); filter: blur(6px); } }
+.p2.in .c-xi { animation: xiIn 1.3s cubic-bezier(.2, .9, .2, 1.3) .5s both; }
+@keyframes xiIn { from { opacity: 0; transform: scale(.4) rotate(-20deg); } }
+.p2.in .c-names, .p2.in .divider { animation: fadeUp 1s var(--ease) .9s both; }
+.p2.in .c-kicker, .p2.in .c-date, .p2.in .c-week { animation: fadeUp 1s var(--ease) 1.2s both; }
+.p2.in .c-time, .p2.in .c-venue, .p2.in .c-city { animation: fadeUp 1s var(--ease) 1.45s both; }
+.p2.in .c-close { animation: fadeUp 1s var(--ease) 1.8s both; }
+.p2.in .back { animation: fadeIn2 .8s ease 1.6s both; }
+@keyframes fadeIn2 { from { opacity: 0; } }
+
+/* back button — glowing orb (same family as the English version) */
+.back { position: absolute; left: 3.5%; top: 2.2%; display: flex; flex-direction: column; align-items: center; gap: 5px; color: #fff3d6; z-index: 6; }
+.bk-orb { position: relative; display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, rgba(255, 220, 170, .35), rgba(90, 8, 10, .7) 62%);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  box-shadow: inset 0 0 0 1.5px rgba(243, 205, 110, .95), inset 0 0 0 4px rgba(60, 4, 6, .4), inset 0 0 0 5px rgba(243, 205, 110, .35), 0 4px 14px rgba(0, 0, 0, .45), 0 0 16px rgba(255, 190, 90, .45); transition: transform .25s var(--ease); }
+.bk-orb svg { width: 24px; height: 24px; animation: bkNudge 2.8s ease-in-out 2.5s infinite; }
+.bk-halo { position: absolute; inset: -2px; border-radius: 50%; border: 1.5px solid rgba(255, 210, 140, .85); opacity: 0; animation: bkPing 2.8s ease-out 2.2s infinite; }
+.bk-label { font-weight: 700; font-size: 11px; letter-spacing: .3em; padding: 3px 5px 3px 8px; border-radius: 99px; color: #f6d98b; background: rgba(60, 4, 6, .55); box-shadow: 0 0 0 1px rgba(243, 205, 110, .4); }
+.back:active .bk-orb { transform: scale(.9); }
+@keyframes bkNudge { 0%, 70%, 100% { transform: translateX(0); } 78% { transform: translateX(-4px); } 86% { transform: translateX(0); } 92% { transform: translateX(-2px); } }
+@keyframes bkPing { 0% { transform: scale(1); opacity: .9; } 70%, 100% { transform: scale(1.55); opacity: 0; } }
+
+/* signature (inside pages only) */
+.sig { position: absolute; z-index: 8; left: 50%; bottom: calc(6px + var(--safe-b)); transform: translateX(-50%); display: flex; align-items: center; gap: 8px; white-space: nowrap; pointer-events: none;
+  padding: 3px 14px 4px; border-radius: 999px; background: radial-gradient(ellipse, rgba(40, 2, 4, .55), rgba(40, 2, 4, 0) 72%); opacity: 0; }
+.p2.in .sig { animation: fadeIn2 1s ease 2s forwards; opacity: 1; }
+.sig-pre { font-family: "Cormorant Garamond", Georgia, serif; font-style: italic; font-size: 11.5px; letter-spacing: .14em; color: rgba(246, 222, 170, .85); }
+.sig-name { font-family: var(--script); font-size: 19px; line-height: 1; padding: 2px 2px 0; color: transparent;
+  background: linear-gradient(100deg, #e9b24c 0%, #fff1c0 30%, #d19a3a 50%, #fff1c0 70%, #e9b24c 100%); background-size: 220% 100%; -webkit-background-clip: text; background-clip: text;
+  animation: sigShine 6s ease-in-out infinite; }
+@keyframes sigShine { 0%, 100% { background-position: 100% 0; } 50% { background-position: 0 0; } }
+.sig-line { display: block; width: 22px; height: 1px; background: linear-gradient(90deg, transparent, rgba(243, 205, 110, .85)); }
+.sig-line.r { background: linear-gradient(270deg, transparent, rgba(243, 205, 110, .85)); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01s !important; animation-iteration-count: 1 !important; }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01s !important; animation-iteration-count: 1 !important; }
+}
+.p2 .stage { position: absolute; left: 50%; top: 50%; width: min(100vw * 1.06, 100dvh * 1080 / 1920); aspect-ratio: 1080 / 1920; transform: translate(-50%, -50%); container-type: inline-size; }
+
+/* where the dragons were: soft clouds roll in after they break free */
+.mist { position: absolute; pointer-events: none; border-radius: 50%; opacity: 0; transition: opacity 1s ease .15s;
+  background:
+    radial-gradient(ellipse 38% 34% at 30% 55%, rgba(255, 251, 244, .95), rgba(255, 248, 238, 0) 100%),
+    radial-gradient(ellipse 40% 36% at 62% 40%, rgba(255, 250, 242, .9), rgba(255, 246, 236, 0) 100%),
+    radial-gradient(ellipse 34% 30% at 55% 72%, rgba(250, 236, 220, .85), rgba(250, 236, 220, 0) 100%);
+  filter: blur(.6cqw); }
+.mistL { left: 4%; top: 5%; width: 26%; height: 27%; }
+.mistR { left: 73%; top: 12%; width: 22%; height: 16%; }
+.p1.loose .mist { opacity: 1; animation: mistDrift 6s ease-in-out infinite alternate; }
+@keyframes mistDrift { from { transform: translateX(-2%) scale(1); } to { transform: translateX(3%) scale(1.06); } }
+
+/* ===== v7: the tall artwork (873 × 1802) fills the phone screen ===== */
+.p1 .stage {
+  width: min(max(100vw, 100vh * 873 / 1802), 100vh * 873 / 1802);
+  width: min(max(100vw, 100dvh * 873 / 1802), 100dvh * 873 / 1802);
+  aspect-ratio: 873 / 1802;
+}
+.art { top: 0; height: 100%; }
+.eyeL { left: 20.9%; top: 23.4%; }
+.eyeR { left: 78.7%; top: 28.2%; }
+.lanL { left: 6.3%; top: 35.5%; width: 26cqw; }
+.lanR { left: 94.2%; top: 35.5%; width: 26cqw; }
+.xi { left: 49.6%; top: 21.3%; width: 17cqw; }
+.mistL { left: 3%; top: 18.9%; width: 29%; height: 18.3%; }
+.mistR { left: 73.5%; top: 23.6%; width: 26%; height: 12%; }
+.enter { left: 24.3%; top: 65.8%; width: 50.6%; height: 6.1%; }
+.en-shine { left: 10.4%; right: 9.5%; top: 9%; bottom: 9%; }

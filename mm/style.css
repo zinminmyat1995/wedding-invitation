@@ -1559,3 +1559,113 @@ button.p5-btn { border: 0; background: none; cursor: pointer; font: inherit; }
 .page-p8.reopen .p8-scene { opacity: 0; transition: opacity .6s; }
 .p8-hall { isolation: isolate; z-index: 0; }
 .p8-doors { z-index: 1; }
+
+/* =========================================================
+   PAGE 6 — gilded 3D coverflow (replaces the old main photo + thumbnails)
+   ========================================================= */
+.page-p6 .gv, .page-p6 .gv-nav, .page-p6 .gv-thumbs, .page-p6 .gv-dots { display: none; }
+.mg { position: absolute; left: 0; width: 100%; top: 17.2%; height: 53.5%; z-index: 3; touch-action: pan-y; }
+.mg-flow { position: absolute; inset: 0; perspective: 1100px; perspective-origin: 50% 45%; }
+.mg-card {
+  position: absolute; left: 50%; top: 50%; box-sizing: border-box;
+  width: var(--w); height: var(--h);
+  margin-left: calc(var(--w) / -2); margin-top: calc(var(--h) / -2);
+  padding: 1.5cqw; border-radius: 2.4cqw; cursor: pointer;
+  /* gilded frame */
+  background:
+    linear-gradient(135deg, #7c4a0c 0%, #f9e29a 18%, #c08a2a 36%, #fff3c2 50%, #b47c1e 64%, #f6d987 82%, #7c4a0c 100%);
+  box-shadow: 0 0 0 .25cqw #6b1a06, 0 2.2cqw 4cqw rgba(70, 30, 0, .45);
+  transform: translateX(var(--x)) translateZ(var(--z)) rotateY(var(--ry));
+  opacity: var(--o, 1); z-index: var(--zi); filter: brightness(var(--b, 1));
+  transition: transform .8s cubic-bezier(.2, .8, .2, 1), width .8s cubic-bezier(.2, .8, .2, 1), height .8s cubic-bezier(.2, .8, .2, 1), margin .8s cubic-bezier(.2, .8, .2, 1), opacity .6s, filter .6s, padding .6s, box-shadow .6s;
+  will-change: transform;
+}
+.mg-card.hide { visibility: hidden; }
+.mg-pic { position: relative; width: 100%; height: 100%; border-radius: 1.3cqw; overflow: hidden; background: #3a1206;
+  box-shadow: 0 0 0 .35cqw #7a1e08, 0 0 0 .6cqw #f3d27a, inset 0 0 2cqw rgba(60, 20, 0, .55); }
+.mg-pic img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; -webkit-user-drag: none; }
+.mg-shine { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(115deg, transparent 35%, rgba(255, 246, 215, .45) 50%, transparent 65%); transform: translateX(-130%); }
+.mg-c, .mg-crest { position: absolute; pointer-events: none; opacity: 0; transition: opacity .5s; overflow: visible; }
+.mg-c { width: 10cqw; height: 10cqw; filter: drop-shadow(0 .2cqw .3cqw rgba(80, 30, 0, .55)); }
+.mg-c.tl { left: -2.2cqw; top: -2.2cqw; }
+.mg-c.tr { right: -2.2cqw; top: -2.2cqw; transform: scaleX(-1); }
+.mg-c.bl { left: -2.2cqw; bottom: -2.2cqw; transform: scaleY(-1); }
+.mg-c.br { right: -2.2cqw; bottom: -2.2cqw; transform: scale(-1); }
+.mg-crest { left: 50%; top: -5.2cqw; width: 15cqw; height: 7.5cqw; transform: translateX(-50%); filter: drop-shadow(0 0 1cqw rgba(255, 210, 120, .9)) drop-shadow(0 .2cqw .2cqw rgba(90, 30, 0, .6)); }
+.mg-card.center { padding: 2.2cqw; border-radius: 3cqw;
+  box-shadow: 0 0 0 .3cqw #6b1a06, 0 0 0 .7cqw #f6d987, 0 0 4cqw rgba(255, 205, 110, .85), 0 3cqw 6cqw rgba(70, 25, 0, .55); }
+.mg-card.center .mg-c, .mg-card.center .mg-crest { opacity: 1; transition-delay: .35s; }
+.mg-card.center .mg-shine { animation: mgShine 1.3s ease .3s forwards; }
+.mg-card.center img { animation: mgKen 14s ease-in-out infinite alternate; }
+@keyframes mgShine { to { transform: translateX(130%); } }
+@keyframes mgKen { from { transform: scale(1); } to { transform: scale(1.06); } }
+/* slow golden glow breathing around the frame */
+.mg-card.center::after { content: ""; position: absolute; inset: -1.6cqw; border-radius: 4cqw; pointer-events: none; box-shadow: 0 0 3cqw rgba(255, 214, 120, .7); animation: mgGlow 3.2s ease-in-out infinite alternate; }
+@keyframes mgGlow { from { opacity: .35; } to { opacity: 1; } }
+
+.mg-nav { border: 0; padding: 0; position: absolute; z-index: 5; top: 43.9%; width: 9.4cqw; height: 9.4cqw; margin-top: -4.7cqw; border-radius: 50%;
+  display: grid; place-items: center; color: #ffe7a8; cursor: pointer;
+  background: radial-gradient(circle at 35% 30%, #9a2a10, #5a1204 70%);
+  box-shadow: 0 0 0 .35cqw #e9be62, 0 0 0 .6cqw #7a1e08, 0 .8cqw 2cqw rgba(60, 15, 0, .5); transition: transform .2s; }
+.mg-nav svg { width: 55%; height: 55%; }
+.mg-nav:active { transform: scale(.86); }
+.mg-prev { left: 2.2%; }
+.mg-next { right: 2.2%; }
+.mg-dots { position: absolute; z-index: 5; left: 50%; top: 72.2%; transform: translate(-50%, -50%); display: flex; gap: 1.6cqw; align-items: center; }
+.mg-dots button { border: 0; padding: 0; width: 2cqw; height: 2cqw; border-radius: 1cqw; background: rgba(160, 100, 30, .5); transition: width .4s var(--ease-out), background .3s; cursor: pointer; }
+.mg-dots button.on { width: 5.6cqw; background: #7a1e08; box-shadow: 0 0 1.2cqw rgba(255, 215, 130, .9); }
+.mg-count { position: absolute; z-index: 5; left: 0; right: 0; top: 74.6%; text-align: center; font-size: 3.6cqw; line-height: 1.6; color: #7a1e08; letter-spacing: .3cqw; pointer-events: none; }
+
+/* entrance: the frames fly in from deep inside the page */
+.p6-in .mg { animation: mgIn 1.4s cubic-bezier(.2, .8, .2, 1) calc(var(--d) + .3s) backwards; }
+@keyframes mgIn { from { opacity: 0; transform: translateY(6cqw) scale(.7); } }
+.p6-in .mg-nav, .p6-in .mg-dots, .p6-in .mg-count { animation: fadeIn2 .7s ease calc(var(--d) + 1.2s) backwards; }
+@keyframes fadeIn2 { from { opacity: 0; } }
+
+/* full-screen photo */
+.mg-viewer { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; padding: 5vmin;
+  background: radial-gradient(ellipse at 50% 40%, rgba(70, 20, 5, .92), rgba(20, 5, 0, .97)); opacity: 0; pointer-events: none; transition: opacity .45s; }
+.mg-viewer.open { opacity: 1; pointer-events: auto; }
+.mgv-frame { display: grid; place-items: center; width: 100%; height: 100%; }
+.mgv-frame img { max-width: 100%; max-height: 100%; border-radius: 10px; padding: 6px; background: linear-gradient(135deg, #7c4a0c, #f9e29a 30%, #b47c1e 60%, #f6d987); box-shadow: 0 0 40px rgba(255, 205, 110, .5); transform: scale(.85); transition: transform .5s cubic-bezier(.2, .9, .2, 1.1); }
+.mg-viewer.open .mgv-frame img { transform: none; }
+.mgv-close { border: 0; position: absolute; top: calc(14px + env(safe-area-inset-top)); right: 14px; width: 44px; height: 44px; border-radius: 50%; color: #ffe7a8; font-size: 20px; background: #5a1204; box-shadow: 0 0 0 2px #e9be62; cursor: pointer; }
+
+/* Page 8 — keep "ကျေးဇူးတင်ပါသည်" sharp on phones:
+   after the pull-back the stage is no longer animated (re-rastered at 1×),
+   and the title gets a crisp dark edge instead of a wide soft glow */
+.page-p8.p8-settled .art-stage { animation: none !important; will-change: auto; }
+.page-p8.p8-settled.walk .art-stage { transform: translate(-50%, -50%) scale(3.6) !important; }
+.p8-main {
+  background: linear-gradient(180deg, #fffdf0 0%, #ffe9b0 40%, #f4c25a 72%, #fff3c8 100%);
+  -webkit-background-clip: text; background-clip: text;
+  filter: drop-shadow(0 .22cqw .12cqw rgba(70, 12, 0, .9)) drop-shadow(0 0 .7cqw rgba(255, 196, 100, .55));
+  -webkit-font-smoothing: antialiased; text-rendering: geometricPrecision;
+}
+.p8-in .p8-main { will-change: auto; }
+
+/* Home — slightly smaller title on the plaque */
+.ht-main { font-size: 5.5cqw; }
+
+/* Page 5 — show the venue photo at once (no reveal from an empty circle,
+   so the artwork's old placeholder picture never flashes) */
+.p5-in .p5-photo, .page-p5 .p5-photo { animation: none !important; clip-path: none !important; }
+.page-p5 .p5-photo { background: #e9cf96; }
+
+/* credit line */
+.credit {
+  position: fixed; z-index: 45; left: 50%; bottom: calc(3px + env(safe-area-inset-bottom));
+  transform: translateX(-50%); margin: 0; pointer-events: none; white-space: nowrap;
+  font-family: Georgia, "Times New Roman", serif; font-size: 10.5px; letter-spacing: .08em; line-height: 1.6;
+  color: rgba(255, 236, 190, .92); text-shadow: 0 0 4px rgba(60, 15, 0, .9), 0 1px 2px rgba(60, 15, 0, .8);
+  padding: 1px 10px; border-radius: 99px; background: rgba(70, 20, 5, .28);
+  opacity: 0; transition: opacity .6s ease;
+}
+.credit span { color: #ff9b8a; }
+.credit b { font-weight: 700; color: #ffe3a0; }
+body.app-open .credit { opacity: 1; transition-delay: 1.2s; }
+body.app-open[data-page="p8"] .credit { opacity: 0; transition-delay: 0s; }
+
+/* buttons a little higher, clear of the credit line */
+.page-p6 .p6-next { top: 89.6% !important; }
+.page-p7 .p7-next { top: 92.27% !important; }
