@@ -336,17 +336,19 @@
     g.globalCompositeOperation = "lighter"; g.fillStyle = rg; g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill(); g.globalCompositeOperation = "source-over";
   }
 
+  const V_SWAP_ = 9.35;
   /* ---------- the transition ----------
      1. each painted dragon glows, trembles and slithers out of the picture,
         diving down into the sea of clouds (drawn from the painted dragon itself)
      2. at that very spot the real 3D dragon (img/dragon.mp4, keyed: black → transparent)
         rises back out of the clouds and coils round the moon gate exactly as in the clip
      3. its body sweeps past the camera → page 2 */
-  const AWAKE = 0.7, RATE = 1.1;
-  const V0 = 0.75, V_SWAP = 9.35, V_END = 10.45, V_RFADE = 8.2;   // times inside the clip
+  const AWAKE = 0.05, SFX_DELAY = 1, SFX_FADE = 1.8;   // dragon sound: starts 1 s after the tap, fades in
+  let SFX_LEN = 12.18, RATE = (V_SWAP_ - 0.75) / (SFX_DELAY + SFX_LEN);   // the clip reaches the camera exactly when the dragon sound ends
+  const V0 = 0.75, V_SWAP = V_SWAP_, V_END = 10.45, V_RFADE = 8.2;   // times inside the clip
   const EMERGE = { fx: 0.47, fy: 0.95 };    // where the clip's dragon rises from (fraction of its frame)
   const KW = 640, KH = 360;
-  const mkV = () => { const v = document.createElement("video"); v.src = "img/dragon.mp4"; v.muted = true; v.playsInline = true; v.setAttribute("playsinline", ""); v.preload = "auto"; v.playbackRate = RATE; return v; };
+  const mkV = () => { const v = document.createElement("video"); v.src = "img/dragon.mp4"; v.muted = true; v.playsInline = true; v.setAttribute("playsinline", ""); v.preload = "auto"; v.defaultPlaybackRate = RATE; v.playbackRate = RATE; return v; };
   DRAG[0].delay = 0; DRAG[0].cx = 0.35; DRAG[0].mirror = false;
   DRAG[1].delay = 0.75; DRAG[1].cx = 0.65; DRAG[1].mirror = true;
   DRAG.forEach((d) => { d.v = mkV(); d.c = document.createElement("canvas"); d.c.width = KW; d.c.height = KH; d.g = d.c.getContext("2d", { willReadFrequently: true }); d.v.load(); });
@@ -396,11 +398,38 @@
   }
 
   let flying = false, tFly = 0, swapped = false, loosed = false;
+  // the dragons' roar / wing sound: starts with the tap, and when it ends we are on page 2
+  const sfx = new Audio("music/dragon.mp3?v=2"); sfx.preload = "auto";
+  sfx.addEventListener("loadedmetadata", () => { if (isFinite(sfx.duration) && sfx.duration > 1) { SFX_LEN = sfx.duration; RATE = (V_SWAP_ - 0.75) / (SFX_DELAY + SFX_LEN); DRAG.forEach((d) => { d.v.defaultPlaybackRate = RATE; d.v.playbackRate = RATE; }); } });
+  let sfxOn = false, sfxCtx = null, sfxGain = null;
+  sfx.addEventListener("ended", () => { if (flying && !swapped) { swapped = true; showPage2(); } });
   function startFlight() {
     if (flying) return;
     flying = true; tFly = 0; swapped = false; loosed = false; haze.length = 0; puffs.length = 0;
     resize(); buildDives();
-    p1.classList.add("awaken");
+    // dragon sound: unlocked inside the tap (silent), started 1 s later, fading in.
+    // The fade goes through Web Audio, because iPhones ignore audio.volume.
+    sfxOn = false;
+    try {
+      if (!sfxCtx) { const AC = window.AudioContext || window.webkitAudioContext; if (AC) { sfxCtx = new AC(); sfxGain = sfxCtx.createGain(); sfxCtx.createMediaElementSource(sfx).connect(sfxGain); sfxGain.connect(sfxCtx.destination); } }
+      if (sfxCtx && sfxCtx.state === "suspended") sfxCtx.resume();
+    } catch (e) { sfxCtx = null; }
+    const setVol = (v) => { if (sfxGain) sfxGain.gain.value = v; else sfx.volume = v; };
+    setVol(0); try { sfx.currentTime = 0; } catch (e) {}
+    const sp = sfx.play(); if (sp) sp.then(() => { if (!sfxOn) { sfx.pause(); try { sfx.currentTime = 0; } catch (e) {} } }).catch(() => {});
+    clearTimeout(startFlight.sfxT);
+    startFlight.sfxT = setTimeout(() => {
+      if (!flying) return;
+      try { sfx.currentTime = 0; } catch (e) {}
+      setVol(0);
+      const p = sfx.play();
+      const fadeIn = () => {
+        sfxOn = true;
+        if (sfxGain) { const t = sfxCtx.currentTime; sfxGain.gain.cancelScheduledValues(t); sfxGain.gain.setValueAtTime(0, t); sfxGain.gain.linearRampToValueAtTime(1, t + SFX_FADE); }
+        else { const t0 = performance.now(); const st = (n) => { const k = Math.min(1, (n - t0) / (SFX_FADE * 1000)); sfx.volume = k; if (k < 1) requestAnimationFrame(st); }; requestAnimationFrame(st); }
+      };
+      if (p) p.then(fadeIn).catch(() => {}); else fadeIn();
+    }, (AWAKE + SFX_DELAY) * 1000);
     // start (and pause) both clips inside the tap, so phones allow playback later
     DRAG.forEach((d) => { d.out = false; d.vOn = false; d.done = false; try { d.v.currentTime = V0; } catch (e) {} const pr = d.v.play(); if (pr) pr.then(() => { if (!d.vOn) d.v.pause(); }).catch(() => {}); });
     startMusic();
@@ -413,7 +442,7 @@
     gDF.setTransform(1, 0, 0, 1, 0, 0); gDF.clearRect(0, 0, cvDF.width, cvDF.height);
     const toArt = (g) => g.setTransform(DPR * K, 0, 0, DPR * K, DPR * SR.left, DPR * SR.top);
     const exp = 0.7 / (K * DPR);
-    if (u >= 0 && !loosed) { loosed = true; p1.classList.add("loose", "flying"); windTarget = 3; }
+    if (u >= 0 && !loosed) { loosed = true; p1.classList.add("flying"); windTarget = 3; }
     if (u < 0) return;
     let alive = false;
 
@@ -422,6 +451,7 @@
     DRAG.forEach((d) => {
       const ud = u - d.delay;
       if (ud < 0) { alive = true; return; }
+      return;                    // the painted dragons stay as they are; only the real 3D dragons fly
       if (!d.out) {
         d.out = true; p1.classList.add(d.mirror ? "looseR" : "looseL");
         for (let k = 0; k < 10; k++) puffs.push({ x: d.anchor.x + rnd(-110, 110), y: d.anchor.y + rnd(-40, 150), r: rnd(50, 120), vx: rnd(-70, 70), vy: rnd(-50, 50), life: rnd(1.1, 1.8), age: 0 });
@@ -451,9 +481,9 @@
     gDF.setTransform(DPR, 0, 0, DPR, 0, 0);
     DRAG.forEach((d) => {
       const ud = u - d.delay;
-      if (d.done || ud < d.diveT - 0.25) return;
+      if (d.done || ud < 0) return;
       alive = true;
-      if (!d.vOn) { d.vOn = true; try { d.v.currentTime = V0; } catch (e) {} d.v.play().catch(() => {}); }
+      if (!d.vOn) { d.vOn = true; try { d.v.currentTime = V0; } catch (e) {} d.v.playbackRate = RATE; d.v.play().catch(() => {}); }
       const vt = d.v.currentTime;
       if (vt >= V_END || d.v.ended || (d.mirror && vt >= V_RFADE + 0.7)) { d.done = true; d.v.pause(); return; }
       if (d.v.readyState < 2) return;
@@ -469,7 +499,7 @@
       if (d.mirror) gDF.scale(-1, 1);
       gDF.drawImage(src, -bw / 2, -bh / 2, bw, bh);
       gDF.restore();
-      if (!d.mirror && !swapped && vt >= V_SWAP) { swapped = true; showPage2(); }
+      if (!d.mirror && !swapped && (sfxOn ? vt >= V_SWAP + 0.8 : vt >= V_SWAP)) { swapped = true; showPage2(); }   // normally the sound's end switches the page
     });
     if (!alive) endFlight();
   }
@@ -483,6 +513,7 @@
 
   /* ---------- pages ---------- */
   function showPage2(push = true) {
+    playMusic();
     p1.classList.remove("on", "in", "flying", "awaken");
     p1.setAttribute("aria-hidden", "true");
     p2.classList.add("on"); p2.removeAttribute("aria-hidden");
@@ -497,7 +528,7 @@
     void p1.offsetWidth; p1.classList.add("in");
     setTimeout(resize, 1700);
   }
-  $("#enterBtn").addEventListener("click", () => { if (reduce) { showPage2(); return; } startFlight(); });
+  $("#enterBtn").addEventListener("click", () => { unlockMusic(); if (reduce) { showPage2(); return; } startFlight(); });
   $("#backBtn").addEventListener("click", () => (history.state && history.state.p === 2 ? history.back() : showPage1()));
   addEventListener("popstate", () => { if (p3.classList.contains("on")) { closePage3(); return; } if (p2.classList.contains("on") && !flying) showPage1(); });
 
@@ -603,61 +634,41 @@
   }
 
   /* =========================================================
-     PAGE 3 — Our Story: photos on the left, the story on the right.
-     On phones the page is taller than it is wide, so it pans sideways:
-     it opens on the photos, glides over to the story, and can be dragged.
+     PAGE 3 — Our Story: the artwork fills the page box (no side scrolling);
+     the story can be read in 中文 / မြန်မာ / English
   ========================================================= */
-  const p3 = $("#p3"), pan3 = $("#pan3"), st3 = $("#st3"), stText = $("#stText"), panHint = $("#panHint");
+  const p3 = $("#p3"), st3 = $("#st3"), stText = $("#stText");
   const STORY = C.story || {};
+  const OS_W = 851, OS_H = 1848;
   let lang = "cn";
+  // size the stage from the page box itself (dvh is unreliable in some phone browsers)
+  function fitStory() {
+    const W = p3.clientWidth || innerWidth, H = p3.clientHeight || innerHeight, r = OS_W / OS_H;
+    let w = Math.max(W, H * r);                          // cover: full width and full height
+    if (W / H > r * 1.35) w = H * r;                     // wide screens: show the whole artwork
+    st3.style.width = `${w}px`; st3.style.height = `${w / r}px`;
+  }
   function renderStory() {
     const paras = STORY[lang] || [];
     let i = 0;
-    stText.className = "st-text" + (lang === "en" ? " en" : "");
-    stText.innerHTML = paras.map((p, k) => (p === "*" ? `<i class="orn" style="--i:${i++}"></i>` : `<p style="--i:${i++}">${lang === "en" ? p.replace(/\n/g, " ") : p.replace(/\n/g, "<br>")}</p>`)).join("");
+    stText.className = "st-text" + (lang === "cn" ? "" : " " + lang);
+    stText.innerHTML = paras.map((p) => (p === "*" ? `<i class="orn" style="--i:${i++}"></i>` : `<p style="--i:${i++}">${lang === "en" ? p.replace(/\n/g, " ") : p.replace(/\n/g, "<br>")}</p>`)).join("");
     stText.scrollTop = 0;
     void stText.offsetWidth; stText.classList.add("show");
   }
-  document.querySelectorAll(".lang button").forEach((b) => b.addEventListener("click", () => {
+  document.querySelectorAll("#p3 .lang button").forEach((b) => b.addEventListener("click", () => {
     if (b.dataset.l === lang) return;
     lang = b.dataset.l;
-    document.querySelectorAll(".lang button").forEach((x) => x.classList.toggle("on", x === b));
+    document.querySelectorAll("#p3 .lang button").forEach((x) => x.classList.toggle("on", x === b));
     renderStory();
   }));
-  // sideways pan
-  let panX = 0, panMin = 0, panAnim = null;
-  function panBounds() {
-    const w = st3.getBoundingClientRect().width, extra = Math.max(0, w - innerWidth);
-    panMin = -extra / 2;                                    // pan offsets measured from the centred position
-    p3.classList.toggle("no-pan", extra < 2);
-    return extra / 2;
-  }
-  const setPan = (x) => { const max = panBounds(); panX = Math.max(-max, Math.min(max, x)); pan3.style.setProperty("--pan", `${panX}px`); };
-  function glideTo(x, ms = 1400) {
-    cancelAnimationFrame(panAnim);
-    const from = panX, t0 = performance.now();
-    const step = (t) => { const k = Math.min(1, (t - t0) / ms), e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2; setPan(from + (x - from) * e); if (k < 1) panAnim = requestAnimationFrame(step); };
-    panAnim = requestAnimationFrame(step);
-  }
-  {
-    let sx = null, s0 = 0, moved = false;
-    p3.addEventListener("pointerdown", (e) => { if (e.target.closest("button, .st-text")) return; sx = e.clientX; s0 = panX; moved = false; cancelAnimationFrame(panAnim); clearTimeout(p3.autoT); });
-    addEventListener("pointermove", (e) => { if (sx === null) return; const d = e.clientX - sx; if (Math.abs(d) > 4) moved = true; setPan(s0 + d); if (moved) panHint.classList.add("off"); });
-    addEventListener("pointerup", () => { if (sx === null) return; sx = null; const max = panBounds(); if (max > 1) glideTo(panX > 0 ? max : -max, 450); });
-    // horizontal swipes inside the text still pan the page
-    let tx = null, ty = 0;
-    stText.addEventListener("touchstart", (e) => { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
-    stText.addEventListener("touchend", (e) => { if (tx === null) return; const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty; tx = null; if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.3) { const max = panBounds(); glideTo(dx > 0 ? max : -max, 450); } });
-  }
-  addEventListener("resize", () => { if (p3.classList.contains("on")) setPan(panX); });
+  addEventListener("resize", () => { if (p3.classList.contains("on")) fitStory(); });
   function showPage3(push = true) {
     p2.classList.remove("on", "in"); p2.setAttribute("aria-hidden", "true");
     p3.classList.add("on"); p3.removeAttribute("aria-hidden");
+    fitStory();
     p3.classList.remove("in"); void p3.offsetWidth; p3.classList.add("in");
     renderStory();
-    panHint.classList.remove("off");
-    const max = panBounds(); setPan(max);                   // open on the photos (left side)…
-    clearTimeout(p3.autoT); p3.autoT = setTimeout(() => glideTo(-max, 1600), 2600);   // …then glide to the story
     if (push) history.pushState({ p: 3 }, "", "#story");
   }
   function closePage3() {
@@ -700,24 +711,39 @@
   }
   requestAnimationFrame(loop);
 
-  /* ---------- music: starts as soon as the browser allows ---------- */
+  /* ---------- music: 青花瓷 starts the moment page 2 appears and loops ----------
+     Phones only let sound start from a tap, so the tap on 进入邀请函 "unlocks" the
+     player (play + pause, silent); when page 2 appears it plays from the start. */
   const audio = $("#bgm");
-  let started = false;
-  function startMusic() {
-    if (started || !C.music) return; started = true;
-    audio.src = C.music; audio.volume = 0;
-    audio.play().then(() => {
-      const t0 = performance.now();
-      const stp = (t) => { audio.volume = Math.max(0, Math.min(0.7, (t - t0) / 2500 * 0.7)); if (audio.volume < 0.7) requestAnimationFrame(stp); };
-      requestAnimationFrame(stp);
-    }).catch(() => { started = false; });
+  audio.loop = true;
+  let unlocked = false, playing = false, wantMusic = false;
+  function unlockMusic() {
+    if (unlocked || !C.music) return;
+    unlocked = true;
+    audio.src = C.music; audio.muted = true;
+    const p = audio.play();
+    if (p) p.then(() => { if (!wantMusic) { audio.pause(); audio.currentTime = 0; } audio.muted = false; }).catch(() => { audio.muted = false; unlocked = false; });
   }
-  startMusic();
-  ["pointerdown", "touchstart", "click", "keydown", "wheel", "scroll"].forEach((ev) => addEventListener(ev, startMusic, { passive: true, capture: true }));
+  function playMusic() {
+    if (playing || !C.music) return;
+    wantMusic = true;
+    if (!audio.src) audio.src = C.music;
+    audio.muted = false; audio.volume = 0;
+    try { audio.currentTime = 0; } catch (e) {}
+    audio.play().then(() => {
+      playing = true;
+      const t0 = performance.now();
+      const stp = (t) => { audio.volume = Math.max(0, Math.min(0.75, (t - t0) / 2000 * 0.75)); if (audio.volume < 0.75) requestAnimationFrame(stp); };
+      requestAnimationFrame(stp);
+    }).catch(() => {});
+  }
+  function startMusic() { unlockMusic(); }
+  // if the browser still blocked it, the next touch anywhere after page 2 starts it
+  ["pointerdown", "touchstart", "click", "keydown"].forEach((ev) => addEventListener(ev, () => { if (wantMusic && !playing) playMusic(); }, { passive: true, capture: true }));
 
   // preview shortcuts:  ?fly  (play the dragons right away)   ?p2  (open page 2)
   if (/[?&]p2\b/.test(location.search)) showPage2(false);
   if (/[?&]story/.test(location.search)) { showPage2(false); showPage3(false); }
   if (/[?&]fly\b/.test(location.search)) setTimeout(startFlight, 1900);
-  window.__cn = { startFlight, get t() { return tFly; }, pullTo(d) { pull = Math.min(d, PULL_MAX); pullTarget = pull; sheetLayout(); } };
+  window.__cn = { get vol() { return sfxGain ? +sfxGain.gain.value.toFixed(2) : sfx.volume; }, get sfx() { return { on: sfxOn, paused: sfx.paused, t: sfx.currentTime }; }, startFlight, get t() { return tFly; }, pullTo(d) { pull = Math.min(d, PULL_MAX); pullTarget = pull; sheetLayout(); } };
 })();
