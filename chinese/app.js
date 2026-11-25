@@ -896,7 +896,7 @@
      the others peek from both sides in 3D; swipe / arrows / thumbnails
   ========================================================= */
   const p5 = $("#p5"), st5 = $("#st5"), cfEl = $("#cf"), cfFlow = $("#cfFlow"), thumbs7 = $("#thumbs7"), cfDots = $("#cfDots");
-  const GAL = (C.gallery || []).map((n) => ({ src: `../assets/img/gallery-en/g${n.n}.jpg`, thumb: `../assets/img/gallery-en/t${n.n}.jpg`, w: n.w, h: n.h }));
+  const GAL = (C.gallery || []).map((n) => ({ src: `../assets/img/gallery-cn/g${n.n}.jpg`, thumb: `../assets/img/gallery-cn/t${n.n}.jpg`, w: n.w, h: n.h }));
   let gi5 = 0;
   const cards5 = GAL.map((p, i) => {
     const el = document.createElement("div"); el.className = "cf-card"; el.dataset.i = i;

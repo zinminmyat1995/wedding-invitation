@@ -20,7 +20,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .page.on { visibility: visible; }
 
 /* ---------- page 1 ---------- */
-.backdrop { position: absolute; inset: -60px; background: url("img/cn-bg.jpg") center / cover; filter: blur(22px) saturate(1.05); transform: scale(1.15); }
+.backdrop { position: absolute; inset: -60px; background: url("img/cn-bg.jpg?v=2") center / cover; filter: blur(22px) saturate(1.05); transform: scale(1.15); }
 .backdrop::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 50%, rgba(255, 244, 228, .25), rgba(255, 236, 214, .45)); }
 .sky { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 /* full-screen on phones: the artwork sits in a tall scene (1199 × 2400) that covers the screen;

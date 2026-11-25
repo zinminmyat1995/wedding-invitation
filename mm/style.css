@@ -1669,3 +1669,12 @@ body.app-open[data-page="p8"] .credit { opacity: 0; transition-delay: 0s; }
 /* buttons a little higher, clear of the credit line */
 .page-p6 .p6-next { top: 89.6% !important; }
 .page-p7 .p7-next { top: 92.27% !important; }
+
+/* ===== names now carry မောင် / မ — keep them inside the screen ===== */
+.gf-names, .p8-names { font-size: min(5.6cqw, 6.6vw); gap: min(2.6cqw, 3vw); }
+.h-names { font-size: min(5.8cqw, 6.6vw); gap: min(3cqw, 3.4vw); }
+.h-heart { width: min(6.6cqw, 7.4vw); }
+.p2-name { font-size: 6cqw; }
+
+/* place photo: the real gate of the monastery, kept whole in the frame */
+.page-p5 .p5-photo img, .gd-hero-img { object-position: 50% 50%; }

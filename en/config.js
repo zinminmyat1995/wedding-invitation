@@ -3,8 +3,8 @@
    ========================================================= */
 window.WEDDING_EN = {
   // ⚠️ romanised from the Myanmar names on the printed card — please check the spelling
-  groom: "Wai Hlyan Soe",
-  bride: "Jue Mi Mi Aw",
+  groom: "Wai Hlyun Soe",
+  bride: "Jue Mi Mi Aww",
 
   home: {
     kicker: "You're invited to our",
@@ -113,17 +113,11 @@ window.WEDDING_EN = {
     { src: "../assets/img/gallery-en/g10.jpg", thumb: "../assets/img/gallery-en/t10.jpg", w: 2, h: 3 },
     { src: "../assets/img/gallery-en/g11.jpg", thumb: "../assets/img/gallery-en/t11.jpg", w: 2, h: 3 },
     { src: "../assets/img/gallery-en/g12.jpg", thumb: "../assets/img/gallery-en/t12.jpg", w: 3, h: 2 },
-    { src: "../assets/img/gallery-en/g13.jpg", thumb: "../assets/img/gallery-en/t13.jpg", w: 3, h: 2 },
-    { src: "../assets/img/gallery-en/g14.jpg", thumb: "../assets/img/gallery-en/t14.jpg", w: 3, h: 2 },
-    { src: "../assets/img/gallery-en/g15.jpg", thumb: "../assets/img/gallery-en/t15.jpg", w: 3, h: 2 },
-    { src: "../assets/img/gallery-en/g16.jpg", thumb: "../assets/img/gallery-en/t16.jpg", w: 3, h: 2 },
-    { src: "../assets/img/gallery-en/g17.jpg", thumb: "../assets/img/gallery-en/t17.jpg", w: 2, h: 3 },
-    { src: "../assets/img/gallery-en/g18.jpg", thumb: "../assets/img/gallery-en/t18.jpg", w: 3, h: 2 },
   ],
 
   photo: "../assets/img/en-hero.jpg",
   photoTiny: "../assets/img/en-hero-tiny.jpg",
 
   // leave empty for no music, or e.g. "../assets/music/en.mp3"
-  music: "../assets/music/en.mp3",   // Lauv – I Like Me Better (loops)
+  music: "../assets/music/en.mp3?v=2",   // new song (loops)
 };

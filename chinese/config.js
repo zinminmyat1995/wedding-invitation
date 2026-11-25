@@ -2,8 +2,8 @@
    中文版 — edit the wording here
    ========================================================= */
 window.WEDDING_CN = {
-  groom: "Wai Hlyan Soe",
-  bride: "Jue Mi Mi Aw",
+  groom: "Wai Hlyun Soe",
+  bride: "Jue Mi Mi Aww",
 
   // Page 1 (opening)
   home: {
@@ -31,8 +31,8 @@ window.WEDDING_CN = {
   },
 
   // Gallery photos (chinese/img/gal — web copies of chinese/image a–p)
-  // Gallery — the same photos as the English version (assets/img/gallery-en)
-  gallery: [{ n: 1, w: 2, h: 3 }, { n: 2, w: 3, h: 2 }, { n: 3, w: 2, h: 3 }, { n: 4, w: 2, h: 3 }, { n: 5, w: 3, h: 2 }, { n: 6, w: 3, h: 2 }, { n: 7, w: 3, h: 2 }, { n: 8, w: 2, h: 3 }, { n: 9, w: 2, h: 3 }, { n: 10, w: 2, h: 3 }, { n: 11, w: 2, h: 3 }, { n: 12, w: 3, h: 2 }, { n: 13, w: 3, h: 2 }, { n: 14, w: 3, h: 2 }, { n: 15, w: 3, h: 2 }, { n: 16, w: 3, h: 2 }, { n: 17, w: 2, h: 3 }, { n: 18, w: 3, h: 2 }],
+  // Gallery — the wedding photos (originals in chinese/image/gallery, web copies in assets/img/gallery-cn)
+  gallery: [{ n: 1, w: 3, h: 2 }, { n: 2, w: 3, h: 2 }, { n: 3, w: 2, h: 3 }, { n: 4, w: 3, h: 2 }, { n: 5, w: 3, h: 2 }, { n: 6, w: 3, h: 2 }, { n: 7, w: 3, h: 2 }, { n: 8, w: 2, h: 3 }, { n: 9, w: 3, h: 2 }, { n: 10, w: 3, h: 2 }, { n: 11, w: 2, h: 3 }, { n: 12, w: 2, h: 3 }, { n: 13, w: 2, h: 3 }],
 
   // Place page (from the real invitation card)
   place: {
